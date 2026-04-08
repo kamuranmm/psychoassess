@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsychoAssess — Hesabat</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface2: #f0f2f8;
+  --border: #e2e6f0;
+  --accent: #4f46e5;
+  --accent2: #7c3aed;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* LOADING */
+#screen-loading {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:16px;
+}
+
+.spinner {
+  width:48px;height:48px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ERROR */
+#screen-error {
+  min-height:100vh;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* REPORT */
+#screen-report { display:none; }
+
+.report-topbar {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.topbar-logo {
+  font-family:'Outfit',sans-serif;
+  font-size:20px;
+  font-weight:800;
+  color:var(--accent);
+}
+
+.export-btns { display:flex; gap:10px; }
+
+.btn-export {
+  padding:9px 18px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+  border:none;
+  font-family:'Outfit',sans-serif;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+
+.btn-pdf { background:var(--danger); color:white; }
+.btn-pdf:hover { background:#b91c1c; }
+.btn-excel { background:var(--success); color:white; }
+.btn-excel:hover { background:#047857; }
+.btn-back {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:9px 18px;
+  border-radius:9px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:'Outfit',sans-serif;
+}
+
+.report-content {
+  max-width:900px;
+  margin:0 auto;
+  padding:32px 20px;
+}
+
+/* REPORT HEADER */
+.report-header {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:32px;
+  margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:relative;
+  overflow:hidden;
+}
+
+.report-header::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:4px;
+  background:linear-gradient(90deg,var(--accent),#7c3aed,#059669);
+}
+
+.report-header-left h1 {
+  font-size:26px;
+  font-weight:800;
+  margin-bottom:4px;
+}
+
+.report-header-left p {
+  color:var(--muted);
+  font-size:14px;
+}
+
+.report-header-right {
+  text-align:right;
+}
+
+.report-date {
+  font-size:13px;
+  color:var(--muted);
+  margin-bottom:4px;
+}
+
+.report-company {
+  font-size:15px;
+  font-weight:700;
+  color:var(--accent);
+}
+
+/* OVERALL SCORE */
+.overall-score-card {
+  background:linear-gradient(135deg,var(--accent),#7c3aed);
+  border-radius:16px;
+  padding:28px 32px;
+  margin-bottom:20px;
+  color:white;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.overall-label {
+  font-size:14px;
+  opacity:0.8;
+  margin-bottom:6px;
+  font-weight:500;
+}
+
+.overall-value {
+  font-family:'JetBrains Mono',monospace;
+  font-size:56px;
+  font-weight:700;
+  line-height:1;
+}
+
+.overall-sub { font-size:14px; opacity:0.7; margin-top:4px; }
+
+.sten-display {
+  text-align:right;
+}
+
+.sten-label { font-size:13px; opacity:0.8; margin-bottom:8px; }
+
+.sten-bar {
+  display:flex;
+  gap:3px;
+}
+
+.sten-dot {
+  width:24px;height:24px;
+  border-radius:6px;
+  background:rgba(255,255,255,0.2);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:10px;
+  font-weight:700;
+}
+
+.sten-dot.active { background:white; color:var(--accent); }
+
+/* SECTION CARDS */
+.section-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.section-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px;
+  position:relative;
+  overflow:hidden;
+}
+
+.section-card::after {
+  content:'';
+  position:absolute;
+  bottom:0;right:0;
+  width:60px;height:60px;
+  border-radius:50%;
+  opacity:0.08;
+}
+
+.section-card.verbal::after { background:#06b6d4; }
+.section-card.numerical::after { background:#059669; }
+.section-card.abstract::after { background:#f59e0b; }
+.section-card.personality::after { background:#a855f7; }
+.section-card.situational::after { background:#ef4444; }
+
+.section-label {
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.8px;
+  margin-bottom:10px;
+}
+
+.section-score {
+  font-family:'JetBrains Mono',monospace;
+  font-size:36px;
+  font-weight:700;
+  margin-bottom:6px;
+}
+
+.section-card.verbal .section-score { color:#06b6d4; }
+.section-card.numerical .section-score { color:#059669; }
+.section-card.abstract .section-score { color:#f59e0b; }
+.section-card.personality .section-score { color:#a855f7; }
+.section-card.situational .section-score { color:#ef4444; }
+
+.section-bar {
+  height:6px;
+  background:var(--surface2);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+
+.section-bar-fill {
+  height:100%;
+  border-radius:3px;
+  transition:width 1s ease;
+}
+
+.section-card.verbal .section-bar-fill { background:#06b6d4; }
+.section-card.numerical .section-bar-fill { background:#059669; }
+.section-card.abstract .section-bar-fill { background:#f59e0b; }
+.section-card.personality .section-bar-fill { background:#a855f7; }
+.section-card.situational .section-bar-fill { background:#ef4444; }
+
+.section-level {
+  font-size:12px;
+  font-weight:600;
+}
+
+/* ANALYSIS CARDS */
+.analysis-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:20px;
+}
+
+.analysis-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:22px;
+}
+
+.analysis-title {
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:16px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.strength-item, .weakness-item {
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid var(--surface2);
+  font-size:14px;
+}
+
+.strength-item:last-child, .weakness-item:last-child { border-bottom:none; }
+
+.strength-dot {
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--success);
+  margin-top:5px;
+  flex-shrink:0;
+}
+
+.weakness-dot {
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--danger);
+  margin-top:5px;
+  flex-shrink:0;
+}
+
+/* RECOMMENDATION */
+.recommendation-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.rec-title {
+  font-size:16px;
+  font-weight:700;
+  margin-bottom:16px;
+}
+
+.rec-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.rec-item {
+  background:var(--surface2);
+  border-radius:10px;
+  padding:14px;
+}
+
+.rec-item-title { font-size:13px; font-weight:700; margin-bottom:6px; }
+.rec-item-desc { font-size:12px; color:var(--muted); line-height:1.5; }
+
+.verdict-box {
+  border-radius:12px;
+  padding:18px 22px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+.verdict-box.suitable { background:#f0fdf4; border:1px solid #bbf7d0; }
+.verdict-box.conditional { background:#fffbeb; border:1px solid #fde68a; }
+.verdict-box.unsuitable { background:#fef2f2; border:1px solid #fecaca; }
+
+.verdict-icon { font-size:32px; }
+.verdict-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+.verdict-desc { font-size:13px; color:var(--muted); }
+
+/* SECTOR */
+.sector-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.sector-grid {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.sector-item {
+  padding:12px 14px;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.sector-item.high { background:#f0fdf4; color:var(--success); border:1px solid #bbf7d0; }
+.sector-item.mid { background:#fffbeb; color:var(--warning); border:1px solid #fde68a; }
+.sector-item.low { background:#f8fafc; color:var(--muted); border:1px solid var(--border); }
+
+/* TRAINING */
+.training-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.training-list {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
+}
+
+.training-item {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 16px;
+  background:var(--surface2);
+  border-radius:10px;
+  font-size:14px;
+}
+
+.training-priority {
+  font-size:10px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:4px;
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+}
+
+.priority-high { background:#fef2f2; color:var(--danger); }
+.priority-mid { background:#fffbeb; color:var(--warning); }
+.priority-low { background:#f0fdf4; color:var(--success); }
+
+/* 16FQ PROFILE */
+.fq-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+.fq-factor-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-top:14px;
+}
+
+.fq-factor {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:13px;
+}
+
+.fq-factor-name {
+  width:120px;
+  font-weight:600;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.fq-bar-wrap {
+  flex:1;
+  height:10px;
+  background:var(--surface2);
+  border-radius:5px;
+  overflow:hidden;
+}
+
+.fq-bar-fill {
+  height:100%;
+  border-radius:5px;
+  background:linear-gradient(90deg,var(--accent),#7c3aed);
+}
+
+.fq-score {
+  width:36px;
+  text-align:right;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:600;
+  font-size:12px;
+  color:var(--accent);
+}
+
+/* EXCEL SCALE TABLE */
+.scale-card {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:24px;
+  margin-bottom:20px;
+  overflow-x:auto;
+}
+
+table.scale-table {
+  width:100%;
+  border-collapse:collapse;
+  font-size:13px;
+}
+
+.scale-table th {
+  padding:10px 12px;
+  background:var(--surface2);
+  text-align:left;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  border-bottom:1px solid var(--border);
+}
+
+.scale-table td {
+  padding:11px 12px;
+  border-bottom:1px solid var(--surface2);
+}
+
+.scale-table tr:last-child td { border-bottom:none; }
+
+.rank-badge {
+  width:28px;height:28px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:800;
+  font-family:'JetBrains Mono',monospace;
+}
+
+.rank-1 { background:#fef3c7; color:#92400e; }
+.rank-2 { background:#e0e7ff; color:#3730a3; }
+.rank-3 { background:#f3f4f6; color:#374151; }
+.rank-other { background:#f9fafb; color:var(--muted); }
+
+.score-cell {
+  font-family:'JetBrains Mono',monospace;
+  font-weight:700;
+  font-size:15px;
+}
+
+.level-badge {
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.level-high { background:#f0fdf4; color:var(--success); }
+.level-mid { background:#fffbeb; color:var(--warning); }
+.level-low { background:#fef2f2; color:var(--danger); }
+
+.percentile-bar-wrap {
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.percentile-bar {
+  flex:1;
+  height:8px;
+  background:var(--surface2);
+  border-radius:4px;
+  overflow:hidden;
+  max-width:120px;
+}
+
+.percentile-bar-fill {
+  height:100%;
+  border-radius:4px;
+}
+
+.footer-note {
+  background:var(--surface2);
+  border-radius:12px;
+  padding:16px 20px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:20px;
+  line-height:1.6;
+}
+</style>
+</head>
+<body>
+
+<div id="screen-loading">
+  <div class="spinner"></div>
+  <div style="color:#6b7280;font-size:15px;font-family:'Outfit',sans-serif;">Hesabat hazırlanır...</div>
+</div>
+
+<div id="screen-error" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;">
+  <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
+  <div style="font-size:20px;font-weight:700;color:#dc2626;" id="err-msg">Xəta baş verdi</div>
+  <button onclick="history.back()" style="margin-top:20px;padding:10px 24px;background:#4f46e5;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;">Geri qayıt</button>
+</div>
+
+<div id="screen-report">
+  <div class="report-topbar">
+    <div class="topbar-logo">PsychoAssess</div>
+    <div class="export-btns">
+      <button class="btn-back" onclick="history.back()">← Geri</button>
+      <button class="btn-export btn-excel" id="btn-excel" onclick="exportExcel()" style="display:none;">📊 Excel Yüklə</button>
+      <button class="btn-export btn-pdf" onclick="exportPDF()">📄 PDF Yüklə</button>
+    </div>
+  </div>
+  <div class="report-content" id="report-content">
+    <!-- dinamik -->
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
+  authDomain: "hr-testing-48e31.firebaseapp.com",
+  databaseURL: "https://hr-testing-48e31-default-rtdb.firebaseio.com",
+  projectId: "hr-testing-48e31",
+  storageBucket: "hr-testing-48e31.firebasestorage.app",
+  messagingSenderId: "905744094931",
+  appId: "1:905744094931:web:2e16300768f61b4fd76626",
+  measurementId: "G-X2NV26TR01"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let reportData = null;
+let candidateInfo = null;
+let reportType = null;
+let allCompanyResults = [];
+
+const params = new URLSearchParams(window.location.search);
+const candidateId = params.get('c');
+reportType = params.get('type') || 'adaptg-pdf';
+
+// ==================== INIT ====================
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    showError('Giriş tələb olunur.');
+    return;
+  }
+  if (!candidateId) {
+    showError('Namizid ID tapılmadı.');
+    return;
+  }
+  await loadReport();
+});
+
+async function loadReport() {
+  try {
+    // Candidate info
+    const candDoc = await db.collection('candidates').doc(candidateId).get();
+    if (!candDoc.exists) { showError('Namizid tapılmadı.'); return; }
+    candidateInfo = { id: candidateId, ...candDoc.data() };
+
+    // Test results
+    const testType = getTestTypeFromReportType(reportType);
+    const resultsSnap = await db.collection('testResults')
+      .where('candidateId','==',candidateId)
+      .where('testType','==',testType)
+      .get();
+
+    if (resultsSnap.empty && reportType !== 'adaptg-excel') {
+      showError('Bu namizid üçün test nəticəsi tapılmadı.');
+      return;
+    }
+
+    if (!resultsSnap.empty) {
+      reportData = resultsSnap.docs[0].data();
+    }
+
+    // Excel üçün bütün şirkətin nəticələrini yüklə
+    if (reportType === 'adaptg-excel') {
+      document.getElementById('btn-excel').style.display = 'flex';
+      const allSnap = await db.collection('testResults')
+        .where('companyId','==',candidateInfo.companyId)
+        .where('testType','==','adaptg')
+        .get();
+      allCompanyResults = allSnap.docs.map(d => ({id:d.id,...d.data()}));
+      renderExcelPreview();
+    } else {
+      renderReport();
+    }
+
+    document.getElementById('screen-loading').style.display = 'none';
+    document.getElementById('screen-report').style.display = 'block';
+
+  } catch(e) {
+    showError('Xəta: ' + e.message);
+  }
+}
+
+function getTestTypeFromReportType(rt) {
+  if (rt.startsWith('adaptg')) return 'adaptg';
+  if (rt.startsWith('16fq')) return '16fq';
+  if (rt.startsWith('ccsi')) return 'ccsi';
+  if (rt === 'consolidated') return 'adaptg';
+  return 'adaptg';
+}
+
+// ==================== RENDER REPORT ====================
+function renderReport() {
+  const content = document.getElementById('report-content');
+  const date = new Date().toLocaleDateString('az-AZ', {year:'numeric',month:'long',day:'numeric'});
+
+  let html = `
+    <div class="report-header">
+      <div class="report-header-left">
+        <h1>${candidateInfo.name}</h1>
+        <p>${candidateInfo.position || 'Namizid'} · ${candidateInfo.email}</p>
+      </div>
+      <div class="report-header-right">
+        <div class="report-date">${date}</div>
+        <div class="report-company">🏢 ${candidateInfo.companyName || ''}</div>
+      </div>
+    </div>`;
+
+  if (reportType === 'adaptg-pdf') {
+    html += renderAdaptGReport();
+  } else if (reportType === '16fq-pdf') {
+    html += render16FQReport();
+  } else if (reportType === 'ccsi-pdf') {
+    html += renderCCSIReport();
+  } else if (reportType === 'consolidated') {
+    html += renderAdaptGReport() + renderCCSIReport();
+  }
+
+  html += `<div class="footer-note">
+    Bu hesabat PsychoAssess platforması tərəfindən avtomatik hazırlanmışdır. 
+    Hesabat yalnız HR qərar dəstəyi üçündür və tam psixoloji diaqnoz kimi qəbul edilməməlidir.
+    Nəticələr namizid ilə birgə müzakirə edilməsi tövsiyə olunur.
+  </div>`;
+
+  content.innerHTML = html;
+
+  // Animate bars
+  setTimeout(() => {
+    document.querySelectorAll('.section-bar-fill, .fq-bar-fill, .percentile-bar-fill').forEach(el => {
+      el.style.width = el.dataset.width || el.style.width;
+    });
+  }, 100);
+}
+
+// ==================== ADAPT-G REPORT ====================
+function renderAdaptGReport() {
+  const scores = reportData?.sectionScores || {};
+  const verbal = scores.verbal?.score || 0;
+  const numerical = scores.numerical?.score || 0;
+  const abstract = scores.abstract?.score || 0;
+  const total = reportData?.totalScore || Math.round((verbal+numerical+abstract)/3);
+  const sten = scoreToSten(total);
+  const percentile = stenToPercentile(sten);
+
+  const strengths = getAdaptGStrengths(verbal, numerical, abstract);
+  const weaknesses = getAdaptGWeaknesses(verbal, numerical, abstract);
+  const sectors = getSectors(verbal, numerical, abstract);
+  const trainings = getTrainings(verbal, numerical, abstract);
+  const verdict = getVerdict(total);
+
+  return `
+    <div class="overall-score-card">
+      <div>
+        <div class="overall-label">ADAPT-G — Ümumi G Xalı</div>
+        <div class="overall-value">${total}%</div>
+        <div class="overall-sub">Percentil: ${percentile}% · Sten: ${sten}/10</div>
+      </div>
+      <div class="sten-display">
+        <div class="sten-label">STEN ŞKALASI</div>
+        <div class="sten-bar">
+          ${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div class="sten-dot ${i<=sten?'active':''}">${i}</div>`).join('')}
+        </div>
+      </div>
+    </div>
+
+    <div class="section-grid">
+      <div class="section-card verbal">
+        <div class="section-label">📖 Verbal Reasoning</div>
+        <div class="section-score">${verbal}%</div>
+        <div class="section-bar"><div class="section-bar-fill" style="width:${verbal}%"></div></div>
+        <div class="section-level" style="color:${getLevelColor(verbal)}">${getLevel(verbal)}</div>
+      </div>
+      <div class="section-card numerical">
+        <div class="section-label">🔢 Numerical Reasoning</div>
+        <div class="section-score">${numerical}%</div>
+        <div class="section-bar"><div class="section-bar-fill" style="width:${numerical}%"></div></div>
+        <div class="section-level" style="color:${getLevelColor(numerical)}">${getLevel(numerical)}</div>
+      </div>
+      <div class="section-card abstract">
+        <div class="section-label">🔷 Abstract Reasoning</div>
+        <div class="section-score">${abstract}%</div>
+        <div class="section-bar"><div class="section-bar-fill" style="width:${abstract}%"></div></div>
+        <div class="section-level" style="color:${getLevelColor(abstract)}">${getLevel(abstract)}</div>
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-title">💪 Güclü tərəflər</div>
+        ${strengths.map(s=>`<div class="strength-item"><span class="strength-dot"></span><span>${s}</span></div>`).join('')}
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-title">📈 İnkişaf sahələri</div>
+        ${weaknesses.map(w=>`<div class="weakness-item"><span class="weakness-dot"></span><span>${w}</span></div>`).join('')}
+      </div>
+    </div>
+
+    <div class="recommendation-card">
+      <div class="rec-title">🎯 Tövsiyələr</div>
+      <div class="rec-grid">
+        ${trainings.slice(0,3).map(t=>`
+          <div class="rec-item">
+            <div class="rec-item-title">${t.title}</div>
+            <div class="rec-item-desc">${t.desc}</div>
+          </div>`).join('')}
+      </div>
+      <div class="verdict-box ${verdict.class}">
+        <div class="verdict-icon">${verdict.icon}</div>
+        <div>
+          <div class="verdict-title">${verdict.title}</div>
+          <div class="verdict-desc">${verdict.desc}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sector-card">
+      <div class="rec-title">🏢 Uyğun Sahələr</div>
+      <div class="sector-grid">
+        ${sectors.map(s=>`
+          <div class="sector-item ${s.level}">
+            <span>${s.icon}</span><span>${s.name}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="training-card">
+      <div class="rec-title">📚 Təlim Tövsiyələri</div>
+      <div class="training-list">
+        ${trainings.map(t=>`
+          <div class="training-item">
+            <span>${t.icon}</span>
+            <span style="flex:1">${t.title} — <span style="color:var(--muted);font-size:13px;">${t.desc}</span></span>
+            <span class="training-priority priority-${t.priority}">${t.priority==='high'?'Prioritet':t.priority==='mid'?'Orta':'Əlavə'}</span>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ==================== 16FQ REPORT ====================
+function render16FQReport() {
+  const scores = reportData?.sectionScores?.personality || {};
+  const factors = {
+    'A': { name:'Ünsiyyətcillik', high:'Açıq, ünsiyyətcil', low:'Çəkingən, qapalı' },
+    'B': { name:'Analitik düşüncə', high:'Güclü analiz', low:'Sadə düşüncə' },
+    'C': { name:'Emosional sabitlik', high:'Sakit, davamlı', low:'Əsəbi, qeyri-sabit' },
+    'E': { name:'Dominantlıq', high:'Lider, güclü', low:'Təvazökar, itaətkar' },
+    'F': { name:'Canlılıq', high:'Enerjili, şən', low:'Ciddi, ölçülü' },
+    'G': { name:'Qaydaya riayət', high:'Məsuliyyətli', low:'Ənənəsiz' },
+    'H': { name:'Sosial cəsarət', high:'Cəsur, açıq', low:'Utancaq, çəkingən' },
+    'I': { name:'Həssaslıq', high:'Empatik, incə', low:'Praktik, sərt' },
+    'L': { name:'Güvən', high:'Şübhəci', low:'Güvənən' },
+    'M': { name:'Abstrakt düşüncə', high:'Yaradıcı', low:'Praktik' },
+    'N': { name:'Özünə nəzarət', high:'Diplomatik', low:'Açıq fikirlı' },
+    'O': { name:'Özgüvən', high:'Narahat', low:'Güvənli' },
+    'Q1': { name:'Yeniliyə açıqlıq', high:'Eksperimental', low:'Ənənəvi' },
+    'Q2': { name:'Müstəqillik', high:'Özbaşına', low:'Qrupa bağlı' },
+    'Q3': { name:'Özünü idarə', high:'Nizam-intizam', low:'Pərişan' },
+    'Q4': { name:'Gərginlik', high:'Gərgin', low:'Rahat' }
+  };
+
+  const factorScores = {};
+  Object.keys(factors).forEach(f => {
+    const data = scores[f];
+    if (data && data.total > 0) {
+      factorScores[f] = Math.round((data.agree / data.total) * 100);
+    } else {
+      factorScores[f] = 50;
+    }
+  });
+
+  const topFactors = Object.entries(factorScores).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const lowFactors = Object.entries(factorScores).sort((a,b)=>a[1]-b[1]).slice(0,5);
+
+  return `
+    <div class="overall-score-card" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
+      <div>
+        <div class="overall-label">16FQ — Şəxsiyyət Profili</div>
+        <div class="overall-value" style="font-size:32px;margin-top:8px;">Tamamlandı</div>
+        <div class="overall-sub">16 faktor üzrə tam analiz</div>
+      </div>
+      <div style="font-size:56px;">🧠</div>
+    </div>
+
+    <div class="fq-card">
+      <div class="rec-title">16 Faktor Profili</div>
+      <div class="fq-factor-list">
+        ${Object.entries(factors).map(([key, meta]) => {
+          const score = factorScores[key] || 50;
+          return `
+            <div class="fq-factor">
+              <div class="fq-factor-name">${key}: ${meta.name}</div>
+              <div class="fq-bar-wrap">
+                <div class="fq-bar-fill" style="width:${score}%"></div>
+              </div>
+              <div class="fq-score">${score}%</div>
+            </div>`;
+        }).join('')}
+      </div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-title">💪 Dominant xüsusiyyətlər</div>
+        ${topFactors.map(([f, score]) => `
+          <div class="strength-item">
+            <span class="strength-dot"></span>
+            <span><strong>${factors[f]?.name}</strong> (${score}%) — ${factors[f]?.high}</span>
+          </div>`).join('')}
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-title">📈 İnkişaf potensialı</div>
+        ${lowFactors.map(([f, score]) => `
+          <div class="weakness-item">
+            <span class="weakness-dot"></span>
+            <span><strong>${factors[f]?.name}</strong> (${score}%) — ${factors[f]?.low}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+
+    <div class="recommendation-card">
+      <div class="rec-title">💼 İş davranışı proqnozu</div>
+      <div class="rec-grid">
+        <div class="rec-item">
+          <div class="rec-item-title">Komanda rolu</div>
+          <div class="rec-item-desc">${factorScores['A']>60?'Komanda yönümlü, əməkdaşlıq güclüdür':'Müstəqil işi üstün tutur'}</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-item-title">Liderlik potensialı</div>
+          <div class="rec-item-desc">${factorScores['E']>60?'Yüksək liderlik meyli var':'Liderlik inkişaf tələb edir'}</div>
+        </div>
+        <div class="rec-item">
+          <div class="rec-item-title">Stressə davamlılıq</div>
+          <div class="rec-item-desc">${factorScores['C']>60?'Yüksək stressə davamlıdır':'Stres idarəsi inkişaf lazımdır'}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ==================== CCSI REPORT ====================
+function renderCCSIReport() {
+  const total = reportData?.totalScore || 0;
+  const sten = scoreToSten(total);
+  const verdict = getVerdict(total);
+
+  return `
+    <div class="overall-score-card" style="background:linear-gradient(135deg,#dc2626,#ef4444);">
+      <div>
+        <div class="overall-label">CCSI — Situasiya Mühakiməsi</div>
+        <div class="overall-value">${total}%</div>
+        <div class="overall-sub">Sten: ${sten}/10 · 24 ssenari</div>
+      </div>
+      <div style="font-size:56px;">💼</div>
+    </div>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <div class="analysis-title">💪 Güclü davranış sahələri</div>
+        ${total>=70?`
+          <div class="strength-item"><span class="strength-dot"></span><span>Münaqişə idarəsində yüksək kompetensiya</span></div>
+          <div class="strength-item"><span class="strength-dot"></span><span>Müştəri ilə ünsiyyətdə effektivlik</span></div>
+          <div class="strength-item"><span class="strength-dot"></span><span>Qərar qəbulunda balans</span></div>
+        `:`
+          <div class="strength-item"><span class="strength-dot"></span><span>Sadə ssenarilərdə adekvat reaksiya</span></div>
+          <div class="strength-item"><span class="strength-dot"></span><span>Müstəqil tapşırıqlarda çalışqanlıq</span></div>
+        `}
+      </div>
+      <div class="analysis-card">
+        <div class="analysis-title">📈 İnkişaf sahələri</div>
+        ${total<70?`
+          <div class="weakness-item"><span class="weakness-dot"></span><span>Mürəkkəb ssenarilərə yanaşma</span></div>
+          <div class="weakness-item"><span class="weakness-dot"></span><span>Prioritet müəyyənləşdirmə</span></div>
+          <div class="weakness-item"><span class="weakness-dot"></span><span>Rəhbər ilə ünsiyyət taktikası</span></div>
+        `:`
+          <div class="weakness-item"><span class="weakness-dot"></span><span>Daha mürəkkəb liderlik ssenariləri</span></div>
+          <div class="weakness-item"><span class="weakness-dot"></span><span>Strateji qərar qəbulu</span></div>
+        `}
+      </div>
+    </div>
+
+    <div class="recommendation-card">
+      <div class="rec-title">🎯 Tövsiyə</div>
+      <div class="verdict-box ${verdict.class}" style="margin-top:0;">
+        <div class="verdict-icon">${verdict.icon}</div>
+        <div>
+          <div class="verdict-title">${verdict.title}</div>
+          <div class="verdict-desc">${verdict.desc}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ==================== EXCEL PREVIEW ====================
+function renderExcelPreview() {
+  const content = document.getElementById('report-content');
+  const date = new Date().toLocaleDateString('az-AZ', {year:'numeric',month:'long',day:'numeric'});
+
+  // Sort by total score
+  const sorted = [...allCompanyResults].sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
+
+  let tableRows = sorted.map((r, idx) => {
+    const rank = idx + 1;
+    const verbal = r.sectionScores?.verbal?.score || 0;
+    const numerical = r.sectionScores?.numerical?.score || 0;
+    const abstract = r.sectionScores?.abstract?.score || 0;
+    const total = r.totalScore || 0;
+    const percentile = Math.round((1 - idx/sorted.length) * 100);
+    const level = getLevel(total);
+    const levelClass = total>=80?'high':total>=60?'mid':'low';
+    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-other';
+
+    return `
+      <tr>
+        <td><div class="rank-badge ${rankClass}">${rank}</div></td>
+        <td style="font-weight:600;">${r.candidateName || '—'}</td>
+        <td><span class="score-cell" style="color:#06b6d4;">${verbal}%</span></td>
+        <td><span class="score-cell" style="color:#059669;">${numerical}%</span></td>
+        <td><span class="score-cell" style="color:#f59e0b;">${abstract}%</span></td>
+        <td><span class="score-cell" style="color:#4f46e5;">${total}%</span></td>
+        <td>
+          <div class="percentile-bar-wrap">
+            <div class="percentile-bar">
+              <div class="percentile-bar-fill" style="width:${percentile}%;background:${total>=80?'#059669':total>=60?'#d97706':'#dc2626'}"></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;">${percentile}%</span>
+          </div>
+        </td>
+        <td><span class="level-badge level-${levelClass}">${level}</span></td>
+      </tr>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="report-header">
+      <div class="report-header-left">
+        <h1>Adapt-G Qrup Skalası</h1>
+        <p>${sorted.length} namizid · ${candidateInfo.companyName}</p>
+      </div>
+      <div class="report-header-right">
+        <div class="report-date">${date}</div>
+        <div class="report-company">📊 Müqayisəli analiz</div>
+      </div>
+    </div>
+
+    <div class="scale-card">
+      <div class="rec-title" style="margin-bottom:16px;">Namizid Sıralama Cədvəli</div>
+      <table class="scale-table">
+        <thead>
+          <tr>
+            <th>Sıra</th>
+            <th>Ad Soyad</th>
+            <th>Verbal</th>
+            <th>Numerical</th>
+            <th>Abstract</th>
+            <th>Ümumi</th>
+            <th>Percentil</th>
+            <th>Səviyyə</th>
+          </tr>
+        </thead>
+        <tbody>${tableRows || '<tr><td colspan="8" style="text-align:center;padding:20px;color:#6b7280;">Nəticə yoxdur</td></tr>'}</tbody>
+      </table>
+    </div>
+
+    <div class="footer-note">
+      Bu cədvəl şirkət daxilindəki bütün Adapt-G test nəticələrini əks etdirir. 
+      Percentil namizidин şirkət daxilindəki digər namizidlərə nisbətdə harada yerləşdiyini göstərir.
+    </div>`;
+}
+
+// ==================== HELPERS ====================
+function scoreToSten(score) {
+  if (score >= 96) return 10;
+  if (score >= 89) return 9;
+  if (score >= 80) return 8;
+  if (score >= 70) return 7;
+  if (score >= 60) return 6;
+  if (score >= 50) return 5;
+  if (score >= 40) return 4;
+  if (score >= 30) return 3;
+  if (score >= 20) return 2;
+  return 1;
+}
+
+function stenToPercentile(sten) {
+  const map = {1:2,2:7,3:16,4:31,5:50,6:69,7:84,8:93,9:98,10:99};
+  return map[sten] || 50;
+}
+
+function getLevel(score) {
+  if (score >= 80) return '🟢 Yüksək';
+  if (score >= 60) return '🟡 Orta';
+  if (score >= 40) return '🟠 Aşağı-orta';
+  return '🔴 Aşağı';
+}
+
+function getLevelColor(score) {
+  if (score >= 80) return '#059669';
+  if (score >= 60) return '#d97706';
+  if (score >= 40) return '#ea580c';
+  return '#dc2626';
+}
+
+function getVerdict(score) {
+  if (score >= 70) return {
+    class:'suitable', icon:'✅',
+    title:'Vəzifəyə uyğundur',
+    desc:'Namizid ümumi əqli qabiliyyət baxımından bu vəzifə üçün güclü namiziddir.'
+  };
+  if (score >= 50) return {
+    class:'conditional', icon:'⚠️',
+    title:'Şərti uyğundur',
+    desc:'Namizid orta səviyyədədir. Müsahibə və əlavə qiymətləndirmə tövsiyə olunur.'
+  };
+  return {
+    class:'unsuitable', icon:'❌',
+    title:'Uyğun deyil',
+    desc:'Namizid bu vəzifə üçün tələb olunan əqli qabiliyyət səviyyəsini göstərməyib.'
+  };
+}
+
+function getAdaptGStrengths(v, n, a) {
+  const s = [];
+  if (v >= 70) s.push('Verbal kommunikasiya və analiz güclüdür');
+  if (n >= 70) s.push('Rəqəmsal mühakimə və hesablama yüksəkdir');
+  if (a >= 70) s.push('Məntiqi düşüncə və problem həlli mükəmməldir');
+  if (v >= 60 && n >= 60) s.push('Kompleks məlumatları anlama bacarığı var');
+  if (a >= 60) s.push('Yeni vəziyyətlərə uyğunlaşma qabiliyyəti yaxşıdır');
+  if (s.length === 0) s.push('Əsas qabiliyyətlər orta səviyyədədir');
+  return s.slice(0,4);
+}
+
+function getAdaptGWeaknesses(v, n, a) {
+  const w = [];
+  if (v < 60) w.push('Verbal reasoning inkişaf tələb edir');
+  if (n < 60) w.push('Rəqəmsal analiz gücləndirilməlidir');
+  if (a < 60) w.push('Abstrakt düşüncə inkişaf potensialı var');
+  if (Math.max(v,n,a) - Math.min(v,n,a) > 25) w.push('Qabiliyyətlər arasında fərq böyükdür');
+  if (w.length === 0) w.push('Bütün sahələr balanslaşdırılmış inkişaf göstərir');
+  return w.slice(0,4);
+}
+
+function getSectors(v, n, a) {
+  const sectors = [
+    { name:'Maliyyə/Bank', icon:'🏦', score: n },
+    { name:'IT/Analitika', icon:'💻', score: a },
+    { name:'Hüquq/HR', icon:'⚖️', score: v },
+    { name:'Marketing', icon:'📢', score: (v+a)/2 },
+    { name:'Mühəndislik', icon:'🔧', score: (n+a)/2 },
+    { name:'Menecment', icon:'👔', score: (v+n+a)/3 },
+    { name:'Satış', icon:'🤝', score: (v+a)/2 },
+    { name:'Mühasibat', icon:'📊', score: n },
+    { name:'Təhsil', icon:'🎓', score: v }
+  ];
+  return sectors
+    .sort((a,b) => b.score - a.score)
+    .map(s => ({...s, level: s.score>=70?'high':s.score>=50?'mid':'low'}));
+}
+
+function getTrainings(v, n, a) {
+  const t = [];
+  if (v < 70) t.push({ icon:'📚', title:'Verbal Reasoning Təlimi', desc:'Oxuma anlama, tənqidi düşüncə', priority:'high' });
+  if (n < 70) t.push({ icon:'🔢', title:'Rəqəmsal Analiz Kursu', desc:'Statistika, maliyyə hesablamaları', priority:'high' });
+  if (a < 70) t.push({ icon:'🧩', title:'Məntiqi Düşüncə Təlimi', desc:'Problem həlli, pattern tanıma', priority:'mid' });
+  t.push({ icon:'💡', title:'Tənqidi Düşüncə', desc:'Kompleks qərar qəbulu', priority:'mid' });
+  t.push({ icon:'⏱', title:'Vaxt İdarəsi', desc:'Sürət və dəqiqlik balansı', priority:'low' });
+  return t.slice(0,5);
+}
+
+// ==================== EXPORT PDF ====================
+async function exportPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  const W = 210, margin = 15;
+  let y = 20;
+
+  const scores = reportData?.sectionScores || {};
+  const verbal = scores.verbal?.score || 0;
+  const numerical = scores.numerical?.score || 0;
+  const abstract = scores.abstract?.score || 0;
+  const total = reportData?.totalScore || 0;
+  const sten = scoreToSten(total);
+  const percentile = stenToPercentile(sten);
+  const date = new Date().toLocaleDateString('az-AZ');
+
+  // Header
+  doc.setFillColor(79,70,229);
+  doc.rect(0,0,W,28,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica','bold');
+  doc.text('PsychoAssess', margin, 12);
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  doc.text('HR Qiymetlendirme Sistemi', margin, 20);
+  doc.text(date, W-margin, 20, {align:'right'});
+
+  y = 38;
+
+  // Candidate info
+  doc.setTextColor(26,26,46);
+  doc.setFontSize(16);
+  doc.setFont('helvetica','bold');
+  doc.text(candidateInfo.name, margin, y);
+  y += 7;
+  doc.setFontSize(10);
+  doc.setFont('helvetica','normal');
+  doc.setTextColor(107,114,128);
+  doc.text((candidateInfo.position||'Namizid') + ' | ' + candidateInfo.email, margin, y);
+  doc.text(candidateInfo.companyName||'', W-margin, y, {align:'right'});
+  y += 12;
+
+  // Report type
+  const typeLabels = {
+    'adaptg-pdf':'ADAPT-G Hesabat',
+    '16fq-pdf':'16FQ Seksiyyet Hesabat',
+    'ccsi-pdf':'CCSI Hesabat',
+    'consolidated':'Konsolide Hesabat'
+  };
+  doc.setFillColor(238,242,255);
+  doc.roundedRect(margin, y-4, W-2*margin, 10, 2, 2, 'F');
+  doc.setTextColor(79,70,229);
+  doc.setFontSize(9);
+  doc.setFont('helvetica','bold');
+  doc.text(typeLabels[reportType]||'Hesabat', W/2, y+2, {align:'center'});
+  y += 14;
+
+  if (reportType === 'adaptg-pdf' || reportType === 'consolidated') {
+    // Overall score box
+    doc.setFillColor(79,70,229);
+    doc.roundedRect(margin, y, W-2*margin, 22, 3, 3, 'F');
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(22);
+    doc.setFont('helvetica','bold');
+    doc.text(total+'%', margin+10, y+14);
+    doc.setFontSize(9);
+    doc.setFont('helvetica','normal');
+    doc.text('Umumi G Xali', margin+10, y+20);
+    doc.text('Sten: '+sten+'/10', W/2, y+10, {align:'center'});
+    doc.text('Percentil: '+percentile+'%', W/2, y+17, {align:'center'});
+    doc.text(getVerdict(total).title, W-margin-2, y+10, {align:'right'});
+    y += 28;
+
+    // Section scores
+    const sections = [
+      { label:'Verbal Reasoning', score:verbal, color:[6,182,212] },
+      { label:'Numerical Reasoning', score:numerical, color:[5,150,105] },
+      { label:'Abstract Reasoning', score:abstract, color:[245,158,11] }
+    ];
+
+    sections.forEach(s => {
+      doc.setTextColor(26,26,46);
+      doc.setFontSize(10);
+      doc.setFont('helvetica','bold');
+      doc.text(s.label, margin, y+4);
+      doc.setTextColor(...s.color);
+      doc.text(s.score+'%', W-margin, y+4, {align:'right'});
+
+      // Progress bar
+      doc.setFillColor(240,242,248);
+      doc.roundedRect(margin, y+6, W-2*margin, 5, 1, 1, 'F');
+      doc.setFillColor(...s.color);
+      doc.roundedRect(margin, y+6, (W-2*margin)*(s.score/100), 5, 1, 1, 'F');
+
+      doc.setTextColor(107,114,128);
+      doc.setFontSize(8);
+      doc.setFont('helvetica','normal');
+      doc.text(getLevel(s.score), margin, y+17);
+      y += 20;
+    });
+
+    y += 4;
+
+    // Strengths & Weaknesses
+    const strengths = getAdaptGStrengths(verbal, numerical, abstract);
+    const weaknesses = getAdaptGWeaknesses(verbal, numerical, abstract);
+
+    doc.setTextColor(26,26,46);
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    doc.text('Guclu Terefleri', margin, y);
+    doc.text('Inkisaf Saheleri', W/2+5, y);
+    y += 6;
+
+    const maxLen = Math.max(strengths.length, weaknesses.length);
+    for (let i=0; i<maxLen; i++) {
+      doc.setFontSize(8);
+      doc.setFont('helvetica','normal');
+      if (strengths[i]) {
+        doc.setTextColor(5,150,105);
+        doc.text('• ' + strengths[i].substring(0,45), margin, y);
+      }
+      if (weaknesses[i]) {
+        doc.setTextColor(220,38,38);
+        doc.text('• ' + weaknesses[i].substring(0,45), W/2+5, y);
+      }
+      y += 6;
+    }
+
+    y += 4;
+
+    // Verdict
+    const verdict = getVerdict(total);
+    const vColor = total>=70?[240,253,244]:total>=50?[255,251,235]:[254,242,242];
+    doc.setFillColor(...vColor);
+    doc.roundedRect(margin, y, W-2*margin, 16, 3, 3, 'F');
+    doc.setTextColor(26,26,46);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','bold');
+    doc.text(verdict.title, margin+6, y+7);
+    doc.setFontSize(8);
+    doc.setFont('helvetica','normal');
+    doc.setTextColor(107,114,128);
+    doc.text(verdict.desc.substring(0,80), margin+6, y+13);
+    y += 22;
+
+    // Trainings
+    doc.setTextColor(26,26,46);
+    doc.setFontSize(11);
+    doc.setFont('helvetica','bold');
+    doc.text('Telim Tovsiyyeleri', margin, y);
+    y += 7;
+
+    const trainings = getTrainings(verbal, numerical, abstract);
+    trainings.forEach(t => {
+      doc.setFontSize(9);
+      doc.setFont('helvetica','bold');
+      doc.setTextColor(79,70,229);
+      doc.text('• ' + t.title, margin, y);
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(107,114,128);
+      doc.text(t.desc, margin+4, y+5);
+      y += 11;
+    });
+  }
+
+  // Footer
+  doc.setFillColor(248,250,252);
+  doc.rect(0,280,W,17,'F');
+  doc.setTextColor(107,114,128);
+  doc.setFontSize(7);
+  doc.text('Bu hesabat PsychoAssess platformasi terefinden avtomatik hazirlanmisdir.', W/2, 287, {align:'center'});
+  doc.text('Yalniz HR qerar destekleme ucundur.', W/2, 292, {align:'center'});
+
+  doc.save(`${candidateInfo.name}_${reportType}_${date}.pdf`);
+}
+
+// ==================== EXPORT EXCEL ====================
+function exportExcel() {
+  const sorted = [...allCompanyResults].sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
+  const date = new Date().toLocaleDateString('az-AZ');
+
+  const wsData = [
+    ['PsychoAssess - Adapt-G Qrup Skalasi', '', '', '', '', '', '', ''],
+    [candidateInfo.companyName + ' | ' + date, '', '', '', '', '', '', ''],
+    [''],
+    ['Sira', 'Ad Soyad', 'Verbal (%)', 'Numerical (%)', 'Abstract (%)', 'Umumi (%)', 'Sten', 'Percentil', 'Seviyye', 'Tovsiyye']
+  ];
+
+  sorted.forEach((r, idx) => {
+    const rank = idx + 1;
+    const v = r.sectionScores?.verbal?.score || 0;
+    const n = r.sectionScores?.numerical?.score || 0;
+    const a = r.sectionScores?.abstract?.score || 0;
+    const total = r.totalScore || 0;
+    const sten = scoreToSten(total);
+    const percentile = Math.round((1 - idx/sorted.length) * 100);
+    const verdict = getVerdict(total);
+
+    wsData.push([
+      rank,
+      r.candidateName || '—',
+      v, n, a, total,
+      sten,
+      percentile + '%',
+      total>=80?'Yuksek':total>=60?'Orta':'Asagi',
+      verdict.title
+    ]);
+  });
+
+  // Stats rows
+  wsData.push(['']);
+  wsData.push(['Statistika', '', '', '', '', '', '', '', '', '']);
+  if (sorted.length > 0) {
+    const totals = sorted.map(r => r.totalScore||0);
+    const avg = Math.round(totals.reduce((s,v)=>s+v,0)/totals.length);
+    const max = Math.max(...totals);
+    const min = Math.min(...totals);
+    wsData.push(['Ortalama', '', '', '', '', avg, '', '', '', '']);
+    wsData.push(['Maksimum', '', '', '', '', max, '', '', '', '']);
+    wsData.push(['Minimum', '', '', '', '', min, '', '', '', '']);
+  }
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  ws['!cols'] = [
+    {wch:6}, {wch:22}, {wch:12}, {wch:14}, {wch:14}, {wch:12}, {wch:8}, {wch:10}, {wch:12}, {wch:20}
+  ];
+
+  ws['!merges'] = [
+    { s:{r:0,c:0}, e:{r:0,c:9} },
+    { s:{r:1,c:0}, e:{r:1,c:9} }
+  ];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Adapt-G Skala');
+  XLSX.writeFile(wb, `${candidateInfo.companyName}_AdaptG_Skala_${date}.xlsx`);
+}
+
+function showError(msg) {
+  document.getElementById('screen-loading').style.display = 'none';
+  document.getElementById('screen-error').style.display = 'flex';
+  document.getElementById('err-msg').textContent = msg;
+}
+</script>
+</body>
+</html>
