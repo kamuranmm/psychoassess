@@ -1113,7 +1113,7 @@ async function loadCandidates() {
   tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
 
   try {
-    const snap = await db.collection('candidates').where('companyId','==',companyId).orderBy('createdAt','desc').get();
+    const snap = await db.collection('candidates').where('companyId','==',companyId).get();
     if (snap.empty) {
       tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div>Hələ namizid yoxdur. + Namizid əlavə et düyməsindən başlayın.</div></td></tr>';
       return;
@@ -1159,8 +1159,8 @@ async function loadResults() {
   tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
 
   try {
-    const snap = await db.collection('testResults').where('companyId','==',companyId).orderBy('completedAt','desc').get();
-    allResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await db.collection('testResults').where('companyId','==',companyId).get();
+    allResults = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.completedAt?.seconds||0) - (a.completedAt?.seconds||0));
     renderResults(allResults);
   } catch(e) { console.error(e); }
 }
@@ -1201,7 +1201,7 @@ async function loadCreditLogs() {
   tbody.innerHTML = '<tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
 
   try {
-    const snap = await db.collection('creditLogs').where('companyId','==',companyId).orderBy('createdAt','desc').limit(50).get();
+    const snap = await db.collection('creditLogs').where('companyId','==',companyId).limit(50).get();
     let html = '';
     snap.forEach(d => {
       const data = d.data();
