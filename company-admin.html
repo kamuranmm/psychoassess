@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsychoAssess — Şirkət Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface2: #f0f2f8;
+    --border: #e2e6f0;
+    --accent: #4f46e5;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* LOGIN */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  .login-box {
+    background: white;
+    border-radius: 24px;
+    padding: 48px;
+    width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .login-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 7px;
+  }
+
+  .field-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 18px;
+  }
+
+  .field-input:focus { border-color: var(--accent); background: white; }
+
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+
+  .error-msg {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--danger);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
+
+  /* TOPBAR */
+  #dashboard { display: none; }
+
+  .topbar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+  .topbar-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .topbar-company {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .credit-pill {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .credit-pill.low {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: var(--danger);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .btn-logout {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--danger);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { background: #fee2e2; }
+
+  /* LAYOUT */
+  .main-layout { display: flex; min-height: calc(100vh - 62px); }
+
+  .sidebar {
+    width: 210px;
+    background: white;
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    flex-shrink: 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 3px;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: #eef2ff; color: var(--accent); font-weight: 600; }
+
+  .content { flex: 1; padding: 28px; overflow-y: auto; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* TABLE */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead { background: #f8fafc; }
+
+  th {
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f8fafc; }
+
+  .candidate-name { font-weight: 600; color: var(--text); }
+  .candidate-email { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-pending { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
+  .badge-done { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+  .badge-partial { background: #eef2ff; color: var(--accent); border: 1px solid #c7d2fe; }
+
+  .test-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .test-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .pill-done { background: #f0fdf4; color: var(--success); }
+  .pill-pending { background: #f1f5f9; color: var(--muted); }
+
+  .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .btn-sm {
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-link { background: #eef2ff; border-color: #c7d2fe; color: var(--accent); }
+  .btn-link:hover { background: #e0e7ff; }
+  .btn-report { background: #f0fdf4; border-color: #bbf7d0; color: var(--success); }
+  .btn-report:hover { background: #dcfce7; }
+  .btn-excel { background: #fffbeb; border-color: #fde68a; color: var(--warning); }
+  .btn-excel:hover { background: #fef3c7; }
+  .btn-danger { background: #fef2f2; border-color: #fecaca; color: var(--danger); }
+  .btn-danger:hover { background: #fee2e2; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .modal-close:hover { background: var(--border); }
+
+  .form-row { margin-bottom: 16px; }
+
+  /* TEST SEÇIM */
+  .test-select-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .test-select-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .test-select-item:hover { border-color: var(--accent); background: #f8f9ff; }
+  .test-select-item.selected { border-color: var(--accent); background: #eef2ff; }
+
+  .test-select-name { font-weight: 600; font-size: 14px; }
+  .test-select-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .test-select-credit { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--warning); }
+
+  .checkbox-custom {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .test-select-item.selected .checkbox-custom {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-size: 12px;
+  }
+
+  /* LINK BOX */
+  .link-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .link-url {
+    font-size: 13px;
+    color: var(--accent);
+    word-break: break-all;
+    flex: 1;
+  }
+
+  .btn-copy {
+    background: var(--accent);
+    border: none;
+    border-radius: 7px;
+    padding: 7px 14px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* CREDIT WARNING */
+  .credit-warning {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .credit-warning-icon { font-size: 32px; margin-bottom: 8px; }
+  .credit-warning-title { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--danger); margin-bottom: 4px; }
+  .credit-warning-text { font-size: 13px; color: var(--muted); }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--muted);
+  }
+
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 14px;
+    z-index: 9999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid var(--success); }
+  .toast.error { border-left: 4px solid var(--danger); }
+
+  /* REPORT MODAL */
+  .report-info {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .report-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .report-row:last-child { border-bottom: none; }
+  .report-row-label { color: var(--muted); }
+  .report-row-value { font-weight: 600; }
+
+  .credit-cost {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .credit-cost-label { font-size: 13px; color: var(--muted); }
+  .credit-cost-value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--warning); }
+
+  select.field-input { appearance: none; cursor: pointer; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab-btn.active { background: white; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">PsychoAssess</div>
+    <div class="login-sub">ŞİRKƏT ADMİN PANELİ</div>
+    <div class="error-msg" id="loginError"></div>
+    <div class="field-label">E-poçt</div>
+    <input type="email" class="field-input" id="loginEmail" placeholder="admin@sirket.az">
+    <div class="field-label">Şifrə</div>
+    <input type="password" class="field-input" id="loginPassword" placeholder="••••••••">
+    <button class="btn-primary" onclick="doLogin()">Daxil ol</button>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PsychoAssess</div>
+      <div class="topbar-company" id="companyName">Şirkət</div>
+    </div>
+    <div class="topbar-right">
+      <div class="credit-pill" id="creditPill">
+        💳 <span id="creditCount">—</span> kredit
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Çıxış</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showPage('overview')" id="nav-overview">
+        <span>📊</span> İcmal
+      </div>
+      <div class="nav-item" onclick="showPage('candidates')" id="nav-candidates">
+        <span>👥</span> Namizidlər
+      </div>
+      <div class="nav-item" onclick="showPage('results')" id="nav-results">
+        <span>📋</span> Nəticələr
+      </div>
+      <div class="nav-item" onclick="showPage('credits')" id="nav-credits">
+        <span>💳</span> Kreditlər
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="page-title">İcmal</div>
+        <div class="page-sub">Şirkətinizin test vəziyyəti</div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Namizidlər</div>
+            <div class="stat-value" id="stat-cands">—</div>
+            <div class="stat-sub">Əlavə edilmiş</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tamamlanan</div>
+            <div class="stat-value" id="stat-done" style="color:var(--success)">—</div>
+            <div class="stat-sub">Test bitirmişlər</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Gözləyən</div>
+            <div class="stat-value" id="stat-pending" style="color:var(--warning)">—</div>
+            <div class="stat-sub">Hələ keçməyiblər</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kredit</div>
+            <div class="stat-value" id="stat-credit" style="color:var(--warning)">—</div>
+            <div class="stat-sub">Qalan kredit</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Son namizidlər</div>
+            <button class="btn-sm btn-link" onclick="showPage('candidates')">Hamısını gör →</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Testlər</th>
+                <th>Status</th>
+                <th>Tarix</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody">
+              <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CANDIDATES -->
+      <div class="page" id="page-candidates">
+        <div class="page-title">Namizidlər</div>
+        <div class="page-sub">Test linki göndərin, nəticələri izləyin</div>
+
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openAddCandidate()">+ Namizid əlavə et</button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Testlər</th>
+                <th>Status</th>
+                <th>Link</th>
+                <th>Hesabatlar</th>
+              </tr>
+            </thead>
+            <tbody id="candidates-tbody">
+              <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="page" id="page-results">
+        <div class="page-title">Nəticələr</div>
+        <div class="page-sub">Tamamlanmış testlərin nəticələri</div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="filterResults('all',this)">Hamısı</button>
+          <button class="tab-btn" onclick="filterResults('adaptg',this)">Adapt-G</button>
+          <button class="tab-btn" onclick="filterResults('16fq',this)">16FQ</button>
+          <button class="tab-btn" onclick="filterResults('ccsi',this)">CCSI</button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Test növü</th>
+                <th>Xal</th>
+                <th>Tarix</th>
+                <th>Hesabat</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody">
+              <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CREDITS -->
+      <div class="page" id="page-credits">
+        <div class="page-title">Kredit İdarəetməsi</div>
+        <div class="page-sub">Kredit balansınız və istifadə tarixçəsi</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+          <div class="stat-card" style="border-left:4px solid var(--warning);">
+            <div class="stat-label">Cari Kredit</div>
+            <div class="stat-value" style="color:var(--warning);font-size:40px;" id="credit-big">—</div>
+            <div class="stat-sub">Qalan kredit sayı</div>
+          </div>
+          <div class="stat-card" style="border-left:4px solid var(--accent);">
+            <div class="stat-label">Kredit Qiymətləri</div>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Adapt-G PDF</span><span style="font-weight:700;color:var(--warning)">5 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Adapt-G Excel</span><span style="font-weight:700;color:var(--warning)">3 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>16FQ PDF</span><span style="font-weight:700;color:var(--warning)">5 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>CCSI PDF</span><span style="font-weight:700;color:var(--warning)">3 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Konsolidə</span><span style="font-weight:700;color:var(--warning)">8 kredit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="credit-warning" id="low-credit-warning" style="display:none;">
+          <div class="credit-warning-icon">⚠️</div>
+          <div class="credit-warning-title">Kredit azalıb!</div>
+          <div class="credit-warning-text">Kredit yenilənməsi üçün bizimlə əlaqə saxlayın.</div>
+          <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:12px;background:var(--danger);color:white;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">📧 Müraciət et</a>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Kredit Tarixçəsi</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Növ</th>
+                <th>Məbləğ</th>
+                <th>Səbəb</th>
+                <th>Tarix</th>
+              </tr>
+            </thead>
+            <tbody id="credit-logs-tbody">
+              <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Namizid əlavə et -->
+<div class="modal-overlay" id="modal-candidate">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-candidate')">✕</div>
+    <div class="modal-title">Namizid əlavə et</div>
+
+    <div class="form-row">
+      <div class="field-label">Ad Soyad</div>
+      <input type="text" class="field-input" id="cand-name" placeholder="Əli Həsənov">
+    </div>
+    <div class="form-row">
+      <div class="field-label">E-poçt</div>
+      <input type="email" class="field-input" id="cand-email" placeholder="eli@email.com">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Vəzifə / Qeyd</div>
+      <input type="text" class="field-input" id="cand-position" placeholder="Məs: Satış mütəxəssisi">
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:12px;">Test seçin</div>
+
+    <div class="test-select-grid">
+      <div class="test-select-item" onclick="toggleTest(this,'adaptg')" data-test="adaptg">
+        <div>
+          <div class="test-select-name">🔵 Adapt-G</div>
+          <div class="test-select-desc">Verbal + Numerical + Abstract Reasoning</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">5 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+      <div class="test-select-item" onclick="toggleTest(this,'16fq')" data-test="16fq">
+        <div>
+          <div class="test-select-name">🟡 16FQ</div>
+          <div class="test-select-desc">Şəxsiyyət İnventarı — 96 sual</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">5 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+      <div class="test-select-item" onclick="toggleTest(this,'ccsi')" data-test="ccsi">
+        <div>
+          <div class="test-select-name">🟠 CCSI</div>
+          <div class="test-select-desc">Situasiya Mühakiməsi — 24 sual</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">3 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:var(--muted);">Hesabat krediti (sonra):</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--warning);" id="selected-cost">0 kredit</span>
+    </div>
+
+    <button class="btn-primary" onclick="createCandidate()">Link yarat və göndər</button>
+  </div>
+</div>
+
+<!-- MODAL: Link göstər -->
+<div class="modal-overlay" id="modal-link">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-link')">✕</div>
+    <div class="modal-title">✅ Test linki hazırdır</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Bu linki namizidə göndərin. O, linki açıb testi keçəcək.</p>
+
+    <div class="link-box">
+      <div class="link-url" id="test-link-url">—</div>
+      <button class="btn-copy" onclick="copyLink()">📋 Kopyala</button>
+    </div>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;font-size:13px;color:var(--success);">
+      💡 Linki WhatsApp, e-poçt və ya istənilən kanalda göndərə bilərsiniz.
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Hesabat yüklə -->
+<div class="modal-overlay" id="modal-report">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-report')">✕</div>
+    <div class="modal-title">📊 Hesabat yüklə</div>
+
+    <div class="report-info" id="report-candidate-info"></div>
+
+    <div class="field-label" style="margin-bottom:10px;">Hesabat növü seçin</div>
+    <select class="field-input" id="report-type" onchange="updateReportCost()">
+      <option value="">— Seçin —</option>
+      <option value="adaptg-pdf" data-cost="5">Adapt-G PDF Hesabat (5 kredit)</option>
+      <option value="adaptg-excel" data-cost="3">Adapt-G Excel Skala (3 kredit)</option>
+      <option value="16fq-pdf" data-cost="5">16FQ PDF Hesabat (5 kredit)</option>
+      <option value="ccsi-pdf" data-cost="3">CCSI PDF Hesabat (3 kredit)</option>
+      <option value="consolidated" data-cost="8">Konsolidə Hesabat (8 kredit)</option>
+    </select>
+
+    <div class="credit-cost" id="report-cost-box" style="display:none;">
+      <div>
+        <div class="credit-cost-label">Bu hesabat üçün kredit</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Qalan: <span id="report-remaining">—</span></div>
+      </div>
+      <div class="credit-cost-value" id="report-cost-val">—</div>
+    </div>
+
+    <div id="no-credit-msg" style="display:none;" class="credit-warning">
+      <div class="credit-warning-icon">😔</div>
+      <div class="credit-warning-title">Kredit yetərli deyil</div>
+      <div class="credit-warning-text">Zəhmət olmasa super adminlə əlaqə saxlayın.</div>
+      <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:10px;background:var(--danger);color:white;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Müraciət et</a>
+    </div>
+
+    <button class="btn-primary" onclick="downloadReport()" id="btn-download-report" style="display:none;margin-top:8px;">📥 Hesabatı yüklə</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
+  authDomain: "hr-testing-48e31.firebaseapp.com",
+  databaseURL: "https://hr-testing-48e31-default-rtdb.firebaseio.com",
+  projectId: "hr-testing-48e31",
+  storageBucket: "hr-testing-48e31.firebasestorage.app",
+  messagingSenderId: "905744094931",
+  appId: "1:905744094931:web:2e16300768f61b4fd76626",
+  measurementId: "G-X2NV26TR01"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// STATE
+let companyData = null;
+let companyId = null;
+let selectedTests = [];
+let currentCandidateId = null;
+let allResults = [];
+
+// CREDIT COSTS
+const COSTS = {
+  'adaptg-pdf': 5,
+  'adaptg-excel': 3,
+  '16fq-pdf': 5,
+  'ccsi-pdf': 3,
+  'consolidated': 8
+};
+
+// AUTH
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if (adminDoc.exists && adminDoc.data().role === 'company') {
+      companyId = adminDoc.data().companyId;
+      const coDoc = await db.collection('companies').doc(companyId).get();
+      companyData = coDoc.data();
+
+      if (!companyData.active) {
+        auth.signOut();
+        showLoginError('Hesabınız deaktiv edilib. Adminlə əlaqə saxlayın.');
+        return;
+      }
+
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('companyName').textContent = companyData.name;
+      updateCreditDisplay(companyData.credits || 0);
+      loadAll();
+
+      // Real-time kredit izlə
+      db.collection('companies').doc(companyId).onSnapshot(snap => {
+        const credits = snap.data().credits || 0;
+        companyData.credits = credits;
+        updateCreditDisplay(credits);
+      });
+
+    } else {
+      auth.signOut();
+      showLoginError('Bu hesab şirkət admin deyil.');
+    }
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+});
+
+function updateCreditDisplay(credits) {
+  document.getElementById('creditCount').textContent = credits;
+  document.getElementById('stat-credit').textContent = credits;
+  if (document.getElementById('credit-big')) {
+    document.getElementById('credit-big').textContent = credits;
+  }
+  const pill = document.getElementById('creditPill');
+  if (credits < 10) {
+    pill.classList.add('low');
+    if (document.getElementById('low-credit-warning')) {
+      document.getElementById('low-credit-warning').style.display = 'block';
+    }
+  } else {
+    pill.classList.remove('low');
+  }
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPassword').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    showLoginError('E-poçt və ya şifrə səhvdir.');
+  }
+}
+
+function doLogout() { auth.signOut(); }
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// NAVİGASİYA
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.getElementById('nav-' + page).classList.add('active');
+  if (page === 'candidates') loadCandidates();
+  if (page === 'results') loadResults();
+  if (page === 'credits') loadCreditLogs();
+}
+
+function loadAll() {
+  loadOverview();
+  loadCandidates();
+}
+
+// OVERVIEW
+async function loadOverview() {
+  try {
+    const snap = await db.collection('candidates').where('companyId','==',companyId).get();
+    const total = snap.size;
+    let done = 0, pending = 0;
+    let recentHTML = '';
+
+    const sorted = snap.docs.sort((a,b) => (b.data().createdAt?.seconds||0) - (a.data().createdAt?.seconds||0));
+
+    snap.forEach(d => {
+      const data = d.data();
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      if (completed.length >= tests.length && tests.length > 0) done++;
+      else pending++;
+    });
+
+    document.getElementById('stat-cands').textContent = total;
+    document.getElementById('stat-done').textContent = done;
+    document.getElementById('stat-pending').textContent = pending;
+
+    sorted.slice(0,5).forEach(d => {
+      const data = d.data();
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+      const isDone = completed.length >= tests.length && tests.length > 0;
+      recentHTML += `<tr>
+        <td><div class="candidate-name">${data.name}</div><div class="candidate-email">${data.email}</div></td>
+        <td><div class="test-pills">${tests.map(t => `<span class="test-pill ${completed.includes(t)?'pill-done':'pill-pending'}">${t.toUpperCase()}</span>`).join('')}</div></td>
+        <td><span class="badge ${isDone?'badge-done':completed.length>0?'badge-partial':'badge-pending'}">${isDone?'✓ Bitdi':completed.length>0?'Davam edir':'Gözləyir'}</span></td>
+        <td style="color:var(--muted);font-size:13px;">${date}</td>
+      </tr>`;
+    });
+
+    document.getElementById('recent-tbody').innerHTML = recentHTML || '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">👥</div>Namizid yoxdur</div></td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+// CANDİDATES
+async function loadCandidates() {
+  const tbody = document.getElementById('candidates-tbody');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('candidates').where('companyId','==',companyId).orderBy('createdAt','desc').get();
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div>Hələ namizid yoxdur. + Namizid əlavə et düyməsindən başlayın.</div></td></tr>';
+      return;
+    }
+
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const id = d.id;
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      const isDone = completed.length >= tests.length && tests.length > 0;
+      const testLink = `${window.location.origin}/test.html?c=${id}`;
+
+      html += `<tr>
+        <td>
+          <div class="candidate-name">${data.name}</div>
+          <div class="candidate-email">${data.email}</div>
+          ${data.position ? `<div class="candidate-email">${data.position}</div>` : ''}
+        </td>
+        <td><div class="test-pills">${tests.map(t => `<span class="test-pill ${completed.includes(t)?'pill-done':'pill-pending'}">${t.toUpperCase()}</span>`).join('')}</div></td>
+        <td><span class="badge ${isDone?'badge-done':completed.length>0?'badge-partial':'badge-pending'}">${isDone?'✓ Bitdi':completed.length>0?'Davam edir':'Gözləyir'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-sm btn-link" onclick="showLink('${id}')">🔗 Link</button>
+          </div>
+        </td>
+        <td>
+          <div class="action-btns">
+            ${isDone ? `<button class="btn-sm btn-report" onclick="openReport('${id}','${data.name}')">📊 PDF</button>
+            ${tests.includes('adaptg') ? `<button class="btn-sm btn-excel" onclick="openReport('${id}','${data.name}','adaptg-excel')">📈 Excel</button>` : ''}` : '<span style="font-size:12px;color:var(--muted);">Test gözləyir</span>'}
+          </div>
+        </td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;padding:20px;">Xəta baş verdi</td></tr>'; }
+}
+
+// RESULTS
+async function loadResults() {
+  const tbody = document.getElementById('results-tbody');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('testResults').where('companyId','==',companyId).orderBy('completedAt','desc').get();
+    allResults = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderResults(allResults);
+  } catch(e) { console.error(e); }
+}
+
+function renderResults(results) {
+  const tbody = document.getElementById('results-tbody');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div>Hələ nəticə yoxdur</div></td></tr>';
+    return;
+  }
+
+  const testNames = { adaptg: 'Adapt-G', '16fq': '16FQ', ccsi: 'CCSI' };
+  let html = '';
+  results.forEach(r => {
+    const date = r.completedAt ? new Date(r.completedAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+    const score = r.totalScore !== undefined ? `${r.totalScore}%` : '—';
+    html += `<tr>
+      <td><div class="candidate-name">${r.candidateName || '—'}</div></td>
+      <td><span class="badge badge-partial">${testNames[r.testType] || r.testType}</span></td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);">${score}</td>
+      <td style="color:var(--muted);font-size:13px;">${date}</td>
+      <td><button class="btn-sm btn-report" onclick="openReport('${r.candidateId}','${r.candidateName}')">📊 Hesabat</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function filterResults(type, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (type === 'all') renderResults(allResults);
+  else renderResults(allResults.filter(r => r.testType === type));
+}
+
+// CREDIT LOGS
+async function loadCreditLogs() {
+  const tbody = document.getElementById('credit-logs-tbody');
+  tbody.innerHTML = '<tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('creditLogs').where('companyId','==',companyId).orderBy('createdAt','desc').limit(50).get();
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleString('az-AZ') : '—';
+      const isAdd = data.type === 'add';
+      html += `<tr>
+        <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:${isAdd?'#f0fdf4':'#fef2f2'};color:${isAdd?'var(--success)':'var(--danger)'};">${isAdd?'+ Əlavə':'− İstifadə'}</span></td>
+        <td style="font-family:'Syne',sans-serif;font-weight:700;color:${isAdd?'var(--success)':'var(--danger)'};">${isAdd?'+':'−'}${data.amount}</td>
+        <td style="color:var(--muted);font-size:13px;">${data.note || '—'}</td>
+        <td style="color:var(--muted);font-size:12px;">${date}</td>
+      </tr>`;
+    });
+    tbody.innerHTML = html || '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📋</div>Əməliyyat yoxdur</div></td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+// ADD CANDIDATE
+function openAddCandidate() {
+  selectedTests = [];
+  document.getElementById('cand-name').value = '';
+  document.getElementById('cand-email').value = '';
+  document.getElementById('cand-position').value = '';
+  document.querySelectorAll('.test-select-item').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.checkbox-custom').forEach(el => el.textContent = '');
+  document.getElementById('selected-cost').textContent = '0 kredit';
+  openModal('modal-candidate');
+}
+
+function toggleTest(el, test) {
+  el.classList.toggle('selected');
+  const cb = el.querySelector('.checkbox-custom');
+  if (el.classList.contains('selected')) {
+    cb.textContent = '✓';
+    if (!selectedTests.includes(test)) selectedTests.push(test);
+  } else {
+    cb.textContent = '';
+    selectedTests = selectedTests.filter(t => t !== test);
+  }
+  // Hesabat krediti (report vaxtı çəkiləcək, indi göstərək)
+  const reportCosts = { adaptg: 5, '16fq': 5, ccsi: 3 };
+  const total = selectedTests.reduce((s, t) => s + (reportCosts[t] || 0), 0);
+  document.getElementById('selected-cost').textContent = total + ' kredit';
+}
+
+async function createCandidate() {
+  const name = document.getElementById('cand-name').value.trim();
+  const email = document.getElementById('cand-email').value.trim();
+  const position = document.getElementById('cand-position').value.trim();
+
+  if (!name || !email) { showToast('Ad və e-poçt mütləqdir', 'error'); return; }
+  if (selectedTests.length === 0) { showToast('Ən azı 1 test seçin', 'error'); return; }
+
+  try {
+    const ref = await db.collection('candidates').add({
+      name, email, position,
+      companyId,
+      companyName: companyData.name,
+      assignedTests: selectedTests,
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-candidate');
+    document.getElementById('test-link-url').textContent = `${window.location.origin}/test.html?c=${ref.id}`;
+    openModal('modal-link');
+    showToast(`${name} əlavə edildi ✓`, 'success');
+    loadCandidates();
+    loadOverview();
+  } catch(e) {
+    showToast('Xəta: ' + e.message, 'error');
+  }
+}
+
+function showLink(candidateId) {
+  const link = `${window.location.origin}/test.html?c=${candidateId}`;
+  document.getElementById('test-link-url').textContent = link;
+  openModal('modal-link');
+}
+
+function copyLink() {
+  const url = document.getElementById('test-link-url').textContent;
+  navigator.clipboard.writeText(url).then(() => showToast('Link kopyalandı ✓', 'success'));
+}
+
+// REPORT
+function openReport(candidateId, candidateName, preType = '') {
+  currentCandidateId = candidateId;
+  document.getElementById('report-candidate-info').innerHTML = `
+    <div class="report-row"><span class="report-row-label">Namizid</span><span class="report-row-value">${candidateName}</span></div>
+    <div class="report-row"><span class="report-row-label">Cari kredit</span><span class="report-row-value" style="color:var(--warning);">${companyData.credits || 0} kredit</span></div>
+  `;
+  document.getElementById('report-type').value = preType;
+  document.getElementById('report-cost-box').style.display = 'none';
+  document.getElementById('no-credit-msg').style.display = 'none';
+  document.getElementById('btn-download-report').style.display = 'none';
+  if (preType) updateReportCost();
+  openModal('modal-report');
+}
+
+function updateReportCost() {
+  const sel = document.getElementById('report-type');
+  const val = sel.value;
+  if (!val) {
+    document.getElementById('report-cost-box').style.display = 'none';
+    document.getElementById('btn-download-report').style.display = 'none';
+    return;
+  }
+
+  const cost = COSTS[val] || 0;
+  const remaining = (companyData.credits || 0) - cost;
+
+  document.getElementById('report-cost-val').textContent = cost + ' kredit';
+  document.getElementById('report-remaining').textContent = remaining >= 0 ? remaining + ' qalacaq' : 'Çatmır!';
+  document.getElementById('report-cost-box').style.display = 'flex';
+
+  if (remaining < 0) {
+    document.getElementById('no-credit-msg').style.display = 'block';
+    document.getElementById('btn-download-report').style.display = 'none';
+  } else {
+    document.getElementById('no-credit-msg').style.display = 'none';
+    document.getElementById('btn-download-report').style.display = 'block';
+  }
+}
+
+async function downloadReport() {
+  const type = document.getElementById('report-type').value;
+  const cost = COSTS[type];
+
+  if ((companyData.credits || 0) < cost) {
+    showToast('Kredit yetərli deyil', 'error');
+    return;
+  }
+
+  try {
+    // Kreditten çıx
+    await db.collection('companies').doc(companyId).update({
+      credits: firebase.firestore.FieldValue.increment(-cost)
+    });
+
+    // Log yaz
+    await db.collection('creditLogs').add({
+      companyId,
+      companyName: companyData.name,
+      type: 'use',
+      amount: cost,
+      note: `Hesabat: ${type} — Namizid: ${currentCandidateId}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-report');
+    showToast(`${cost} kredit istifadə edildi. Hesabat hazırlanır...`, 'success');
+
+    // Hesabat səhifəsinə yönləndir
+    setTimeout(() => {
+      window.open(`report.html?c=${currentCandidateId}&type=${type}`, '_blank');
+    }, 800);
+
+  } catch(e) {
+    showToast('Xəta baş verdi', 'error');
+  }
+}
+
+// MODAL
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+// TOAST
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = type==='success' ? '✓ '+msg : '✕ '+msg;
+  t.className = 'toast '+type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsychoAssess — Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070b14;
+  --surface: #0d1424;
+  --surface2: #131d30;
+  --border: #1e2d45;
+  --accent: #3b82f6;
+  --accent2: #06b6d4;
+  --accent3: #10b981;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --success: #10b981;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(59,130,246,0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 60% at 90% 80%, rgba(6,182,212,0.05) 0%, transparent 70%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* SCREENS */
+.screen { display:none; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; flex-direction:column; }
+
+/* WELCOME SCREEN */
+#screen-welcome {
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.welcome-card {
+  background: var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:48px;
+  max-width:560px;
+  width:100%;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.welcome-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+}
+
+.brand {
+  font-size:14px;
+  font-weight:600;
+  color:var(--accent);
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:20px;
+}
+
+.welcome-title {
+  font-size:32px;
+  font-weight:800;
+  margin-bottom:8px;
+  line-height:1.2;
+}
+
+.welcome-name {
+  font-size:18px;
+  color:var(--accent2);
+  font-weight:600;
+  margin-bottom:24px;
+}
+
+.welcome-desc {
+  font-size:15px;
+  color:var(--muted);
+  line-height:1.7;
+  margin-bottom:32px;
+}
+
+.test-list {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-bottom:36px;
+  text-align:left;
+}
+
+.test-list-item {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.test-list-name { font-weight:600; font-size:15px; }
+.test-list-meta { font-size:12px; color:var(--muted); margin-top:3px; }
+.test-list-badge {
+  background:rgba(59,130,246,0.1);
+  border:1px solid rgba(59,130,246,0.2);
+  border-radius:8px;
+  padding:4px 12px;
+  font-size:12px;
+  font-weight:600;
+  color:var(--accent);
+}
+
+.btn-start {
+  width:100%;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border:none;
+  border-radius:14px;
+  padding:18px;
+  color:white;
+  font-family:'Outfit',sans-serif;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.3s;
+  letter-spacing:0.5px;
+}
+
+.btn-start:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(59,130,246,0.3); }
+
+/* TEST HEADER */
+.test-header {
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  position:sticky;
+  top:0;
+  z-index:100;
+  flex-shrink:0;
+}
+
+.test-header-left { display:flex; align-items:center; gap:16px; }
+
+.test-type-badge {
+  font-size:12px;
+  font-weight:700;
+  padding:5px 14px;
+  border-radius:20px;
+  letter-spacing:0.5px;
+}
+
+.badge-adaptg { background:rgba(59,130,246,0.15); color:var(--accent); border:1px solid rgba(59,130,246,0.3); }
+.badge-verbal { background:rgba(6,182,212,0.15); color:var(--accent2); border:1px solid rgba(6,182,212,0.3); }
+.badge-numerical { background:rgba(16,185,129,0.15); color:var(--accent3); border:1px solid rgba(16,185,129,0.3); }
+.badge-abstract { background:rgba(245,158,11,0.15); color:var(--warning); border:1px solid rgba(245,158,11,0.3); }
+.badge-16fq { background:rgba(168,85,247,0.15); color:#a855f7; border:1px solid rgba(168,85,247,0.3); }
+.badge-ccsi { background:rgba(239,68,68,0.15); color:var(--danger); border:1px solid rgba(239,68,68,0.3); }
+
+.progress-wrap {
+  flex:1;
+  max-width:300px;
+  margin:0 20px;
+}
+
+.progress-info {
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:5px;
+}
+
+.progress-bar {
+  height:4px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--accent2));
+  border-radius:2px;
+  transition:width 0.4s ease;
+}
+
+.timer {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:16px;
+  font-weight:600;
+  color:var(--text);
+}
+
+.timer.warning { color:var(--warning); }
+.timer.danger { color:var(--danger); animation:blink 1s infinite; }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* TEST BODY */
+.test-body {
+  flex:1;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:40px 20px;
+  overflow-y:auto;
+}
+
+.question-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:40px;
+  max-width:720px;
+  width:100%;
+  animation:slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.q-number {
+  font-size:12px;
+  font-weight:600;
+  color:var(--muted);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+
+.difficulty-dots {
+  display:inline-flex;
+  gap:4px;
+  margin-left:12px;
+}
+
+.dot {
+  width:7px;height:7px;
+  border-radius:50%;
+  background:var(--border);
+}
+
+.dot.active { background:var(--accent); }
+
+.q-text {
+  font-size:18px;
+  font-weight:500;
+  line-height:1.6;
+  margin-bottom:28px;
+  color:var(--text);
+}
+
+/* SVG ABSTRACT */
+.abstract-container {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:28px;
+}
+
+.abstract-grid {
+  display:grid;
+  gap:4px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:8px;
+}
+
+.abstract-grid.g3x3 { grid-template-columns:repeat(3,80px); }
+.abstract-grid.g2x3 { grid-template-columns:repeat(3,80px); }
+
+.abstract-cell {
+  width:80px;height:80px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.abstract-cell.question-cell {
+  background:rgba(59,130,246,0.05);
+  border:2px dashed var(--accent);
+}
+
+.abstract-cell svg { width:52px;height:52px; }
+
+.abstract-hint {
+  font-size:12px;
+  color:var(--muted);
+  font-style:italic;
+}
+
+/* OPTIONS */
+.options-grid {
+  display:grid;
+  gap:10px;
+}
+
+.options-grid.grid-2 { grid-template-columns:1fr 1fr; }
+.options-grid.grid-1 { grid-template-columns:1fr; }
+
+.option-btn {
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  padding:16px 20px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  text-align:left;
+  font-family:'Outfit',sans-serif;
+  color:var(--text);
+}
+
+.option-btn:hover {
+  border-color:var(--accent);
+  background:rgba(59,130,246,0.05);
+  transform:translateY(-1px);
+}
+
+.option-btn.selected {
+  border-color:var(--accent);
+  background:rgba(59,130,246,0.1);
+}
+
+.option-btn.correct {
+  border-color:var(--success);
+  background:rgba(16,185,129,0.1);
+}
+
+.option-btn.wrong {
+  border-color:var(--danger);
+  background:rgba(239,68,68,0.08);
+}
+
+.option-label {
+  width:32px;height:32px;
+  border-radius:8px;
+  background:var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:700;
+  font-size:14px;
+  flex-shrink:0;
+  transition:all 0.2s;
+}
+
+.option-btn.selected .option-label { background:var(--accent); color:white; }
+.option-btn.correct .option-label { background:var(--success); color:white; }
+.option-btn.wrong .option-label { background:var(--danger); color:white; }
+
+.option-text { font-size:15px; font-weight:500; line-height:1.4; }
+
+/* ABSTRACT OPTIONS */
+.abstract-options {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+
+.abstract-option {
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:10px;
+  padding:12px;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+
+.abstract-option:hover { border-color:var(--accent); transform:translateY(-2px); }
+.abstract-option.selected { border-color:var(--accent); background:rgba(59,130,246,0.1); }
+.abstract-option.correct { border-color:var(--success); background:rgba(16,185,129,0.1); }
+.abstract-option.wrong { border-color:var(--danger); background:rgba(239,68,68,0.08); }
+
+.abstract-option svg { width:54px;height:54px; }
+.abstract-option-label { font-size:12px; font-weight:700; color:var(--muted); }
+
+/* LIKERT (16FQ) */
+.likert-wrap { margin-bottom:8px; }
+
+.likert-options {
+  display:flex;
+  gap:8px;
+  justify-content:center;
+  margin-top:16px;
+}
+
+.likert-btn {
+  flex:1;
+  max-width:160px;
+  padding:14px 10px;
+  background:var(--surface2);
+  border:1.5px solid var(--border);
+  border-radius:12px;
+  cursor:pointer;
+  font-family:'Outfit',sans-serif;
+  color:var(--text);
+  font-size:13px;
+  font-weight:600;
+  transition:all 0.2s;
+  text-align:center;
+}
+
+.likert-btn:hover { border-color:var(--accent); }
+.likert-btn.selected { border-color:var(--accent); background:rgba(59,130,246,0.1); color:var(--accent); }
+
+.likert-poles {
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  color:var(--muted);
+  padding:0 4px;
+  margin-top:8px;
+}
+
+/* NAV */
+.test-nav {
+  padding:20px 40px;
+  display:flex;
+  justify-content:flex-end;
+  gap:12px;
+}
+
+.btn-next {
+  background:var(--accent);
+  border:none;
+  border-radius:12px;
+  padding:14px 32px;
+  color:white;
+  font-family:'Outfit',sans-serif;
+  font-size:15px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.btn-next:hover { background:#2563eb; transform:translateY(-1px); }
+.btn-next:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+/* SECTION TRANSITION */
+#screen-section {
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.section-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:48px;
+  max-width:500px;
+  width:100%;
+  text-align:center;
+}
+
+.section-icon { font-size:56px; margin-bottom:20px; }
+.section-title { font-size:28px; font-weight:800; margin-bottom:12px; }
+.section-desc { font-size:15px; color:var(--muted); line-height:1.7; margin-bottom:32px; }
+
+.section-stats {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:32px;
+}
+
+.section-stat {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:14px;
+}
+
+.section-stat-val { font-size:22px; font-weight:800; color:var(--accent); font-family:'JetBrains Mono',monospace; }
+.section-stat-label { font-size:11px; color:var(--muted); margin-top:4px; }
+
+/* DONE SCREEN */
+#screen-done {
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.done-card {
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:52px;
+  max-width:540px;
+  width:100%;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+.done-card::before {
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:4px;
+  background:linear-gradient(90deg,var(--accent),var(--accent2),var(--accent3));
+}
+
+.done-icon { font-size:64px; margin-bottom:20px; }
+.done-title { font-size:30px; font-weight:800; margin-bottom:8px; }
+.done-sub { font-size:16px; color:var(--muted); margin-bottom:32px; }
+
+.done-results {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-bottom:32px;
+}
+
+.done-result-item {
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.done-result-name { font-size:15px; font-weight:600; }
+.done-result-score {
+  font-family:'JetBrains Mono',monospace;
+  font-size:20px;
+  font-weight:700;
+  color:var(--accent);
+}
+
+.done-msg {
+  background:rgba(16,185,129,0.08);
+  border:1px solid rgba(16,185,129,0.2);
+  border-radius:12px;
+  padding:16px;
+  font-size:14px;
+  color:var(--accent3);
+  line-height:1.6;
+}
+
+/* ERROR */
+#screen-error {
+  align-items:center;
+  justify-content:center;
+}
+
+.error-box {
+  text-align:center;
+  padding:40px;
+}
+
+.error-box h2 { font-size:24px; margin-bottom:12px; color:var(--danger); }
+.error-box p { color:var(--muted); }
+
+/* LOADING */
+#screen-loading {
+  align-items:center;
+  justify-content:center;
+}
+
+.loading-inner { text-align:center; }
+.loading-spinner {
+  width:48px;height:48px;
+  border:3px solid var(--border);
+  border-top-color:var(--accent);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+  margin:0 auto 16px;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading-text { color:var(--muted); font-size:15px; }
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div class="screen active" id="screen-loading">
+  <div class="loading-inner">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Yüklənir...</div>
+  </div>
+</div>
+
+<!-- ERROR -->
+<div class="screen" id="screen-error">
+  <div class="error-box">
+    <h2>⚠️ Xəta</h2>
+    <p id="error-msg">Link etibarsızdır və ya müddəti bitib.</p>
+  </div>
+</div>
+
+<!-- WELCOME -->
+<div class="screen" id="screen-welcome">
+  <div class="welcome-card">
+    <div class="brand">PsychoAssess</div>
+    <div class="welcome-title">Salam, <span id="welcome-name" style="color:var(--accent2)">—</span>!</div>
+    <div class="welcome-desc">Sizi <strong id="welcome-company" style="color:var(--text)">—</strong> tərəfindən dəvət edilmisiniz. Aşağıdakı testləri ardıcıl keçəcəksiniz.</div>
+
+    <div class="test-list" id="test-list"></div>
+
+    <button class="btn-start" onclick="startTests()">Testi Başla →</button>
+  </div>
+</div>
+
+<!-- SECTION TRANSITION -->
+<div class="screen" id="screen-section">
+  <div class="section-card">
+    <div class="section-icon" id="section-icon">🔵</div>
+    <div class="section-title" id="section-title">—</div>
+    <div class="section-desc" id="section-desc">—</div>
+    <div class="section-stats">
+      <div class="section-stat">
+        <div class="section-stat-val" id="sec-questions">—</div>
+        <div class="section-stat-label">Sual</div>
+      </div>
+      <div class="section-stat">
+        <div class="section-stat-val" id="sec-time">—</div>
+        <div class="section-stat-label">Dəqiqə</div>
+      </div>
+      <div class="section-stat">
+        <div class="section-stat-val" id="sec-type">—</div>
+        <div class="section-stat-label">Format</div>
+      </div>
+    </div>
+    <button class="btn-start" onclick="startCurrentTest()">Başla →</button>
+  </div>
+</div>
+
+<!-- TEST -->
+<div class="screen" id="screen-test">
+  <div class="test-header">
+    <div class="test-header-left">
+      <span class="test-type-badge" id="test-badge">—</span>
+      <span id="section-name" style="font-size:14px;font-weight:600;color:var(--muted);">—</span>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="q-progress">Sual 1/20</span>
+        <span id="q-difficulty" style="color:var(--muted)">Orta</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="timer" id="timer">⏱ 00:00</div>
+  </div>
+
+  <div class="test-body">
+    <div class="question-card" id="question-card">
+      <!-- dinamik -->
+    </div>
+  </div>
+
+  <div class="test-nav">
+    <button class="btn-next" id="btn-next" onclick="nextQuestion()" disabled>
+      Növbəti →
+    </button>
+  </div>
+</div>
+
+<!-- DONE -->
+<div class="screen" id="screen-done">
+  <div class="done-card">
+    <div class="done-icon">🎉</div>
+    <div class="done-title">Təbrik edirik!</div>
+    <div class="done-sub">Bütün testləri uğurla tamamladınız.</div>
+    <div class="done-results" id="done-results"></div>
+    <div class="done-msg">
+      Nəticələriniz şirkət adminə göndərildi. Hesabatınız hazırlandıqdan sonra sizinlə əlaqə saxlanılacaq.
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
+  authDomain: "hr-testing-48e31.firebaseapp.com",
+  databaseURL: "https://hr-testing-48e31-default-rtdb.firebaseio.com",
+  projectId: "hr-testing-48e31",
+  storageBucket: "hr-testing-48e31.firebasestorage.app",
+  messagingSenderId: "905744094931",
+  appId: "1:905744094931:web:2e16300768f61b4fd76626",
+  measurementId: "G-X2NV26TR01"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// ==================== STATE ====================
+let candidateId = null;
+let candidateData = null;
+let assignedTests = [];
+let currentTestIndex = 0;
+let currentTest = null;
+let currentQuestions = [];
+let currentQIndex = 0;
+let selectedAnswer = null;
+let answers = {};
+let timerInterval = null;
+let timeLeft = 0;
+let difficultyLevel = 1; // 0=easy, 1=medium, 2=hard
+let testScores = {};
+
+// ==================== TEST META ====================
+const TEST_META = {
+  adaptg: {
+    label: 'Adapt-G',
+    icon: '🔵',
+    badgeClass: 'badge-adaptg',
+    desc: 'Verbal, Numerical və Abstract Reasoning qabiliyyətlərinizi ölçür.',
+    sections: ['verbal','numerical','abstract'],
+    questionsPerSection: 20,
+    timePerSection: { verbal:900, numerical:900, abstract:1200 }
+  },
+  '16fq': {
+    label: '16FQ Şəxsiyyət',
+    icon: '🟡',
+    badgeClass: 'badge-16fq',
+    desc: '16 şəxsiyyət faktoru üzrə qiymətləndirmə. Düzgün/yanlış cavab yoxdur.',
+    sections: ['personality'],
+    questionsPerSection: 96,
+    timePerSection: { personality: 0 }
+  },
+  ccsi: {
+    label: 'CCSI',
+    icon: '🟠',
+    badgeClass: 'badge-ccsi',
+    desc: 'İş ssenarilərini necə həll etdiyinizi qiymətləndirir.',
+    sections: ['situational'],
+    questionsPerSection: 24,
+    timePerSection: { situational: 1500 }
+  }
+};
+
+const SECTION_META = {
+  verbal:      { label:'Verbal Reasoning',     badge:'badge-verbal',    icon:'📖', time:'15 dəq', format:'Çoxseçimli' },
+  numerical:   { label:'Numerical Reasoning',  badge:'badge-numerical', icon:'🔢', time:'15 dəq', format:'Çoxseçimli' },
+  abstract:    { label:'Abstract Reasoning',   badge:'badge-abstract',  icon:'🔷', time:'20 dəq', format:'Şəkilli' },
+  personality: { label:'Şəxsiyyət İnventarı', badge:'badge-16fq',      icon:'🧠', time:'Limitsiz',format:'Likert' },
+  situational: { label:'Situasiya Mühakiməsi',badge:'badge-ccsi',       icon:'💼', time:'25 dəq', format:'Ssenari' }
+};
+
+// ==================== QUESTIONS ====================
+
+// VERBAL - 3 çətinlik səviyyəsi
+const VERBAL_EASY = [
+  { q:'Aşağıdakı sözlərdən hansı "sürətli" sözünün sinonimi deyil?', opts:['Cəld','Iti','Yavaş','Çevik'], correct:2 },
+  { q:'"Günəş qərbdən çıxır." Bu cümlə haqqında nə deyə bilərik?', opts:['Doğrudur','Yanlışdır','Mümkündür','Bəzən doğrudur'], correct:1 },
+  { q:'Bütün itlər heyvandır. Reks itdir. Reks nədir?', opts:['Quşdur','Heyvan deyil','Heyvandır','Bəlkə heyvandır'], correct:2 },
+  { q:'"Böyük" sözünün antonimi hansıdır?', opts:['Nəhəng','Kiçik','Geniş','Uzun'], correct:1 },
+  { q:'Aşağıdakı sözlərdən hansı digərlərinə aid deyil?', opts:['Alma','Armud','Portağal','Kərpic'], correct:3 }
+];
+
+const VERBAL_MEDIUM = [
+  { q:'Mətn: "Şirkət bu rübdə gəlirini 15% artırdı, lakin xərclər 22% artdı." Bu mətnə əsasən hansı nəticə çıxarmaq olar?', opts:['Şirkətin mənfəəti artdı','Şirkətin mənfəəti azaldı','Gəlir xərclərdən çoxdur','Xərclər azaldı'], correct:1 },
+  { q:'"İstedad lazımdır, amma yalnız çalışqanlıq uğur gətirir." Bu fikrə ən uyğun nəticə hansıdır?', opts:['İstedadlı olmaq kifayətdir','Çalışqanlıq istedad olmadan faydasızdır','Uğur üçün hər ikisi lazımdır','İstedad daha vacibdir'], correct:2 },
+  { q:'Həmişə: "Bütün rəhbərlər qərar qəbul edir. Əli qərar qəbul edir." Bu məlumat əsasında nə deyə bilərik?', opts:['Əli mütləq rəhbərdir','Əli rəhbər olmaya bilər','Əli heç vaxt rəhbər deyil','Qərar qəbul edənlər rəhbərdir'], correct:1 },
+  { q:'Mətn: "Azərbaycanda son 5 ildə turizm 40% artdı." Bu fikir əsasında ən güclü nəticə hansıdır?', opts:['Turizm gələcəkdə azalacaq','Azərbaycan populyar turizm məkanıdır','Turistlər xaricdən gəlir','Otellərin sayı artdı'], correct:1 },
+  { q:'"Yüksək keyfiyyətli məhsullar həmişə bahalıdır." Bu məntiqi zəncirlə uyğun olmayan fikir hansıdır?', opts:['Ucuz məhsul keyfiyyətsiz ola bilər','Bəzi bahalı məhsullar keyfiyyətsizdir','Keyfiyyət qiymətlə bağlıdır','Ucuz = keyfiyyətsiz'], correct:1 }
+];
+
+const VERBAL_HARD = [
+  { q:'Mətn: "Tədqiqatlar göstərir ki, uzun iş saatları məhsuldarlığı artırmır, əksinə azaldır. Bununla belə, şirkətlərin 60%-i işçilərindən 50+ saat tələb edir." Bu məlumat əsasında ən məntiqi nəticə hansıdır?', opts:['Şirkətlər bu tədqiqatları bilmirlər','Şirkətlər tədqiqatları bilsələr də dəyişmirlər','Tədqiqatlar yanlışdır','Məhsuldarlıq artdı'], correct:1 },
+  { q:'"Əgər iqtisadiyyat böyüyürsə, işsizlik azalır. İşsizlik azalmayıb." Bu məntiqi arqumentdən hansı nəticə çıxır?', opts:['İqtisadiyyat böyüyür','İqtisadiyyat böyümür','İşsizlik artıb','İqtisadiyyat sabitdir'], correct:1 },
+  { q:'Mətn analizi: "Şirkət A bazarda 35% pay tutur. Şirkət B 25%, şirkət C 20% tutur. Qalan 20% kiçik oyunçulardadır. Son rübdə şirkət A 5% pay itirdi." Bu vəziyyətdə bazarın yenidən paylanması haqqında ən dəqiq ifadə hansıdır?', opts:['Şirkət A 30% paya düşdü','Kiçik oyunçular gücləndi','Şirkət B lider oldu','Bazar paylanması dəyişmədi'], correct:0 },
+  { q:'"Bütün innovativ şirkətlər R&D-ə investisiya qoyur. Bu şirkət R&D-ə investisiya qoymur." Buradan hansı nəticə çıxır?', opts:['Bu şirkət innovativdir','Bu şirkət innovativ deyil','Bu şirkət R&D planlaşdırır','Nəticə çıxarmaq mümkün deyil'], correct:1 },
+  { q:'Paradoks: "Bu cümlə yanlışdır." Bu cümlə haqqında ən dəqiq ifadə hansıdır?', opts:['Cümlə doğrudur','Cümlə yanlışdır','Nə doğru, nə yanlış deyil','Məntiqi paradoksdur'], correct:3 }
+];
+
+// NUMERICAL
+const NUMERICAL_EASY = [
+  { q:'Bir şirkətin satışı yanvarda 1200, fevralda 1450 manat oldu. Artım neçə manat oldu?', opts:['150','200','250','300'], correct:2 },
+  { q:'15 işçidən 6-sı qadındır. Qadınların faizi nə qədərdir?', opts:['30%','40%','45%','50%'], correct:1 },
+  { q:'500 manatlıq məhsula 20% endirim edildi. Yeni qiymət nə qədərdir?', opts:['380','400','420','450'], correct:1 },
+  { q:'3 saatda 120 km yol getdilər. Orta sürət nə qədərdir?', opts:['30 km/s','40 km/s','45 km/s','50 km/s'], correct:1 },
+  { q:'Bir məhsul 80 manata alınıb, 100 manata satılıb. Mənfəət faizi nə qədərdir?', opts:['15%','20%','25%','30%'], correct:2 }
+];
+
+const NUMERICAL_MEDIUM = [
+  { q:'Cədvəl: Jan=45k, Feb=52k, Mar=48k, Apr=61k. Rüblük ortalama nə qədərdir?', opts:['48.5k','51.5k','50.5k','52k'], correct:1 },
+  { q:'İşçilərin maaşı ötən il 8% artdı. Bu il daha 12% artacaq. Ümumi artım nə qədərdir?', opts:['20%','20.96%','21.12%','21.5%'], correct:1 },
+  { q:'Şirkətin xərclərinin 35%-i maaş, 25%-i icarə, 20%-i xammal, qalanı isə digər xərclərdir. Digər xərclər neçə faizdir?', opts:['10%','15%','20%','25%'], correct:2 },
+  { q:'Məhsulun qiyməti 3 ay əvvəl 200 manat idi. Hər ay 5% artdı. İndi nə qədərdir?', opts:['215.25','230.5','231.53','225'], correct:2 },
+  { q:'20 işçidən hər biri gündə 6 saat işləyir. Həftədə (5 iş günü) ümumi iş saatı nə qədərdir?', opts:['500','550','600','650'], correct:2 }
+];
+
+const NUMERICAL_HARD = [
+  { q:'Şirkət A-nın gəliri şirkət B-nin 2.4 mislidir. B-nin gəliri 850.000 manatdırsa, A+B-nin cəmi nə qədərdir?', opts:['2,890,000','2,040,000','2,890,000','3,040,000'], correct:0 },
+  { q:'Bir prosesin səmərəliliyi 75%-dir. 400 vahid girişdə çıxış nə qədər olacaq?', opts:['280','300','320','350'], correct:1 },
+  { q:'Şirkətin mənfəəti ilk rübdə 120k, ikinci rübdə 15% artdı, üçüncü rübdə 10% azaldı. Üçüncü rüb mənfəəti nə qədərdir?', opts:['122.1k','124.2k','126k','128k'], correct:0 },
+  { q:'100 vahid məhsulun dəyişən xərci 45 manat, sabit xərc aylıq 2800 manatdır. Zərərsizlik nöqtəsi (break-even) nə qədər vahiddir?', opts:['55','58','62','64'], correct:2 },
+  { q:'İki növ investisiya: A = 12% illik gəlir, B = 9% illik gəlir. 10.000 manat ikisə bölünür, ümumi gəlir 1050 manat olur. A-ya nə qədər qoyulub?', opts:['4000','4500','5000','5500'], correct:2 }
+];
+
+// ABSTRACT (SVG ilə)
+function svgCircle(r,fill='none',stroke='#3b82f6',sw=2.5) {
+  return `<svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgSquare(s,fill='none',stroke='#3b82f6',sw=2.5,x,y) {
+  x=x||(26-s/2);y=y||(26-s/2);
+  return `<svg viewBox="0 0 52 52"><rect x="${x}" y="${y}" width="${s}" height="${s}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgTriangle(fill='none',stroke='#3b82f6',sw=2.5) {
+  return `<svg viewBox="0 0 52 52"><polygon points="26,6 46,44 6,44" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgDiamond(fill='none',stroke='#3b82f6',sw=2.5) {
+  return `<svg viewBox="0 0 52 52"><polygon points="26,4 48,26 26,48 4,26" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgStar(fill='none',stroke='#f59e0b',sw=2) {
+  return `<svg viewBox="0 0 52 52"><polygon points="26,4 31,19 47,19 34,29 39,45 26,35 13,45 18,29 5,19 21,19" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgCross(stroke='#3b82f6',sw=3) {
+  return `<svg viewBox="0 0 52 52"><line x1="8" y1="26" x2="44" y2="26" stroke="${stroke}" stroke-width="${sw}"/><line x1="26" y1="8" x2="26" y2="44" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgMinus(stroke='#3b82f6',sw=3) {
+  return `<svg viewBox="0 0 52 52"><line x1="8" y1="26" x2="44" y2="26" stroke="${stroke}" stroke-width="${sw}"/></svg>`;
+}
+function svgDots(n, stroke='#3b82f6') {
+  const positions = [[26,26],[16,20],[36,20],[16,32],[36,32],[21,26],[31,26]];
+  const pts = positions.slice(0,n);
+  return `<svg viewBox="0 0 52 52">${pts.map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4" fill="${stroke}"/>`).join('')}</svg>`;
+}
+function svgEmpty() {
+  return `<svg viewBox="0 0 52 52"><text x="26" y="32" text-anchor="middle" font-size="22" fill="#64748b">?</text></svg>`;
+}
+
+const ABSTRACT_EASY = [
+  {
+    q:'Aşağıdakı ardıcıllıqda "?" nə olmalıdır?',
+    grid:{ type:'row', cells:[svgCircle(8,'#3b82f6'), svgCircle(14,'#3b82f6'), svgCircle(20,'#3b82f6'), svgEmpty()] },
+    opts:[svgCircle(14,'#3b82f6'), svgCircle(26,'#3b82f6'), svgCircle(20,'#3b82f6'), svgTriangle('#3b82f6')],
+    correct:1, hint:'Çevrənin ölçüsü ardıcıl artır'
+  },
+  {
+    q:'Sıradakı fiqur hansı olmalıdır?',
+    grid:{ type:'row', cells:[svgSquare(12), svgSquare(20), svgSquare(28), svgEmpty()] },
+    opts:[svgSquare(36), svgSquare(28), svgCircle(18), svgTriangle()],
+    correct:0, hint:'Kvadratın ölçüsü artır'
+  },
+  {
+    q:'Hansı fiqur sıraya uyğundur?',
+    grid:{ type:'row', cells:[svgDots(1), svgDots(2), svgDots(3), svgEmpty()] },
+    opts:[svgDots(5), svgDots(4), svgDots(3), svgDots(6)],
+    correct:1, hint:'Nöqtə sayı ardıcıl artır'
+  }
+];
+
+const ABSTRACT_MEDIUM = [
+  {
+    q:'3×3 matrisdə "?" hansı fiqur olmalıdır?',
+    grid:{ type:'3x3', cells:[
+      svgCircle(10), svgCircle(16), svgCircle(22),
+      svgSquare(18), svgSquare(24), svgSquare(30),
+      svgTriangle(), svgTriangle('#3b82f6','#3b82f6'), svgEmpty()
+    ]},
+    opts:[svgTriangle('#10b981','#10b981'), svgCircle(10), svgSquare(12), svgDiamond('#10b981','#10b981')],
+    correct:0, hint:'Hər sətirdə fiqur böyüyür, hər sütunda şəkil növü dəyişir'
+  },
+  {
+    q:'Hansı fiqur "?" yerinə gəlməlidir?',
+    grid:{ type:'3x3', cells:[
+      svgCircle(18,'#3b82f6'), svgSquare(24,'none','#3b82f6'), svgTriangle('none','#3b82f6'),
+      svgCircle(18,'none','#06b6d4'), svgSquare(24,'none','#06b6d4'), svgTriangle('none','#06b6d4'),
+      svgCircle(18,'none','#10b981'), svgSquare(24,'none','#10b981'), svgEmpty()
+    ]},
+    opts:[svgTriangle('none','#10b981'), svgCircle(18,'none','#10b981'), svgDiamond('none','#10b981'), svgTriangle('none','#3b82f6')],
+    correct:0, hint:'Hər sətirdə eyni rəng, hər sütunda eyni forma'
+  },
+  {
+    q:'Ardıcıllıqda boş yer hansı fiqur olmalıdır?',
+    grid:{ type:'row', cells:[svgCross(), svgDiamond(), svgMinus(), svgEmpty()] },
+    opts:[svgCross(), svgCircle(14), svgDots(4), svgStar()],
+    correct:3, hint:'Forma sırası dövri olaraq dəyişir'
+  }
+];
+
+const ABSTRACT_HARD = [
+  {
+    q:'Kompleks matrisdə "?" hansı fiqur olmalıdır?',
+    grid:{ type:'3x3', cells:[
+      svgCircle(10,'#3b82f6'), svgCircle(14,'#3b82f6'), svgCircle(18,'#3b82f6'),
+      svgDots(1,'#06b6d4'), svgDots(2,'#06b6d4'), svgDots(3,'#06b6d4'),
+      svgSquare(14,'none','#f59e0b'), svgSquare(20,'none','#f59e0b'), svgEmpty()
+    ]},
+    opts:[svgSquare(26,'none','#f59e0b'), svgSquare(20,'none','#3b82f6'), svgCircle(20,'#f59e0b'), svgDots(3,'#f59e0b')],
+    correct:0, hint:'Hər sətirdə həm rəng, həm ölçü ardıcıl artır'
+  },
+  {
+    q:'Transformasiya qaydası əsasında "?" hansı olmalıdır?',
+    grid:{ type:'3x3', cells:[
+      svgCircle(18,'#3b82f6'), svgSquare(24,'none','#3b82f6'), svgEmpty(),
+      svgDiamond('none','#06b6d4'), svgCircle(14,'#06b6d4'), svgSquare(18,'none','#06b6d4'),
+      svgSquare(20,'none','#10b981'), svgDiamond('none','#10b981'), svgCircle(16,'#10b981')
+    ]},
+    opts:[svgTriangle('none','#3b82f6'), svgDiamond('none','#3b82f6'), svgCircle(14,'none','#3b82f6'), svgStar('none','#3b82f6')],
+    correct:1, hint:'Hər sətirdə forma sırası: dairə→kvadrat→romb'
+  }
+];
+
+// 16FQ QUESTIONS
+const FQ16_QUESTIONS = [
+  { q:'Başqaları ilə ünsiyyət qurmaqdan zövq alıram.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Çətin vəziyyətlərdə sakit qalmağı bacarıram.', a:'Razıyam', b:'Razı deyiləm', factor:'C' },
+  { q:'Yeni ideyalar irəli sürmək xoşuma gəlir.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'Qaydalar və prosedurlar mənim üçün mühümdür.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Böyük izdihamlı tədbirlərdən zövq alıram.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Müstəqil qərar qəbul etməyi üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Yeni şeylər öyrənmək məni həyəcanlandırır.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'İnsanlara kömək etmək mənə xoş hiss verir.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Stress altında da effektiv çalışa bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'C' },
+  { q:'Dəqiq və detallı iş görməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Qrup şəraitində liderlik etməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Mürəkkəb problemləri analiz etməkdən zövq alıram.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'Çox vaxt insanların hisslərinə diqqət yetirirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'I' },
+  { q:'Dəyişikliklərə asanlıqla uyğunlaşıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Öz güclü tərəflərimi yaxşı bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Sərt danışmaq yerinə üstüörtülü ifadə etməyi üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Uzunmüddətli planlaşdırma mənə xoş gəlir.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Çox vaxt təşkilatlı olmağa çalışıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Rəqabət mühitindən həzz alıram.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Başqalarının fikrinə həssaslıqla yanaşıram.', a:'Razıyam', b:'Razı deyiləm', factor:'I' },
+  { q:'Məqsədimə çatmaq üçün inadla çalışıram.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Gözlənilməz vəziyyətləri sevmirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q4' },
+  { q:'Başqalarına öz fikrimi asanlıqla bildirirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'Xüsusi diqqət çəkmədən işimi görməyi üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Emosiyalarımı nəzarətdə saxlaya bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'C' },
+  { q:'Yeni texnologiyaları öyrənmək istəyim var.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Komanda şəraitini fərdi işdən üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Uzun müddət fokuslu qala bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Risk almaqdan çəkinmirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Başqalarının problemlərini öz üzərimə götürürəm.', a:'Razıyam', b:'Razı deyiləm', factor:'I' },
+  { q:'Yüksək standartlara cavab verməyə çalışıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'İş yerimdə harmonik mühit vacibdir.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'Mücərrəd ideyalar barədə düşünməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'M' },
+  { q:'Öz hisslərim haqqında açıq danışa bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'Qaydaları öz sözümlə şərh etməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Mənim üçün sabitlik dəyişiklikdən vacibdir.', a:'Razıyam', b:'Razı deyiləm', factor:'Q4' },
+  { q:'Başqaları ilə fikir ayrılığı mənə narahatçılıq vermir.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Mükəmməlliyə can atmaq həmişə vacidir.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Fikirlərimə güvənirlər.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Fərqli perspektivlərdən yanaşmağı sevirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'M' },
+  { q:'Gizli motivlər haqqında düşünürəm.', a:'Razıyam', b:'Razı deyiləm', factor:'L' },
+  { q:'İnsanlara güvənmək asandır.', a:'Razıyam', b:'Razı deyiləm', factor:'L' },
+  { q:'Ciddi şəkildə danışmağı üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'Öz xoşbəxtliyim başqalarından asılıdır.', a:'Razıyam', b:'Razı deyiləm', factor:'Q2' },
+  { q:'Müstəqil çalışmağı üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'Q2' },
+  { q:'İnsanlara asanlıqla yardım edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Gələcəyi planlaşdırmaq xoşuma gəlir.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Fiziki fəaliyyət məni canlandırır.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Xüsusi diqqət olmadan işimi görə bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q2' },
+  { q:'Başqalarını inandırmaq bacarığım var.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Mürəkkəb vəziyyətlərdə rahat qalıram.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Ətrafdakılar mənim fikrimi qəbul edir.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Gündəlik rutini sevmirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'M' },
+  { q:'Uzun müddətli münasibətlər qurmaq vacibdir.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Öz davranışlarımı analiz etməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'Enerji səviyyəm həmişə yüksəkdir.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Başqalarının hissləri mənə güclü təsir edir.', a:'Razıyam', b:'Razı deyiləm', factor:'I' },
+  { q:'Çoxlu alternativlər arasından seçim etməyi xoşlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'M' },
+  { q:'Özümü nadir hallarda utancaq hiss edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Öz səhvlərimi asanlıqla etiraf edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Yüksək məqsədlərə can atıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Gündəlik işdə dəqiqlik vacibdir.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Sosial tədbirlərdə aktiv iştirak edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'Gözlənilməz problemlər məni narahat etmir.', a:'Razıyam', b:'Razı deyiləm', factor:'C' },
+  { q:'Öz fikirlərimi asanlıqla ifadə edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Başqaları ilə işbirliyi etməyi sevirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'İş həyatımda sistemlilik vacibdir.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Yeni mühitlərə tez uyğunlaşıram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Başqalarının məni sevib-sevmədiyini düşünürəm.', a:'Razıyam', b:'Razı deyiləm', factor:'L' },
+  { q:'Həddindən çox narahat olmuram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q4' },
+  { q:'Mürəkkəb məsələləri sadə şəkildə izah edə bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'Daxili narahatçılığı gizlədə bilirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Öz qaydalarımı yaratmağı üstün tuturam.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Böyük qruplarla işləmək mənə çətin gəlmir.', a:'Razıyam', b:'Razı deyiləm', factor:'A' },
+  { q:'Öz işimdən məmnunluq hiss edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'C' },
+  { q:'Başqalarının rəyinə hörmət edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'L' },
+  { q:'Hədəflərimə çatmaq üçün planlar qururum.', a:'Razıyam', b:'Razı deyiləm', factor:'G' },
+  { q:'Fikirlərimi yazmaq danışmaqdan asandır.', a:'Razıyam', b:'Razı deyiləm', factor:'F' },
+  { q:'İşimdə çox yüklənmirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q4' },
+  { q:'Öz gücümə inanıram.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Ətrafdakılar mənə müraciət edirlər.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'Müxtəlif mədəniyyətlərə marağım var.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Başqalarının hisslərini anlayıram.', a:'Razıyam', b:'Razı deyiləm', factor:'I' },
+  { q:'Öz performansımı müntəzəm qiymətləndirirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'B' },
+  { q:'Çətin tapşırıqlarla məşğul olmağı sevirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'H' },
+  { q:'Böyük qərarları tez qəbul edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'E' },
+  { q:'İşdə xüsusi diqqət göstərilməsi xoşuma gəlir.', a:'Razıyam', b:'Razı deyiləm', factor:'O' },
+  { q:'Öz vaxtımı effektiv idarə edirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q3' },
+  { q:'Sosial proseslərə marağım var.', a:'Razıyam', b:'Razı deyiləm', factor:'M' },
+  { q:'Başqaları ilə açıq danışmaqdan çəkinmirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'N' },
+  { q:'Öz peşəkar inkişafıma diqqət yetirirəm.', a:'Razıyam', b:'Razı deyiləm', factor:'Q2' },
+  { q:'İş mühitindəki dəyişikliklərə adaptasiya oluram.', a:'Razıyam', b:'Razı deyiləm', factor:'Q1' },
+  { q:'Nəticə əldə etmək prosesdən önəmlidir.', a:'Razıyam', b:'Razı deyiləm', factor:'G' }
+];
+
+// CCSI QUESTIONS
+const CCSI_QUESTIONS = [
+  {
+    q:'Müştəri telefonda çox əsəbi şəkildə sizinlə danışır. Nə edərdiniz?',
+    opts:[
+      'Müştərinin danışığını kəsib özünüzü müdafiə edərdiniz',
+      'Sakit qalıb müştərini dinlər, problemin həllini axtarardınız',
+      'Zəngi başqa əməkdaşa yönləndirərdiniz',
+      'Müştəriyə əsəbi şəkildə cavab verərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Layihənin son tarixi sabah olmasına baxmayaraq, komanda üzvü öz hissəsini tamamlamamışdır. Nə edərdiniz?',
+    opts:[
+      'Ona kömək etməyi təklif edərdiniz',
+      'Rəhbərinizə dərhal bildirərdiniz',
+      'Onun işini özünüz görərdiniz',
+      'Heç nə etməzdiniz, bu onun məsuliyyətidir'
+    ], correct:0
+  },
+  {
+    q:'İki vacib tapşırığınız var, ikisinin də müddəti eyni vaxtda bitir. Nə edərdiniz?',
+    opts:[
+      'İkisini eyni vaxtda yerinə yetirməyə çalışardınız',
+      'Rəhbərinizlə prioritetliyi müzakirə edərdiniz',
+      'Asanını seçib digərini unudardınız',
+      'Hər ikisini gecikdirərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Rəhbəriniz sizə səhv məlumat vermişdir. Müştəriyə bu məlumatı söylədikdən sonra xəta aşkarlandı. Nə edərdiniz?',
+    opts:[
+      'Bütün günahı rəhbərinizin üstünə yıxardınız',
+      'Müştəriyə üzr istəyib düzgün məlumat verərdiniz',
+      'Heç nə etməzdiniz',
+      'Müştərini başqa şöbəyə yönləndirərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Komanda yığıncağında başqa bir əməkdaşınız sizin ideyaları öz adına çıxartdı. Nə edərdiniz?',
+    opts:[
+      'Yığıncaqda dərhal üzə vurardınız',
+      'Sonra özəl söhbətdə vəziyyəti aydınlaşdırardınız',
+      'Heç nə etməzdiniz',
+      'Rəhbərinizə şikayət edərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Siz xəstəsiniz amma vacib layihənin son günüdür. Nə edərdiniz?',
+    opts:[
+      'İşə gedib tapşırığı tamamlardınız',
+      'Komanda ilə əlaqə qurar, uzaqdan işə qatılmağa çalışardınız',
+      'Sadəcə istirahət edərdiniz',
+      'Tapşırığı başqasına ötürərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Müştəri sizin səlahiyyətinizdən kənar bir tələb irəli sürür. Nə edərdiniz?',
+    opts:[
+      'Müştəriyə "yox" deyib uzaqlaşardınız',
+      'Tələbi qəbul edib sonra nəticəsinə baxardınız',
+      'Müştəriyə vəziyyəti izah edib rəhbərinizə yönləndirərdiniz',
+      'Tələbi yerinə yetirmək üçün hər şey edərdiniz'
+    ], correct:2
+  },
+  {
+    q:'İş yerindəki bir prosesin daha effektiv şəkildə aparıla biləcəyini gördünüz. Nə edərdiniz?',
+    opts:[
+      'Heç nə etməzdiniz, bu sizin işiniz deyil',
+      'Təklifinizi yazılı şəkildə rəhbərinizə bildirərdiniz',
+      'Özbaşına prosesi dəyişdirərdiniz',
+      'Həmkarlarınıza şikayət edərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Komanda üzvünüz daim iş saatlarına gecikirk. Bu komandaya mənfi təsir edir. Nə edərdiniz?',
+    opts:[
+      'Birbaşa rəhbərə xəbər verərdiniz',
+      'Komanda üzvü ilə dostcasına söhbət edərdiniz',
+      'Heç nə etməzdiniz',
+      'Onun işini özünüz görərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Çox mürəkkəb bir müştəri şikayəti alırsınız. Nə edərdiniz?',
+    opts:[
+      'Standart cavabı verərdiniz',
+      'Şikayəti ciddi qəbul edib həll yolları axtarardınız',
+      'Şikayəti görmürmüş kimi davranardınız',
+      'Müştərini başqa departamana yönləndirərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Rəhbəriniz sizə razı olmadığınız bir tapşırıq verir. Nə edərdiniz?',
+    opts:[
+      'Açıq şəkildə rəhbəri tənqid edərdiniz',
+      'Tapşırığı yerinə yetirərdiniz',
+      'Narahatlığınızı uyğun şəkildə bildirərdınız, sonra qərarı qəbul edərdiniz',
+      'Tapşırığı rədd edərdiniz'
+    ], correct:2
+  },
+  {
+    q:'Sürətli işləmək səhvlərə yol açır. Yavaş işləmək isə gecikməyə. Siz nəyi üstün tutarsınız?',
+    opts:[
+      'Həmişə sürəti',
+      'Tapşırığa görə balans qurardınız',
+      'Həmişə keyfiyyəti',
+      'Hər ikisindən qaçardınız'
+    ], correct:1
+  },
+  {
+    q:'İşdə çox böyük miqyaslı dəyişiklik elan edildi. Nə hiss edərdiniz?',
+    opts:[
+      'Narahat olardınız',
+      'Dəyişikliyi fürsət kimi görərdiniz',
+      'Müqavimət göstərərdiniz',
+      'Laqeyd qalardınız'
+    ], correct:1
+  },
+  {
+    q:'Bir iş tapşırığını başa çatdıra bilmirsiniz. Nə edərdiniz?',
+    opts:[
+      'Müddəti uzatmağı xahiş edərdiniz',
+      'Kömək istərdiniz',
+      'Tapşırığı yarımçıq buraxardınız',
+      'Rəhbərinizə bildirərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Müştəri sizin şirkətiniz haqqında yanlış məlumat deyir. Nə edərdiniz?',
+    opts:[
+      'Müştərini düzəltməzdiniz',
+      'Hörmətlə düzgün məlumatı bildirərdiniz',
+      'Müştəri ilə mübahisə edərdiniz',
+      'Mövzunu dəyişərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Komandada iki nəfər arasında ciddi münaqişə var. Nə edərdiniz?',
+    opts:[
+      'Münaqişəyə qarışmazdınız',
+      'Aralarında vasitəçi olmağa çalışardınız',
+      'Dərhal rəhbərinizə bildirərdiniz',
+      'Hər ikinə dəstək verərdiniz'
+    ], correct:1
+  },
+  {
+    q:'İş yükünüz çox artıb. Nə edərdiniz?',
+    opts:[
+      'Hər şeyi özünüz görməyə çalışardınız',
+      'Prioritetlər müəyyən edib rəhbərlə müzakirə edərdiniz',
+      'Bəzi tapşırıqları yerinə yetirməzdiniz',
+      'Digər əməkdaşlara ötürərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Şirkətin yeni siyasəti sizin fəaliyyət üsulunuzu çətinləşdirir. Nə edərdiniz?',
+    opts:[
+      'Siyasəti ignore edərdiniz',
+      'Siyasətin dəyişdirilməsini rəsmən təklif edərdiniz',
+      'Yeni siyasətə uyğunlaşardınız',
+      'İstefa verərdiniz'
+    ], correct:2
+  },
+  {
+    q:'Müştəri məhsulunuzu qaytarmaq istəyir amma siz haqlı olmadığını düşünürsünüz. Nə edərdiniz?',
+    opts:[
+      'Müştərini rədd edərdiniz',
+      'Şirkətin qaytarma siyasətini izah edib yardımçı olardınız',
+      'Hər şeyi müştəriyə verərdiniz',
+      'Mövzudan qaçardınız'
+    ], correct:1
+  },
+  {
+    q:'Komandanın motivasiyasının aşağı olduğunu hiss edirsiniz. Nə edərdiniz?',
+    opts:[
+      'Heç nə etməzdiniz',
+      'Komanda ruhunu qaldırmaq üçün təşəbbüs göstərərdiniz',
+      'Rəhbərinizi günahlandırardınız',
+      'İşinizlə məşğul olardınız'
+    ], correct:1
+  },
+  {
+    q:'Bir tapşırıqda səhv etdiniz. Rəhbəriniz hələ bilmir. Nə edərdiniz?',
+    opts:[
+      'Gizlədərdiniz',
+      'Özünüz düzəltməyə çalışardınız',
+      'Rəhbərinizə bildirərdınız',
+      'Başqasının üstünə atardınız'
+    ], correct:2
+  },
+  {
+    q:'Eyni anda bir neçə müştəriyə xidmət etməlisiniz. Nə edərdiniz?',
+    opts:[
+      'Hamısına bərabər diqqət verərdiniz',
+      'Prioritet sırası müəyyən edərdiniz',
+      'Yalnız birinciyə diqqət verərdiniz',
+      'Kömək istərdiniz'
+    ], correct:1
+  },
+  {
+    q:'Rəhbəriniz sizi əsassız tənqid edir. Nə edərdiniz?',
+    opts:[
+      'Rəhbərinizlə mübahisə edərdiniz',
+      'Sakitliklə dinlər, sonra fikirinizi bildirərdiniz',
+      'Heç nə etməzdiniz',
+      'Dərhal HR-ə gedərdiniz'
+    ], correct:1
+  },
+  {
+    q:'İşdə çox yorulmusunuz. Növbəti tapşırıq gəlir. Nə edərdiniz?',
+    opts:[
+      'Tapşırığı rədd edərdiniz',
+      'Qısa fasilə alıb sonra tapşırığa başlardınız',
+      'Keyfiyyətsiz şəkildə tamamlardınız',
+      'Başqasına ötürərdiniz'
+    ], correct:1
+  }
+];
+
+// ==================== INIT ====================
+window.addEventListener('load', async () => {
+  const params = new URLSearchParams(window.location.search);
+  candidateId = params.get('c');
+
+  if (!candidateId) {
+    showError('Test linki tapılmadı.');
+    return;
+  }
+
+  try {
+    const doc = await db.collection('candidates').doc(candidateId).get();
+    if (!doc.exists) { showError('Namizid tapılmadı.'); return; }
+
+    candidateData = doc.data();
+    assignedTests = candidateData.assignedTests || [];
+
+    if (assignedTests.length === 0) { showError('Sizə test təyin edilməmişdir.'); return; }
+
+    // Tamamlanmış testləri çıxart
+    const completed = candidateData.completedTests || [];
+    assignedTests = assignedTests.filter(t => !completed.includes(t));
+
+    if (assignedTests.length === 0) {
+      showDoneScreen([]);
+      return;
+    }
+
+    // Welcome screen
+    document.getElementById('welcome-name').textContent = candidateData.name;
+    document.getElementById('welcome-company').textContent = candidateData.companyName || '';
+
+    const testListEl = document.getElementById('test-list');
+    assignedTests.forEach(t => {
+      const meta = TEST_META[t];
+      if (!meta) return;
+      const totalQ = meta.sections.reduce((s, sec) => s + meta.questionsPerSection, 0);
+      const totalMin = Object.values(meta.timePerSection).reduce((s,v)=>s+v,0);
+      testListEl.innerHTML += `
+        <div class="test-list-item">
+          <div>
+            <div class="test-list-name">${meta.icon} ${meta.label}</div>
+            <div class="test-list-meta">${totalQ} sual${totalMin>0?' · '+Math.round(totalMin/60)+' dəq':' · Limitsiz'}</div>
+          </div>
+          <div class="test-list-badge">${t.toUpperCase()}</div>
+        </div>`;
+    });
+
+    showScreen('welcome');
+  } catch(e) {
+    showError('Xəta: ' + e.message);
+  }
+});
+
+// ==================== TEST FLOW ====================
+function startTests() {
+  currentTestIndex = 0;
+  showSectionIntro();
+}
+
+function showSectionIntro() {
+  if (currentTestIndex >= assignedTests.length) {
+    finishAll();
+    return;
+  }
+
+  const testKey = assignedTests[currentTestIndex];
+  const meta = TEST_META[testKey];
+  const firstSection = meta.sections[0];
+  const sm = SECTION_META[firstSection];
+
+  document.getElementById('section-icon').textContent = meta.icon;
+  document.getElementById('section-title').textContent = meta.label;
+  document.getElementById('section-desc').textContent = meta.desc;
+  document.getElementById('sec-questions').textContent = meta.questionsPerSection * meta.sections.length;
+  document.getElementById('sec-time').textContent = Object.values(meta.timePerSection).reduce((s,v)=>s+v,0)>0 ? Math.round(Object.values(meta.timePerSection).reduce((s,v)=>s+v,0)/60) : '∞';
+  document.getElementById('sec-type').textContent = sm.format;
+
+  currentTest = { key: testKey, meta, sectionIndex: 0, allAnswers: {} };
+  showScreen('section');
+}
+
+function startCurrentTest() {
+  loadSection();
+}
+
+function loadSection() {
+  const { key, meta, sectionIndex } = currentTest;
+  const section = meta.sections[sectionIndex];
+  const sm = SECTION_META[section];
+
+  // Badge
+  const badge = document.getElementById('test-badge');
+  badge.textContent = sm.label;
+  badge.className = 'test-type-badge ' + sm.badge;
+  document.getElementById('section-name').textContent = meta.label;
+
+  // Questions
+  currentQuestions = getQuestions(key, section);
+  currentQIndex = 0;
+  difficultyLevel = 1;
+  answers = {};
+  selectedAnswer = null;
+
+  // Timer
+  clearInterval(timerInterval);
+  const timeSec = meta.timePerSection[section];
+  if (timeSec > 0) {
+    timeLeft = timeSec;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        finishSection();
+      }
+    }, 1000);
+  } else {
+    document.getElementById('timer').textContent = '∞ Limitsiz';
+  }
+
+  showScreen('test');
+  renderQuestion();
+}
+
+function getQuestions(testKey, section) {
+  if (testKey === 'adaptg') {
+    if (section === 'verbal') return buildAdaptivePool(VERBAL_EASY, VERBAL_MEDIUM, VERBAL_HARD, 20);
+    if (section === 'numerical') return buildAdaptivePool(NUMERICAL_EASY, NUMERICAL_MEDIUM, NUMERICAL_HARD, 20);
+    if (section === 'abstract') return buildAdaptivePool(ABSTRACT_EASY, ABSTRACT_MEDIUM, ABSTRACT_HARD, 20);
+  }
+  if (testKey === '16fq') return shuffle([...FQ16_QUESTIONS]).slice(0, 96);
+  if (testKey === 'ccsi') return [...CCSI_QUESTIONS];
+  return [];
+}
+
+function buildAdaptivePool(easy, medium, hard, count) {
+  const pool = [];
+  const e = shuffle([...easy]);
+  const m = shuffle([...medium]);
+  const h = shuffle([...hard]);
+  // Start with medium
+  for (let i=0; i<count; i++) {
+    if (i < e.length) pool.push({...e[i%e.length], difficulty:0});
+    if (i < m.length) pool.push({...m[i%m.length], difficulty:1});
+    if (i < h.length) pool.push({...h[i%h.length], difficulty:2});
+  }
+  return pool;
+}
+
+function shuffle(arr) {
+  for (let i=arr.length-1;i>0;i--) {
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function getNextQuestion() {
+  const pool = currentQuestions.filter(q => q.difficulty === difficultyLevel);
+  const used = Object.keys(answers).map(Number);
+  const available = pool.filter((q,i) => !used.includes(currentQuestions.indexOf(q)));
+  if (available.length > 0) return available[0];
+  // fallback
+  const allAvail = currentQuestions.filter((q,i) => !used.includes(i));
+  return allAvail[0] || null;
+}
+
+let currentQ = null;
+let currentQPoolIndex = 0;
+
+function renderQuestion() {
+  const testKey = assignedTests[currentTestIndex];
+  const meta = TEST_META[testKey];
+  const section = meta.sections[currentTest.sectionIndex];
+  const total = meta.questionsPerSection;
+
+  // Update progress
+  document.getElementById('q-progress').textContent = `Sual ${currentQIndex+1}/${total}`;
+  document.getElementById('progress-fill').style.width = `${((currentQIndex)/total)*100}%`;
+
+  const diffNames = ['Asan','Orta','Çətin'];
+  document.getElementById('q-difficulty').textContent = testKey==='adaptg' ? diffNames[difficultyLevel]||'Orta' : '';
+
+  selectedAnswer = null;
+  document.getElementById('btn-next').disabled = true;
+
+  // Get question
+  if (testKey === 'adaptg') {
+    currentQ = getAdaptiveQ();
+  } else {
+    currentQ = currentQuestions[currentQIndex];
+  }
+
+  if (!currentQ) { finishSection(); return; }
+
+  const card = document.getElementById('question-card');
+
+  if (section === 'abstract') {
+    renderAbstractQ(card, currentQ);
+  } else if (testKey === '16fq') {
+    renderLikertQ(card, currentQ);
+  } else {
+    renderMCQ(card, currentQ, section);
+  }
+}
+
+let adaptivePool = { easy:[], medium:[], hard:[] };
+let adaptiveUsed = [];
+
+function getAdaptiveQ() {
+  const testKey = assignedTests[currentTestIndex];
+  const section = currentTest.meta.sections[currentTest.sectionIndex];
+  let pools;
+  if (section==='verbal') pools = [VERBAL_EASY, VERBAL_MEDIUM, VERBAL_HARD];
+  else if (section==='numerical') pools = [NUMERICAL_EASY, NUMERICAL_MEDIUM, NUMERICAL_HARD];
+  else pools = [ABSTRACT_EASY, ABSTRACT_MEDIUM, ABSTRACT_HARD];
+
+  const pool = pools[difficultyLevel] || pools[1];
+  const available = pool.filter((_,i) => !adaptiveUsed.includes(`${section}-${difficultyLevel}-${i}`));
+  if (available.length === 0) {
+    // try other levels
+    for (let lvl=0;lvl<3;lvl++) {
+      const p = pools[lvl].filter((_,i) => !adaptiveUsed.includes(`${section}-${lvl}-${i}`));
+      if (p.length > 0) {
+        const idx = pools[lvl].indexOf(p[0]);
+        adaptiveUsed.push(`${section}-${lvl}-${idx}`);
+        return {...p[0], difficulty:lvl};
+      }
+    }
+    return null;
+  }
+  const q = available[Math.floor(Math.random()*available.length)];
+  const idx = pool.indexOf(q);
+  adaptiveUsed.push(`${section}-${difficultyLevel}-${idx}`);
+  return {...q, difficulty:difficultyLevel};
+}
+
+function renderMCQ(card, q, section) {
+  const labels = ['A','B','C','D'];
+  card.innerHTML = `
+    <div class="q-number">
+      Sual ${currentQIndex+1}
+      <span class="difficulty-dots">
+        ${[0,1,2].map(i=>`<span class="dot ${i<=difficultyLevel?'active':''}"></span>`).join('')}
+      </span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="options-grid grid-1">
+      ${q.opts.map((opt,i)=>`
+        <button class="option-btn" onclick="selectAnswer(${i},this)">
+          <span class="option-label">${labels[i]}</span>
+          <span class="option-text">${opt}</span>
+        </button>`).join('')}
+    </div>`;
+}
+
+function renderAbstractQ(card, q) {
+  const gridClass = q.grid.type==='3x3' ? 'g3x3' : 'g2x3';
+  const gridCols = q.grid.type==='3x3' ? 3 : 3;
+
+  card.innerHTML = `
+    <div class="q-number">
+      Sual ${currentQIndex+1}
+      <span class="difficulty-dots">
+        ${[0,1,2].map(i=>`<span class="dot ${i<=difficultyLevel?'active':''}"></span>`).join('')}
+      </span>
+    </div>
+    <div class="q-text">${q.q}</div>
+    <div class="abstract-container">
+      <div class="abstract-grid ${gridClass}">
+        ${q.grid.cells.map((cell,i)=>`
+          <div class="abstract-cell ${cell.includes('?')?'question-cell':''}">${cell}</div>
+        `).join('')}
+      </div>
+      ${q.hint?`<div class="abstract-hint">💡 Qaydanı tapın</div>`:''}
+    </div>
+    <div class="abstract-options">
+      ${q.opts.map((opt,i)=>`
+        <div class="abstract-option" onclick="selectAnswer(${i},this)">
+          ${opt}
+          <div class="abstract-option-label">${['A','B','C','D'][i]}</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+function renderLikertQ(card, q) {
+  card.innerHTML = `
+    <div class="q-number">Sual ${currentQIndex+1} / 96 — Amil: ${q.factor}</div>
+    <div class="q-text">${q.q}</div>
+    <div class="likert-wrap">
+      <div class="likert-options">
+        <button class="likert-btn" onclick="selectAnswer(0,this)">${q.a}</button>
+        <button class="likert-btn" onclick="selectAnswer(1,this)">Qərarım yoxdur</button>
+        <button class="likert-btn" onclick="selectAnswer(2,this)">${q.b}</button>
+      </div>
+      <div class="likert-poles">
+        <span>${q.a}</span>
+        <span>${q.b}</span>
+      </div>
+    </div>`;
+}
+
+function selectAnswer(idx, el) {
+  selectedAnswer = idx;
+  document.getElementById('btn-next').disabled = false;
+
+  const testKey = assignedTests[currentTestIndex];
+  const section = currentTest.meta.sections[currentTest.sectionIndex];
+
+  if (testKey === 'adaptg' || testKey === 'ccsi') {
+    // Remove all selected
+    document.querySelectorAll('.option-btn, .abstract-option').forEach(b => b.classList.remove('selected','correct','wrong'));
+    el.classList.add('selected');
+  } else {
+    document.querySelectorAll('.likert-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+}
+
+function nextQuestion() {
+  if (selectedAnswer === null) return;
+
+  const testKey = assignedTests[currentTestIndex];
+
+  // Record answer
+  answers[currentQIndex] = {
+    answer: selectedAnswer,
+    correct: currentQ.correct,
+    isCorrect: selectedAnswer === currentQ.correct,
+    difficulty: currentQ.difficulty || difficultyLevel,
+    factor: currentQ.factor || null
+  };
+
+  // Adaptive difficulty update
+  if (testKey === 'adaptg') {
+    if (answers[currentQIndex].isCorrect) {
+      difficultyLevel = Math.min(2, difficultyLevel + 1);
+    } else {
+      difficultyLevel = Math.max(0, difficultyLevel - 1);
+    }
+  }
+
+  currentQIndex++;
+
+  const meta = TEST_META[testKey];
+  const totalPerSection = meta.questionsPerSection;
+
+  if (currentQIndex >= totalPerSection) {
+    finishSection();
+  } else {
+    renderQuestion();
+  }
+}
+
+function finishSection() {
+  clearInterval(timerInterval);
+
+  const testKey = assignedTests[currentTestIndex];
+  const meta = TEST_META[testKey];
+
+  // Save section answers
+  currentTest.allAnswers[meta.sections[currentTest.sectionIndex]] = { ...answers };
+
+  currentTest.sectionIndex++;
+
+  if (currentTest.sectionIndex < meta.sections.length) {
+    // Next section
+    const nextSec = meta.sections[currentTest.sectionIndex];
+    const sm = SECTION_META[nextSec];
+    document.getElementById('section-icon').textContent = sm.icon;
+    document.getElementById('section-title').textContent = sm.label;
+    document.getElementById('section-desc').textContent = `Növbəti hissə: ${sm.label}`;
+    document.getElementById('sec-questions').textContent = meta.questionsPerSection;
+    document.getElementById('sec-time').textContent = meta.timePerSection[nextSec]>0 ? Math.round(meta.timePerSection[nextSec]/60) : '∞';
+    document.getElementById('sec-type').textContent = sm.format;
+
+    currentQIndex = 0;
+    adaptiveUsed = [];
+    showScreen('section');
+  } else {
+    // Test tamamlandı
+    saveTestResult();
+  }
+}
+
+async function saveTestResult() {
+  const testKey = assignedTests[currentTestIndex];
+  const meta = TEST_META[testKey];
+
+  // Score hesabla
+  let totalCorrect = 0, totalQ = 0;
+  const sectionScores = {};
+
+  meta.sections.forEach(sec => {
+    const secAnswers = currentTest.allAnswers[sec] || {};
+    const vals = Object.values(secAnswers);
+    if (testKey === '16fq') {
+      sectionScores[sec] = computeFQScores(vals);
+      totalQ += vals.length;
+    } else {
+      const correct = vals.filter(a => a.isCorrect).length;
+      totalCorrect += correct;
+      totalQ += vals.length;
+      sectionScores[sec] = { score: Math.round((correct/Math.max(vals.length,1))*100) };
+    }
+  });
+
+  const totalScore = totalQ > 0 ? Math.round((totalCorrect/totalQ)*100) : 0;
+
+  try {
+    await db.collection('testResults').add({
+      candidateId,
+      candidateName: candidateData.name,
+      companyId: candidateData.companyId,
+      companyName: candidateData.companyName,
+      testType: testKey,
+      totalScore,
+      sectionScores,
+      rawAnswers: currentTest.allAnswers,
+      completedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Mark as completed
+    await db.collection('candidates').doc(candidateId).update({
+      completedTests: firebase.firestore.FieldValue.arrayUnion(testKey)
+    });
+
+    testScores[testKey] = { totalScore, sectionScores };
+    currentTestIndex++;
+
+    if (currentTestIndex < assignedTests.length) {
+      showSectionIntro();
+    } else {
+      finishAll();
+    }
+  } catch(e) {
+    console.error(e);
+    currentTestIndex++;
+    if (currentTestIndex < assignedTests.length) showSectionIntro();
+    else finishAll();
+  }
+}
+
+function computeFQScores(answers) {
+  const factorScores = {};
+  answers.forEach(a => {
+    if (!a.factor) return;
+    if (!factorScores[a.factor]) factorScores[a.factor] = { agree:0, total:0 };
+    factorScores[a.factor].total++;
+    if (a.answer === 0) factorScores[a.factor].agree++;
+  });
+  return factorScores;
+}
+
+function finishAll() {
+  const resultsEl = document.getElementById('done-results');
+  resultsEl.innerHTML = '';
+
+  Object.entries(testScores).forEach(([key, data]) => {
+    const meta = TEST_META[key];
+    if (key === '16fq') {
+      resultsEl.innerHTML += `
+        <div class="done-result-item">
+          <div class="done-result-name">${meta.icon} ${meta.label}</div>
+          <div class="done-result-score" style="font-size:14px;color:var(--accent3)">✓ Tamamlandı</div>
+        </div>`;
+    } else {
+      resultsEl.innerHTML += `
+        <div class="done-result-item">
+          <div class="done-result-name">${meta.icon} ${meta.label}</div>
+          <div class="done-result-score">${data.totalScore}%</div>
+        </div>`;
+    }
+  });
+
+  if (resultsEl.innerHTML === '') {
+    resultsEl.innerHTML = '<div style="text-align:center;color:var(--accent3);font-size:15px;">✓ Bütün testlər tamamlandı</div>';
+  }
+
+  showScreen('done');
+}
+
+// ==================== HELPERS ====================
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function showError(msg) {
+  document.getElementById('error-msg').textContent = msg;
+  showScreen('error');
+}
+
+function showDoneScreen(scores) {
+  testScores = scores;
+  finishAll();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft/60).toString().padStart(2,'0');
+  const s = (timeLeft%60).toString().padStart(2,'0');
+  const el = document.getElementById('timer');
+  el.textContent = `⏱ ${m}:${s}`;
+  el.className = 'timer';
+  if (timeLeft < 60) el.classList.add('danger');
+  else if (timeLeft < 180) el.classList.add('warning');
+}
+</script>
+</body>
+</html>
