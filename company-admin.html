@@ -600,6 +600,22 @@
   }
 
   .tab-btn.active { background: white; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  /* PROJECT STYLES */
+  .project-card { background:white; border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:14px; box-shadow:var(--shadow); }
+  .project-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .project-title { font-family:"Syne",sans-serif; font-size:17px; font-weight:700; }
+  .project-meta { font-size:12px; color:var(--muted); margin-top:3px; }
+  .project-stats { display:flex; gap:16px; margin-bottom:14px; }
+  .project-stat { background:var(--surface2); border-radius:8px; padding:8px 14px; font-size:13px; }
+  .project-stat-val { font-weight:700; color:var(--accent); font-size:16px; }
+  .project-stat-label { color:var(--muted); font-size:11px; }
+  .project-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .sten-indicator { display:inline-flex; align-items:center; gap:3px; }
+  .sten-box { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+  .sten-box.strong { background:#dcfce7; color:#166534; }
+  .sten-box.weak { background:#fee2e2; color:#991b1b; }
+  .sten-box.inactive { background:#f1f5f9; color:#94a3b8; }
+
 </style>
 </head>
 <body>
@@ -638,7 +654,7 @@
       <div class="nav-item active" onclick="showPage('overview')" id="nav-overview">
         <span>📊</span> İcmal
       </div>
-      <div class="nav-item" onclick="showPage('candidates')" id="nav-candidates">
+      <div class="nav-item" onclick="showPage('projects')" id="nav-projects"><span>📁</span> Layihələr</div><div class="nav-item" onclick="showPage('candidates')" id="nav-candidates">
         <span>👥</span> Namizidlər
       </div>
       <div class="nav-item" onclick="showPage('results')" id="nav-results">
@@ -817,6 +833,70 @@
         </div>
       </div>
 
+      <!-- PROJECTS PAGE -->
+      <div class="page" id="page-projects">
+        <div class="page-title">Layihələr</div>
+        <div class="page-sub">Vəzifə üzrə namizid qrupları yaradın və müqayisəli analiz edin</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openAddProject()">+ Yeni layihə</button>
+        </div>
+        <div id="projects-list">
+          <div class="loading"><div class="spinner"></div>Yüklənir...</div>
+        </div>
+      </div>
+
+      <!-- PROJECT DETAIL PAGE -->
+      <div class="page" id="page-project-detail">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button onclick="showPage('projects')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Geri</button>
+          <div>
+            <div class="page-title" id="detail-project-name" style="margin-bottom:0;">—</div>
+            <div class="page-sub" id="detail-project-meta" style="margin-bottom:0;">—</div>
+          </div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card">
+            <div class="stat-label">Namizidlər</div>
+            <div class="stat-value" id="detail-total">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tamamlanan</div>
+            <div class="stat-value" style="color:var(--success)" id="detail-done">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Gözləyən</div>
+            <div class="stat-value" style="color:var(--warning)" id="detail-pending">—</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="section-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;">Namizidlər</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-sm btn-link" onclick="openAddToProject()">+ Namizid əlavə et</button>
+            <button class="btn-sm btn-excel" id="btn-group-excel" onclick="exportGroupExcel()">📊 Qrup Excel</button>
+          </div>
+        </div>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Sıra</th>
+                <th>Namizid</th>
+                <th>Verbal</th>
+                <th>Numerical</th>
+                <th>Abstract</th>
+                <th>Ümumi</th>
+                <th>Sten (1-10)</th>
+                <th>Qiymət</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="project-candidates-tbody">
+              <tr><td colspan="9"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -941,8 +1021,87 @@
 </div>
 
 <!-- TOAST -->
+
+<!-- MODAL: Layihə yarat -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-project')">✕</div>
+    <div class="modal-title">Yeni Layihə</div>
+    <div class="form-row">
+      <div class="field-label">Layihə adı</div>
+      <input type="text" class="field-input" id="proj-name" placeholder="Məs: Satış Mütəxəssisi — Aprel 2026">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Vəzifə</div>
+      <input type="text" class="field-input" id="proj-position" placeholder="Məs: Satış mütəxəssisi">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Test növü</div>
+      <select class="field-input" id="proj-test">
+        <option value="adaptg">🔵 Adapt-G (Verbal + Numerical + Abstract)</option>
+        <option value="16fq">🟡 16FQ Şəxsiyyət İnventarı</option>
+        <option value="ccsi">🟠 CCSI Situasiya Mühakiməsi</option>
+        <option value="all">🔷 Hamısı (Adapt-G + 16FQ + CCSI)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="field-label">Qeyd (optional)</div>
+      <input type="text" class="field-input" id="proj-note" placeholder="Əlavə məlumat">
+    </div>
+    <button class="btn-primary" onclick="createProject()">Layihə yarat</button>
+  </div>
+</div>
+
+<!-- MODAL: Layihəyə namizid əlavə et -->
+<div class="modal-overlay" id="modal-add-to-project">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-add-to-project')">✕</div>
+    <div class="modal-title">Namizid əlavə et</div>
+    <div class="form-row">
+      <div class="field-label">Ad Soyad</div>
+      <input type="text" class="field-input" id="proj-cand-name" placeholder="Əli Həsənov">
+    </div>
+    <div class="form-row">
+      <div class="field-label">E-poçt</div>
+      <input type="email" class="field-input" id="proj-cand-email" placeholder="eli@email.com">
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--success);">
+      💡 Test növü layihədən avtomatik götürüləcək
+    </div>
+    <button class="btn-primary" onclick="addCandidateToProject()">Əlavə et və link yarat</button>
+  </div>
+</div>
+
+<!-- MODAL: Qrup Excel kredit -->
+<div class="modal-overlay" id="modal-group-credit">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-group-credit')">✕</div>
+    <div class="modal-title">📊 Qrup Excel Hesabatı</div>
+    <div class="credit-info" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Hesablama:</div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;">
+        <span>Namizid sayı:</span><span id="gc-count" style="font-weight:700;">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;">
+        <span>Hər namizid:</span><span style="font-weight:700;color:var(--warning);">1 kredit</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;">
+        <span style="font-weight:700;">Ümumi:</span>
+        <span id="gc-total" style="font-weight:800;color:var(--warning);font-family:'Syne',sans-serif;font-size:20px;">—</span>
+      </div>
+    </div>
+    <div id="gc-no-credit" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:24px;margin-bottom:8px;">😔</div>
+      <div style="font-weight:700;color:var(--danger);margin-bottom:4px;">Kredit yetərli deyil</div>
+      <a href="mailto:admin@psychoassess.az" style="color:var(--danger);font-size:13px;">Adminlə əlaqə saxlayın</a>
+    </div>
+    <button class="btn-primary" id="gc-confirm-btn" onclick="confirmGroupExcel()" style="background:var(--success);">✅ Təsdiq et və yüklə</button>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -1056,8 +1215,9 @@ function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('page-' + page).classList.add('active');
-  document.getElementById('nav-' + page).classList.add('active');
+  const navEl = document.getElementById('nav-' + page); if(navEl) navEl.classList.add('active'); if(page==='project-detail'){const pn=document.getElementById('nav-projects');if(pn)pn.classList.add('active');}
   if (page === 'candidates') loadCandidates();
+  if (page === 'projects') loadProjects();
   if (page === 'results') loadResults();
   if (page === 'credits') loadCreditLogs();
 }
@@ -1373,6 +1533,311 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
 });
 
 // TOAST
+
+// ==================== PROJECTS ====================
+let currentProjectId = null;
+let currentProjectData = null;
+let currentProjectCandidates = [];
+
+async function loadProjects() {
+  const list = document.getElementById('projects-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>Yüklənir...</div>';
+  try {
+    const snap = await db.collection('projects').where('companyId','==',companyId).get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">📁</div><div>Hələ layihə yoxdur. "Yeni layihə" düyməsindən başlayın.</div></div>';
+      return;
+    }
+    const docs = snap.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+    list.innerHTML = docs.map(d => {
+      const data = d.data();
+      const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 16FQ', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[data.testType]||data.testType;
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+      return `
+        <div class="project-card">
+          <div class="project-header">
+            <div>
+              <div class="project-title">${data.name}</div>
+              <div class="project-meta">${data.position||''} · ${testLabel} · ${date}</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-sm btn-link" onclick="openProjectDetail('${d.id}')">📂 Açıq</button>
+              <button class="btn-sm btn-danger" onclick="deleteProject('${d.id}','${data.name}')">🗑</button>
+            </div>
+          </div>
+          <div class="project-stats">
+            <div class="project-stat">
+              <div class="project-stat-val">${data.candidateCount||0}</div>
+              <div class="project-stat-label">Namizid</div>
+            </div>
+            <div class="project-stat">
+              <div class="project-stat-val" style="color:var(--success)">${data.completedCount||0}</div>
+              <div class="project-stat-label">Tamamlanan</div>
+            </div>
+            <div class="project-stat">
+              <div class="project-stat-val" style="color:var(--warning)">${(data.candidateCount||0)-(data.completedCount||0)}</div>
+              <div class="project-stat-label">Gözləyən</div>
+            </div>
+          </div>
+          ${data.note ? `<div style="font-size:13px;color:var(--muted);">📝 ${data.note}</div>` : ''}
+        </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = '<div style="color:red;padding:20px;">Xəta baş verdi</div>'; console.error(e); }
+}
+
+function openAddProject() {
+  document.getElementById('proj-name').value = '';
+  document.getElementById('proj-position').value = '';
+  document.getElementById('proj-note').value = '';
+  openModal('modal-project');
+}
+
+async function createProject() {
+  const name = document.getElementById('proj-name').value.trim();
+  const position = document.getElementById('proj-position').value.trim();
+  const testType = document.getElementById('proj-test').value;
+  const note = document.getElementById('proj-note').value.trim();
+  if (!name) { showToast('Layihə adı mütləqdir','error'); return; }
+  try {
+    const ref = await db.collection('projects').add({
+      name, position, testType, note,
+      companyId,
+      companyName: companyData.name,
+      candidateCount: 0,
+      completedCount: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-project');
+    showToast(`${name} layihəsi yaradıldı ✓`,'success');
+    openProjectDetail(ref.id);
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+async function openProjectDetail(projectId) {
+  currentProjectId = projectId;
+  const doc = await db.collection('projects').doc(projectId).get();
+  currentProjectData = doc.data();
+  document.getElementById('detail-project-name').textContent = currentProjectData.name;
+  const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 16FQ', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[currentProjectData.testType]||'';
+  document.getElementById('detail-project-meta').textContent = (currentProjectData.position||'') + ' · ' + testLabel;
+  showPage('project-detail');
+  loadProjectCandidates();
+}
+
+async function loadProjectCandidates() {
+  const tbody = document.getElementById('project-candidates-tbody');
+  tbody.innerHTML = '<tr><td colspan="9"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+  try {
+    const snap = await db.collection('candidates').where('projectId','==',currentProjectId).get();
+    currentProjectCandidates = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Nəticələri yüklə
+    const resultSnaps = await Promise.all(
+      currentProjectCandidates.map(c =>
+        db.collection('testResults').where('candidateId','==',c.id).where('testType','==','adaptg').get()
+      )
+    );
+
+    // Hər namizidə xal əlavə et
+    currentProjectCandidates = currentProjectCandidates.map((c,i) => {
+      const res = resultSnaps[i];
+      if (!res.empty) {
+        const r = res.docs[0].data();
+        c.scores = r.sectionScores || {};
+        c.totalScore = r.totalScore || 0;
+        c.sten = scoreToSten(c.totalScore);
+        c.hasResult = true;
+      } else {
+        c.hasResult = false;
+        c.totalScore = -1;
+        c.sten = 0;
+      }
+      return c;
+    });
+
+    // Xala görə sırala
+    currentProjectCandidates.sort((a,b) => b.totalScore - a.totalScore);
+
+    const total = currentProjectCandidates.length;
+    const done = currentProjectCandidates.filter(c=>c.hasResult).length;
+    document.getElementById('detail-total').textContent = total;
+    document.getElementById('detail-done').textContent = done;
+    document.getElementById('detail-pending').textContent = total - done;
+
+    if (!currentProjectCandidates.length) {
+      tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div>Hələ namizid yoxdur</div></td></tr>';
+      return;
+    }
+
+    let html = '';
+    currentProjectCandidates.forEach((c, idx) => {
+      const rank = idx + 1;
+      const verbal = c.scores?.verbal?.score || '—';
+      const numerical = c.scores?.numerical?.score || '—';
+      const abstract = c.scores?.abstract?.score || '—';
+      const total = c.hasResult ? c.totalScore + '%' : '—';
+      const sten = c.sten || '—';
+      const stenColor = c.sten >= 5 ? 'var(--success)' : c.sten > 0 ? 'var(--danger)' : 'var(--muted)';
+      const qiymət = !c.hasResult ? '<span style="color:var(--muted);font-size:12px;">Test gözləyir</span>' :
+        c.sten >= 5 ?
+        '<span class="badge" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;">🟢 Güclü</span>' :
+        '<span class="badge" style="background:#fef2f2;color:var(--danger);border:1px solid #fecaca;">🔴 Zəif</span>';
+
+      const stenBar = c.hasResult ? `
+        <div style="display:flex;align-items:center;gap:4px;">
+          <span style="font-family:'JetBrains Mono',monospace;font-weight:800;font-size:18px;color:${stenColor};">${sten}</span>
+          <div style="display:flex;gap:2px;">
+            ${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div style="width:8px;height:8px;border-radius:2px;background:${i<=c.sten?(c.sten>=5?'#059669':'#dc2626'):'#e2e6f0'};"></div>`).join('')}
+          </div>
+        </div>` : '—';
+
+      const testLink = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${c.id}`;
+
+      html += `<tr style="${rank<=3&&c.hasResult?'background:#fafafa':''}">
+        <td><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${rank===1?'#d97706':rank===2?'#6b7280':rank===3?'#92400e':'var(--muted)'};">${rank}</span></td>
+        <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
+        <td style="font-weight:700;color:#06b6d4;">${verbal !== '—' ? verbal+'%' : '—'}</td>
+        <td style="font-weight:700;color:#059669;">${numerical !== '—' ? numerical+'%' : '—'}</td>
+        <td style="font-weight:700;color:#f59e0b;">${abstract !== '—' ? abstract+'%' : '—'}</td>
+        <td style="font-weight:800;font-size:16px;color:var(--accent);">${total}</td>
+        <td>${stenBar}</td>
+        <td>${qiymət}</td>
+        <td><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button></td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="9" style="color:red;text-align:center;padding:20px;">Xəta baş verdi</td></tr>'; }
+}
+
+function openAddToProject() {
+  document.getElementById('proj-cand-name').value = '';
+  document.getElementById('proj-cand-email').value = '';
+  openModal('modal-add-to-project');
+}
+
+async function addCandidateToProject() {
+  const name = document.getElementById('proj-cand-name').value.trim();
+  const email = document.getElementById('proj-cand-email').value.trim();
+  if (!name || !email) { showToast('Ad və e-poçt mütləqdir','error'); return; }
+  const tests = currentProjectData.testType === 'all' ? ['adaptg','16fq','ccsi'] : [currentProjectData.testType];
+  try {
+    const ref = await db.collection('candidates').add({
+      name, email,
+      position: currentProjectData.position || '',
+      companyId,
+      companyName: companyData.name,
+      projectId: currentProjectId,
+      projectName: currentProjectData.name,
+      assignedTests: tests,
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('projects').doc(currentProjectId).update({
+      candidateCount: firebase.firestore.FieldValue.increment(1)
+    });
+    const link = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${ref.id}`;
+    closeModal('modal-add-to-project');
+    showToast(`${name} əlavə edildi ✓`,'success');
+    navigator.clipboard.writeText(link).catch(()=>{});
+    showToast('Link kopyalandı! 📋','success');
+    loadProjectCandidates();
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+function scoreToSten(score) {
+  if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
+  if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
+  if (score>=40) return 4; if (score>=30) return 3; if (score>=20) return 2;
+  return 1;
+}
+
+async function deleteProject(id, name) {
+  if (!confirm(`"${name}" layihəsini silmək istəyirsiniz?`)) return;
+  try {
+    await db.collection('projects').doc(id).delete();
+    showToast(`${name} silindi`,'success');
+    loadProjects();
+  } catch(e) { showToast('Xəta','error'); }
+}
+
+// GROUP EXCEL
+function exportGroupExcel() {
+  const completed = currentProjectCandidates.filter(c=>c.hasResult);
+  if (!completed.length) { showToast('Hələ test nəticəsi yoxdur','error'); return; }
+  const count = completed.length;
+  const cost = count;
+  document.getElementById('gc-count').textContent = count + ' nəfər';
+  document.getElementById('gc-total').textContent = cost + ' kredit';
+  const hasCredit = (companyData.credits||0) >= cost;
+  document.getElementById('gc-no-credit').style.display = hasCredit ? 'none' : 'block';
+  document.getElementById('gc-confirm-btn').style.display = hasCredit ? 'block' : 'none';
+  openModal('modal-group-credit');
+}
+
+async function confirmGroupExcel() {
+  const completed = currentProjectCandidates.filter(c=>c.hasResult);
+  const cost = completed.length;
+  try {
+    await db.collection('companies').doc(companyId).update({
+      credits: firebase.firestore.FieldValue.increment(-cost)
+    });
+    await db.collection('creditLogs').add({
+      companyId, companyName: companyData.name,
+      type:'use', amount:cost,
+      note:`Qrup Excel: ${currentProjectData.name}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-group-credit');
+    generateGroupExcel(completed);
+    showToast(`${cost} kredit istifadə edildi ✓`,'success');
+  } catch(e) { showToast('Xəta','error'); }
+}
+
+function generateGroupExcel(candidates) {
+  const date = new Date().toLocaleDateString('az-AZ');
+  const wsData = [
+    ['PsychoAssess — Qrup Skala Hesabatı','','','','','','','','',''],
+    [currentProjectData.name + ' | ' + (currentProjectData.position||'') + ' | ' + date,'','','','','','','','',''],
+    [''],
+    ['Sıra','Ad Soyad','Verbal (%)','Numerical (%)','Abstract (%)','Ümumi (%)','Sten (1-10)','Səviyyə','Qiymət','Tövsiyə']
+  ];
+
+  candidates.forEach((c, idx) => {
+    const rank = idx + 1;
+    const v = c.scores?.verbal?.score || 0;
+    const n = c.scores?.numerical?.score || 0;
+    const a = c.scores?.abstract?.score || 0;
+    const total = c.totalScore || 0;
+    const sten = c.sten || 1;
+    const seviyye = total>=80?'Yüksək':total>=60?'Orta':'Aşağı';
+    const qiymet = sten>=5?'🟢 Güclü':'🔴 Zəif';
+    const tovsiyye = sten>=7?'İşə qəbul tövsiyə olunur':sten>=5?'Müsahibə tövsiyə olunur':'Uyğun deyil';
+    wsData.push([rank, c.name, v, n, a, total, sten, seviyye, qiymet, tovsiyye]);
+  });
+
+  wsData.push(['']);
+  wsData.push(['STATİSTİKA','','','','','','','','','']);
+  const totals = candidates.map(c=>c.totalScore||0);
+  const avg = Math.round(totals.reduce((s,v)=>s+v,0)/totals.length);
+  const strong = candidates.filter(c=>c.sten>=5).length;
+  const weak = candidates.filter(c=>c.sten<5).length;
+  wsData.push(['Ortalama xal','','','','',avg,'','','','']);
+  wsData.push(['Güclü namizidlər (Sten ≥5)','','','','','',strong,'','','']);
+  wsData.push(['Zəif namizidlər (Sten <5)','','','','','',weak,'','','']);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [{wch:6},{wch:22},{wch:12},{wch:14},{wch:14},{wch:12},{wch:12},{wch:12},{wch:14},{wch:24}];
+  ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Qrup Skala');
+  XLSX.writeFile(wb, `${currentProjectData.name}_Skala_${date}.xlsx`);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(()=>showToast('Link kopyalandı ✓','success'));
+}
+
 function showToast(msg, type='success') {
   const t = document.getElementById('toast');
   t.textContent = type==='success' ? '✓ '+msg : '✕ '+msg;
