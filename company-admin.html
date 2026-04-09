@@ -1695,12 +1695,24 @@ async function loadProjectCandidates() {
     // Nəticə açılıbmı yoxla
     const isUnlocked = currentProjectUnlocked === currentProjectId;
 
-    // "Nəticələri aç" düyməsini göstər/gizlə
+    // Düymələri göstər/gizlə
     const completedCount = currentProjectCandidates.filter(c=>c.hasResult).length;
     const unlockBtn = document.getElementById('btn-unlock-results');
-    if(unlockBtn) unlockBtn.style.display = completedCount > 0 && !isUnlocked ? 'inline-flex' : 'none';
     const excelBtn = document.getElementById('btn-group-excel');
-    if(excelBtn) excelBtn.style.display = isUnlocked && completedCount > 0 ? 'inline-flex' : 'none';
+    if(completedCount > 0) {
+      if(isUnlocked) {
+        // Açılıb: unlock gizlət, excel göstər (pulsuz)
+        if(unlockBtn) { unlockBtn.style.display = 'none'; }
+        if(excelBtn) { excelBtn.style.display = 'inline-flex'; excelBtn.textContent = '📊 Excel Yüklə (Pulsuz)'; }
+      } else {
+        // Açılmayıb: unlock göstər, excel göstər (kredit istər)
+        if(unlockBtn) { unlockBtn.style.display = 'inline-flex'; }
+        if(excelBtn) { excelBtn.style.display = 'inline-flex'; excelBtn.textContent = '📊 Excel (Kredit ilə)'; }
+      }
+    } else {
+      if(unlockBtn) unlockBtn.style.display = 'none';
+      if(excelBtn) excelBtn.style.display = 'none';
+    }
 
     let html = '';
     currentProjectCandidates.forEach((c, idx) => {
@@ -1837,10 +1849,10 @@ async function loadExistingCandidates() {
   listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Yüklənir...</div>';
   try {
     const snap = await db.collection('candidates').where('companyId','==',companyId).get();
-    // Bu layihədə olanları çıxart
     const inProject = new Set(currentProjectCandidates.map(c=>c.id));
+    // Yalnız testi keçənlər + bu layihədə olmayanlar
     allCompanyCandidates = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(c => !inProject.has(c.id))
+      .filter(c => !inProject.has(c.id) && (c.completedTests||[]).length > 0)
       .sort((a,b) => (a.name||'').localeCompare(b.name||''));
     renderExistingList(allCompanyCandidates);
   } catch(e) {
@@ -1851,14 +1863,24 @@ async function loadExistingCandidates() {
 function renderExistingList(candidates) {
   const listEl = document.getElementById('exist-cand-list');
   if(!candidates.length) {
-    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Əlavə edilə biləcək namizid yoxdur</div>';
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Testi keçmiş başqa namizid yoxdur</div>';
     return;
   }
-  listEl.innerHTML = candidates.map(c => `
-    <div onclick="selectExisting('${c.id}',this)" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;" id="exist-item-${c.id}">
-      <div style="font-weight:600;font-size:14px;">${c.name}</div>
-      <div style="font-size:12px;color:var(--muted);">${c.email} ${c.position?'· '+c.position:''}</div>
-    </div>`).join('');
+  const testLabels = {adaptg:'Adapt-G', '16fq':'15FQ+', ccsi:'CCSI'};
+  listEl.innerHTML = candidates.map(c => {
+    const tests = (c.completedTests||[]).map(t =>
+      `<span style="background:#eff6ff;color:var(--accent);border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">${testLabels[t]||t}</span>`
+    ).join(' ');
+    return `<div onclick="selectExisting('${c.id}',this)" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;" id="exist-item-${c.id}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-weight:600;font-size:14px;">${c.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${c.email}${c.position?' · '+c.position:''}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">${tests}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function filterExistingCandidates() {
@@ -1938,11 +1960,17 @@ async function deleteProject(id, name) {
 function exportGroupExcel() {
   const completed = currentProjectCandidates.filter(c=>c.hasResult);
   if (!completed.length) { showToast('Hələ test nəticəsi yoxdur','error'); return; }
+  // Artıq açılıbsa - pulsuz yüklə
+  if (currentProjectUnlocked === currentProjectId) {
+    generateGroupExcel(completed);
+    showToast('Excel yüklənir...','success');
+    return;
+  }
+  // Açılmayıbsa - kredit ist
   const count = completed.length;
-  const cost = count;
   document.getElementById('gc-count').textContent = count + ' nəfər';
-  document.getElementById('gc-total').textContent = cost + ' kredit';
-  const hasCredit = (companyData.credits||0) >= cost;
+  document.getElementById('gc-total').textContent = count + ' kredit';
+  const hasCredit = (companyData.credits||0) >= count;
   document.getElementById('gc-no-credit').style.display = hasCredit ? 'none' : 'block';
   document.getElementById('gc-confirm-btn').style.display = hasCredit ? 'block' : 'none';
   openModal('modal-group-credit');
