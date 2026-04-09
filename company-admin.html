@@ -1639,8 +1639,14 @@ async function openProjectDetail(projectId) {
   const doc = await db.collection('projects').doc(projectId).get();
   currentProjectData = doc.data();
   document.getElementById('detail-project-name').textContent = currentProjectData.name;
-  const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 16FQ', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[currentProjectData.testType]||'';
+  const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 15FQ+', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[currentProjectData.testType]||'';
   document.getElementById('detail-project-meta').textContent = (currentProjectData.position||'') + ' · ' + testLabel;
+  // Firestore-dan unlock vəziyyətini oxu - daimi saxlanılır
+  if (currentProjectData.unlocked === true) {
+    currentProjectUnlocked = projectId;
+  } else {
+    currentProjectUnlocked = null;
+  }
   showPage('project-detail');
   loadProjectCandidates();
 }
@@ -1693,7 +1699,7 @@ async function loadProjectCandidates() {
     // Nəticə açılıbmı yoxla
 
     // Nəticə açılıbmı yoxla
-    const isUnlocked = currentProjectUnlocked === currentProjectId;
+    const isUnlocked = currentProjectUnlocked === currentProjectId || currentProjectData?.unlocked === true;
 
     // Düymələri göstər/gizlə
     const completedCount = currentProjectCandidates.filter(c=>c.hasResult).length;
@@ -1980,24 +1986,28 @@ async function confirmGroupExcel() {
   const completed = currentProjectCandidates.filter(c=>c.hasResult);
   const cost = completed.length;
   try {
+    // Kredit çıx
     await db.collection('companies').doc(companyId).update({
       credits: firebase.firestore.FieldValue.increment(-cost)
     });
+    // Log
     await db.collection('creditLogs').add({
       companyId, companyName: companyData.name,
       type:'use', amount:cost,
-      note:`Qrup Nəticə Açılışı + Excel: ${currentProjectData.name}`,
+      note:`Layihə nəticə açılışı: ${currentProjectData.name}`,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    closeModal('modal-group-credit');
-    // Nəticələri aç
+    // Firestore-da layihəni unlock et - daimi saxla
+    await db.collection('projects').doc(currentProjectId).update({
+      unlocked: true,
+      unlockedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
     currentProjectUnlocked = currentProjectId;
-    // Cədvəli yenilə
+    closeModal('modal-group-credit');
     loadProjectCandidates();
-    // Excel yüklə
-    generateGroupExcel(completed);
-    showToast(`${cost} kredit istifadə edildi, nəticələr açıldı ✓`,'success');
-  } catch(e) { showToast('Xəta','error'); }
+    showToast(`${cost} kredit ödənildi, nəticələr açıldı ✓`, 'success');
+    // Excel avtomatik yüklənmir - istəsə özü basır
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
 }
 
 function generateGroupExcel(candidates) {
