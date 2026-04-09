@@ -1320,6 +1320,7 @@ async function loadCandidates() {
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-link" onclick="showLink('${id}')">🔗 Link</button>
+            <button class="btn-sm btn-danger" onclick="deleteCandidate('${id}','${data.name}')">🗑️</button>
           </div>
         </td>
         <td>
@@ -1731,7 +1732,7 @@ async function loadProjectCandidates() {
           <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
           <td colspan="5" style="color:var(--muted);font-size:12px;font-style:italic;">Test hələ keçilməyib</td>
           <td><span style="font-size:12px;color:var(--muted);">⏳ Gözləyir</span></td>
-          <td><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
         </tr>`;
         return;
       }
@@ -1746,7 +1747,7 @@ async function loadProjectCandidates() {
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td><span class="badge" style="background:#fffbeb;color:var(--warning);border:1px solid #fde68a;">✓ Bitdi</span></td>
-          <td><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
         </tr>`;
         return;
       }
@@ -1776,7 +1777,7 @@ async function loadProjectCandidates() {
         <td style="font-weight:800;font-size:16px;color:var(--accent);">${totalPct}%</td>
         <td>${stenBar}</td>
         <td>${qiymət}</td>
-        <td><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button></td>
+        <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
       </tr>`;
     });
     tbody.innerHTML = html;
@@ -1946,6 +1947,34 @@ function unlockProjectResults() {
   openModal('modal-group-credit');
 }
 
+async function deleteCandidate(id, name) {
+  if (!confirm(`"${name}" namizidini silmək istəyirsiniz? Bu əməliyyat geri alına bilməz.`)) return;
+  try {
+    await db.collection('candidates').doc(id).delete();
+    // Test nəticələrini də sil
+    const results = await db.collection('testResults').where('candidateId','==',id).get();
+    await Promise.all(results.docs.map(d => d.ref.delete()));
+    showToast(`${name} silindi ✓`, 'success');
+    loadCandidates();
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+async function deleteProjCandidate(id, name) {
+  if (!confirm(`"${name}" namizidini layihədən silmək istəyirsiniz?`)) return;
+  try {
+    // Namizidi layihədən çıxart (tam silmirik, yalnız layihə bağlantısını kəsirik)
+    await db.collection('candidates').doc(id).update({
+      projectId: firebase.firestore.FieldValue.delete(),
+      projectName: firebase.firestore.FieldValue.delete()
+    });
+    await db.collection('projects').doc(currentProjectId).update({
+      candidateCount: firebase.firestore.FieldValue.increment(-1)
+    });
+    showToast(`${name} layihədən çıxarıldı ✓`, 'success');
+    loadProjectCandidates();
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
 function scoreToSten(score) {
   if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
   if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
@@ -2091,6 +2120,8 @@ window.exportGroupExcel = exportGroupExcel;
 window.confirmGroupExcel = confirmGroupExcel;
 window.copyToClipboard = copyToClipboard;
 window.deleteProject = deleteProject;
+window.deleteCandidate = deleteCandidate;
+window.deleteProjCandidate = deleteProjCandidate;
 window.toggleCompany = toggleCompany;
 
 </script>
