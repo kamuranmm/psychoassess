@@ -4,1463 +4,490 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PsychoAssess — Hesabat</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #f4f6fb;
-  --surface: #ffffff;
-  --surface2: #f0f2f8;
-  --border: #e2e6f0;
-  --accent: #4f46e5;
-  --accent2: #7c3aed;
-  --success: #059669;
-  --warning: #d97706;
-  --danger: #dc2626;
-  --text: #1a1a2e;
-  --muted: #6b7280;
-}
-
-* { margin:0; padding:0; box-sizing:border-box; }
-
-body {
-  font-family: 'Outfit', sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-}
-
-/* LOADING */
-#screen-loading {
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:16px;
-}
-
-.spinner {
-  width:48px;height:48px;
-  border:3px solid var(--border);
-  border-top-color:var(--accent);
-  border-radius:50%;
-  animation:spin 0.8s linear infinite;
-}
-
-@keyframes spin { to { transform:rotate(360deg); } }
-
-/* ERROR */
-#screen-error {
-  min-height:100vh;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:12px;
-}
-
-/* REPORT */
-#screen-report { display:none; }
-
-.report-topbar {
-  background: white;
-  border-bottom: 1px solid var(--border);
-  padding: 0 28px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-}
-
-.topbar-logo {
-  font-family:'Outfit',sans-serif;
-  font-size:20px;
-  font-weight:800;
-  color:var(--accent);
-}
-
-.export-btns { display:flex; gap:10px; }
-
-.btn-export {
-  padding:9px 18px;
-  border-radius:9px;
-  font-size:13px;
-  font-weight:700;
-  cursor:pointer;
-  border:none;
-  font-family:'Outfit',sans-serif;
-  transition:all 0.2s;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.btn-pdf { background:var(--danger); color:white; }
-.btn-pdf:hover { background:#b91c1c; }
-.btn-excel { background:var(--success); color:white; }
-.btn-excel:hover { background:#047857; }
-.btn-back {
-  background:var(--surface2);
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:9px 18px;
-  border-radius:9px;
-  font-size:13px;
-  font-weight:600;
-  cursor:pointer;
-  font-family:'Outfit',sans-serif;
-}
-
-.report-content {
-  max-width:900px;
-  margin:0 auto;
-  padding:32px 20px;
-}
-
-/* REPORT HEADER */
-.report-header {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:32px;
-  margin-bottom:20px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  position:relative;
-  overflow:hidden;
-}
-
-.report-header::before {
-  content:'';
-  position:absolute;
-  top:0;left:0;right:0;
-  height:4px;
-  background:linear-gradient(90deg,var(--accent),#7c3aed,#059669);
-}
-
-.report-header-left h1 {
-  font-size:26px;
-  font-weight:800;
-  margin-bottom:4px;
-}
-
-.report-header-left p {
-  color:var(--muted);
-  font-size:14px;
-}
-
-.report-header-right {
-  text-align:right;
-}
-
-.report-date {
-  font-size:13px;
-  color:var(--muted);
-  margin-bottom:4px;
-}
-
-.report-company {
-  font-size:15px;
-  font-weight:700;
-  color:var(--accent);
-}
-
-/* OVERALL SCORE */
-.overall-score-card {
-  background:linear-gradient(135deg,var(--accent),#7c3aed);
-  border-radius:16px;
-  padding:28px 32px;
-  margin-bottom:20px;
-  color:white;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-}
-
-.overall-label {
-  font-size:14px;
-  opacity:0.8;
-  margin-bottom:6px;
-  font-weight:500;
-}
-
-.overall-value {
-  font-family:'JetBrains Mono',monospace;
-  font-size:56px;
-  font-weight:700;
-  line-height:1;
-}
-
-.overall-sub { font-size:14px; opacity:0.7; margin-top:4px; }
-
-.sten-display {
-  text-align:right;
-}
-
-.sten-label { font-size:13px; opacity:0.8; margin-bottom:8px; }
-
-.sten-bar {
-  display:flex;
-  gap:3px;
-}
-
-.sten-dot {
-  width:24px;height:24px;
-  border-radius:6px;
-  background:rgba(255,255,255,0.2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:10px;
-  font-weight:700;
-}
-
-.sten-dot.active { background:white; color:var(--accent); }
-
-/* SECTION CARDS */
-.section-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.section-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:22px;
-  position:relative;
-  overflow:hidden;
-}
-
-.section-card::after {
-  content:'';
-  position:absolute;
-  bottom:0;right:0;
-  width:60px;height:60px;
-  border-radius:50%;
-  opacity:0.08;
-}
-
-.section-card.verbal::after { background:#06b6d4; }
-.section-card.numerical::after { background:#059669; }
-.section-card.abstract::after { background:#f59e0b; }
-.section-card.personality::after { background:#a855f7; }
-.section-card.situational::after { background:#ef4444; }
-
-.section-label {
-  font-size:12px;
-  font-weight:600;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:0.8px;
-  margin-bottom:10px;
-}
-
-.section-score {
-  font-family:'JetBrains Mono',monospace;
-  font-size:36px;
-  font-weight:700;
-  margin-bottom:6px;
-}
-
-.section-card.verbal .section-score { color:#06b6d4; }
-.section-card.numerical .section-score { color:#059669; }
-.section-card.abstract .section-score { color:#f59e0b; }
-.section-card.personality .section-score { color:#a855f7; }
-.section-card.situational .section-score { color:#ef4444; }
-
-.section-bar {
-  height:6px;
-  background:var(--surface2);
-  border-radius:3px;
-  overflow:hidden;
-  margin-bottom:8px;
-}
-
-.section-bar-fill {
-  height:100%;
-  border-radius:3px;
-  transition:width 1s ease;
-}
-
-.section-card.verbal .section-bar-fill { background:#06b6d4; }
-.section-card.numerical .section-bar-fill { background:#059669; }
-.section-card.abstract .section-bar-fill { background:#f59e0b; }
-.section-card.personality .section-bar-fill { background:#a855f7; }
-.section-card.situational .section-bar-fill { background:#ef4444; }
-
-.section-level {
-  font-size:12px;
-  font-weight:600;
-}
-
-/* ANALYSIS CARDS */
-.analysis-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-  margin-bottom:20px;
-}
-
-.analysis-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:22px;
-}
-
-.analysis-title {
-  font-size:15px;
-  font-weight:700;
-  margin-bottom:16px;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.strength-item, .weakness-item {
-  display:flex;
-  align-items:flex-start;
-  gap:10px;
-  padding:10px 0;
-  border-bottom:1px solid var(--surface2);
-  font-size:14px;
-}
-
-.strength-item:last-child, .weakness-item:last-child { border-bottom:none; }
-
-.strength-dot {
-  width:8px;height:8px;
-  border-radius:50%;
-  background:var(--success);
-  margin-top:5px;
-  flex-shrink:0;
-}
-
-.weakness-dot {
-  width:8px;height:8px;
-  border-radius:50%;
-  background:var(--danger);
-  margin-top:5px;
-  flex-shrink:0;
-}
-
-/* RECOMMENDATION */
-.recommendation-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:24px;
-  margin-bottom:20px;
-}
-
-.rec-title {
-  font-size:16px;
-  font-weight:700;
-  margin-bottom:16px;
-}
-
-.rec-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:12px;
-  margin-bottom:20px;
-}
-
-.rec-item {
-  background:var(--surface2);
-  border-radius:10px;
-  padding:14px;
-}
-
-.rec-item-title { font-size:13px; font-weight:700; margin-bottom:6px; }
-.rec-item-desc { font-size:12px; color:var(--muted); line-height:1.5; }
-
-.verdict-box {
-  border-radius:12px;
-  padding:18px 22px;
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-
-.verdict-box.suitable { background:#f0fdf4; border:1px solid #bbf7d0; }
-.verdict-box.conditional { background:#fffbeb; border:1px solid #fde68a; }
-.verdict-box.unsuitable { background:#fef2f2; border:1px solid #fecaca; }
-
-.verdict-icon { font-size:32px; }
-.verdict-title { font-size:16px; font-weight:700; margin-bottom:4px; }
-.verdict-desc { font-size:13px; color:var(--muted); }
-
-/* SECTOR */
-.sector-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:24px;
-  margin-bottom:20px;
-}
-
-.sector-grid {
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:10px;
-  margin-top:14px;
-}
-
-.sector-item {
-  padding:12px 14px;
-  border-radius:10px;
-  font-size:13px;
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.sector-item.high { background:#f0fdf4; color:var(--success); border:1px solid #bbf7d0; }
-.sector-item.mid { background:#fffbeb; color:var(--warning); border:1px solid #fde68a; }
-.sector-item.low { background:#f8fafc; color:var(--muted); border:1px solid var(--border); }
-
-/* TRAINING */
-.training-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:24px;
-  margin-bottom:20px;
-}
-
-.training-list {
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  margin-top:14px;
-}
-
-.training-item {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px 16px;
-  background:var(--surface2);
-  border-radius:10px;
-  font-size:14px;
-}
-
-.training-priority {
-  font-size:10px;
-  font-weight:700;
-  padding:3px 8px;
-  border-radius:4px;
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-}
-
-.priority-high { background:#fef2f2; color:var(--danger); }
-.priority-mid { background:#fffbeb; color:var(--warning); }
-.priority-low { background:#f0fdf4; color:var(--success); }
-
-/* 16FQ PROFILE */
-.fq-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:24px;
-  margin-bottom:20px;
-}
-
-.fq-factor-list {
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  margin-top:14px;
-}
-
-.fq-factor {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  font-size:13px;
-}
-
-.fq-factor-name {
-  width:120px;
-  font-weight:600;
-  color:var(--muted);
-  font-size:12px;
-}
-
-.fq-bar-wrap {
-  flex:1;
-  height:10px;
-  background:var(--surface2);
-  border-radius:5px;
-  overflow:hidden;
-}
-
-.fq-bar-fill {
-  height:100%;
-  border-radius:5px;
-  background:linear-gradient(90deg,var(--accent),#7c3aed);
-}
-
-.fq-score {
-  width:36px;
-  text-align:right;
-  font-family:'JetBrains Mono',monospace;
-  font-weight:600;
-  font-size:12px;
-  color:var(--accent);
-}
-
-/* EXCEL SCALE TABLE */
-.scale-card {
-  background:white;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:24px;
-  margin-bottom:20px;
-  overflow-x:auto;
-}
-
-table.scale-table {
-  width:100%;
-  border-collapse:collapse;
-  font-size:13px;
-}
-
-.scale-table th {
-  padding:10px 12px;
-  background:var(--surface2);
-  text-align:left;
-  font-size:11px;
-  font-weight:700;
-  color:var(--muted);
-  text-transform:uppercase;
-  letter-spacing:0.5px;
-  border-bottom:1px solid var(--border);
-}
-
-.scale-table td {
-  padding:11px 12px;
-  border-bottom:1px solid var(--surface2);
-}
-
-.scale-table tr:last-child td { border-bottom:none; }
-
-.rank-badge {
-  width:28px;height:28px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:12px;
-  font-weight:800;
-  font-family:'JetBrains Mono',monospace;
-}
-
-.rank-1 { background:#fef3c7; color:#92400e; }
-.rank-2 { background:#e0e7ff; color:#3730a3; }
-.rank-3 { background:#f3f4f6; color:#374151; }
-.rank-other { background:#f9fafb; color:var(--muted); }
-
-.score-cell {
-  font-family:'JetBrains Mono',monospace;
-  font-weight:700;
-  font-size:15px;
-}
-
-.level-badge {
-  padding:3px 10px;
-  border-radius:20px;
-  font-size:11px;
-  font-weight:700;
-}
-
-.level-high { background:#f0fdf4; color:var(--success); }
-.level-mid { background:#fffbeb; color:var(--warning); }
-.level-low { background:#fef2f2; color:var(--danger); }
-
-.percentile-bar-wrap {
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
-.percentile-bar {
-  flex:1;
-  height:8px;
-  background:var(--surface2);
-  border-radius:4px;
-  overflow:hidden;
-  max-width:120px;
-}
-
-.percentile-bar-fill {
-  height:100%;
-  border-radius:4px;
-}
-
-.footer-note {
-  background:var(--surface2);
-  border-radius:12px;
-  padding:16px 20px;
-  font-size:12px;
-  color:var(--muted);
-  margin-bottom:20px;
-  line-height:1.6;
-}
+:root{--bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;--accent:#0057b8;--accent2:#00a3e0;--success:#059669;--warning:#d97706;--danger:#dc2626;--text:#1e293b;--muted:#64748b;--shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.04);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+.topbar{background:var(--accent);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-size:18px;font-weight:800;color:white;}
+.topbar-right{display:flex;gap:10px;align-items:center;}
+.btn-exp{padding:8px 16px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:6px;transition:all 0.2s;}
+.btn-pdf{background:white;color:var(--danger);}
+.btn-excel{background:white;color:var(--success);}
+.btn-back{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);}
+#screen-loading{min-height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+#screen-error{min-height:100vh;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+#screen-report{display:none;}
+.report-wrap{max-width:960px;margin:0 auto;padding:28px 20px;}
+.cover-card{border-radius:16px;padding:32px;margin-bottom:20px;color:white;display:flex;align-items:center;justify-content:space-between;position:relative;overflow:hidden;}
+.cover-name{font-size:28px;font-weight:800;margin-bottom:4px;}
+.cover-meta{font-size:14px;opacity:0.8;margin-bottom:16px;}
+.cover-badge{background:rgba(255,255,255,0.2);border:1px solid rgba(255,255,255,0.3);border-radius:8px;padding:6px 16px;font-size:13px;font-weight:700;display:inline-block;}
+.cover-right{text-align:right;opacity:0.85;font-size:13px;}
+.cover-right .co{font-size:15px;font-weight:700;margin-top:4px;}
+.section-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;box-shadow:var(--shadow);}
+.section-hdr{color:white;padding:14px 22px;font-size:14px;font-weight:700;letter-spacing:0.5px;}
+.section-body{padding:22px;}
+.stanine-tbl{width:100%;border-collapse:collapse;}
+.stanine-tbl th{padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;text-align:left;border-bottom:2px solid var(--border);}
+.stanine-tbl td{padding:10px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.stanine-tbl tr:last-child td{border-bottom:none;}
+.s-label{font-weight:700;color:var(--accent);font-size:11px;width:55px;}
+.s-name{font-size:13px;font-weight:600;}
+.s-desc{font-size:11px;color:var(--muted);margin-top:2px;}
+.stanine-vis{display:flex;align-items:center;gap:8px;}
+.s-cells{display:flex;gap:2px;}
+.s-cell{width:22px;height:22px;border-radius:4px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#94a3b8;}
+.s-cell.on{background:var(--accent);color:white;}
+.s-cell.cur{background:var(--accent);color:white;transform:scale(1.2);box-shadow:0 2px 8px rgba(0,87,184,0.4);}
+.pct{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);min-width:36px;text-align:right;}
+.res-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px;margin-bottom:14px;}
+.res-box-title{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.res-box-text{font-size:13px;line-height:1.75;color:#374151;}
+.narr-title{font-size:15px;font-weight:700;color:var(--accent);margin-bottom:10px;padding-bottom:8px;border-bottom:2px solid #dbeafe;}
+.narr-text{font-size:13px;line-height:1.75;color:#374151;margin-bottom:18px;}
+.sw-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.sw-box{border-radius:10px;padding:16px;}
+.sw-str{background:#f0fdf4;border:1px solid #bbf7d0;}
+.sw-dev{background:#fff7ed;border:1px solid #fed7aa;}
+.sw-title{font-size:13px;font-weight:700;margin-bottom:10px;}
+.sw-item{font-size:12px;line-height:1.5;padding:5px 0;border-bottom:1px solid rgba(0,0,0,0.05);display:flex;align-items:flex-start;gap:8px;}
+.sw-item:last-child{border-bottom:none;}
+.sw-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.bf-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+.bf-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;}
+.bf-letter{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.bf-score{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;}
+.bf-bar{height:6px;background:var(--border);border-radius:3px;margin:8px 0;overflow:hidden;}
+.bf-bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.bf-lbl{font-size:10px;color:var(--muted);font-weight:600;}
+.verdict-box{border-radius:12px;padding:18px 22px;display:flex;align-items:center;gap:16px;margin-top:4px;}
+.v-suit{background:#f0fdf4;border:1px solid #bbf7d0;}
+.v-cond{background:#fffbeb;border:1px solid #fde68a;}
+.v-unfit{background:#fef2f2;border:1px solid #fecaca;}
+.v-icon{font-size:32px;}
+.v-title{font-size:15px;font-weight:700;margin-bottom:3px;}
+.v-desc{font-size:13px;color:var(--muted);}
+.disclaimer{background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-top:16px;font-size:11px;color:var(--muted);line-height:1.6;}
+.ag-sum{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+.ag-stat{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center;}
+.ag-val{font-family:'JetBrains Mono',monospace;font-size:26px;font-weight:700;color:var(--accent);}
+.ag-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600;}
+.ag-sub{font-size:11px;color:var(--muted);}
+.sector-tag{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:4px;margin:3px;}
+@media print{.topbar{display:none;}.report-wrap{padding:0;}.section-card{break-inside:avoid;}}
 </style>
 </head>
 <body>
 
 <div id="screen-loading">
   <div class="spinner"></div>
-  <div style="color:#6b7280;font-size:15px;font-family:'Outfit',sans-serif;">Hesabat hazırlanır...</div>
+  <div style="color:var(--muted);font-family:'Outfit',sans-serif;">Hesabat hazırlanır...</div>
 </div>
 
-<div id="screen-error" style="display:none;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;">
-  <div style="font-size:48px;margin-bottom:16px;">⚠️</div>
-  <div style="font-size:20px;font-weight:700;color:#dc2626;" id="err-msg">Xəta baş verdi</div>
-  <button onclick="history.back()" style="margin-top:20px;padding:10px 24px;background:#4f46e5;color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;">Geri qayıt</button>
+<div id="screen-error">
+  <div style="font-size:48px;">⚠️</div>
+  <div style="font-size:18px;font-weight:700;color:var(--danger);" id="err-msg">Xəta</div>
+  <button onclick="history.back()" style="margin-top:16px;padding:10px 24px;background:var(--accent);color:white;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:'Outfit',sans-serif;">Geri</button>
 </div>
 
 <div id="screen-report">
-  <div class="report-topbar">
+  <div class="topbar">
     <div class="topbar-logo">PsychoAssess</div>
-    <div class="export-btns">
-      <button class="btn-back" onclick="history.back()">← Geri</button>
-      <button class="btn-export btn-excel" id="btn-excel" onclick="exportExcel()" style="display:none;">📊 Excel Yüklə</button>
-      <button class="btn-export btn-pdf" onclick="exportPDF()">📄 PDF Yüklə</button>
+    <div class="topbar-right">
+      <button class="btn-exp btn-back" onclick="history.back()">← Geri</button>
+      <button class="btn-exp btn-excel" id="btn-excel-top" onclick="exportExcel()" style="display:none;">📊 Excel Yüklə</button>
+      <button class="btn-exp btn-pdf" onclick="window.print()">🖨️ Çap / PDF</button>
     </div>
   </div>
-  <div class="report-content" id="report-content">
-    <!-- dinamik -->
-  </div>
+  <div class="report-wrap" id="report-content"></div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
-  authDomain: "hr-testing-48e31.firebaseapp.com",
-  databaseURL: "https://hr-testing-48e31-default-rtdb.firebaseio.com",
-  projectId: "hr-testing-48e31",
-  storageBucket: "hr-testing-48e31.firebasestorage.app",
-  messagingSenderId: "905744094931",
-  appId: "1:905744094931:web:2e16300768f61b4fd76626",
-  measurementId: "G-X2NV26TR01"
-};
-
+const firebaseConfig={apiKey:"AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",authDomain:"hr-testing-48e31.firebaseapp.com",databaseURL:"https://hr-testing-48e31-default-rtdb.firebaseio.com",projectId:"hr-testing-48e31",storageBucket:"hr-testing-48e31.firebasestorage.app",messagingSenderId:"905744094931",appId:"1:905744094931:web:2e16300768f61b4fd76626"};
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
+const db=firebase.firestore();
+const auth=firebase.auth();
 
-let reportData = null;
-let candidateInfo = null;
-let reportType = null;
-let allCompanyResults = [];
+const params=new URLSearchParams(window.location.search);
+const candidateId=params.get('c');
+const reportType=params.get('type')||'adaptg-pdf';
+let candidateInfo=null,reportData=null,allCompanyResults=[];
 
-const params = new URLSearchParams(window.location.search);
-const candidateId = params.get('c');
-reportType = params.get('type') || 'adaptg-pdf';
+// STANINE
+function s2p(s){return{1:4,2:11,3:23,4:40,5:60,6:77,7:89,8:96,9:99}[s]||50;}
+function pct2s(p){if(p>=96)return 9;if(p>=89)return 8;if(p>=77)return 7;if(p>=60)return 6;if(p>=40)return 5;if(p>=23)return 4;if(p>=11)return 3;if(p>=4)return 2;return 1;}
+function sten2s(t){return{1:1,2:1,3:2,4:3,5:4,6:5,7:6,8:7,9:8,10:9}[t]||5;}
 
-// ==================== INIT ====================
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    showError('Giriş tələb olunur.');
-    return;
-  }
-  if (!candidateId) {
-    showError('Namizid ID tapılmadı.');
-    return;
-  }
-  await loadReport();
-});
-
-async function loadReport() {
-  try {
-    // Candidate info
-    const candDoc = await db.collection('candidates').doc(candidateId).get();
-    if (!candDoc.exists) { showError('Namizid tapılmadı.'); return; }
-    candidateInfo = { id: candidateId, ...candDoc.data() };
-
-    // Test results
-    const testType = getTestTypeFromReportType(reportType);
-    const resultsSnap = await db.collection('testResults')
-      .where('candidateId','==',candidateId)
-      .where('testType','==',testType)
-      .get();
-
-    if (resultsSnap.empty && reportType !== 'adaptg-excel') {
-      showError('Bu namizid üçün test nəticəsi tapılmadı.');
-      return;
-    }
-
-    if (!resultsSnap.empty) {
-      reportData = resultsSnap.docs[0].data();
-    }
-
-    // Excel üçün bütün şirkətin nəticələrini yüklə
-    if (reportType === 'adaptg-excel') {
-      document.getElementById('btn-excel').style.display = 'flex';
-      const allSnap = await db.collection('testResults')
-        .where('companyId','==',candidateInfo.companyId)
-        .where('testType','==','adaptg')
-        .get();
-      allCompanyResults = allSnap.docs.map(d => ({id:d.id,...d.data()}));
-      renderExcelPreview();
-    } else {
-      renderReport();
-    }
-
-    document.getElementById('screen-loading').style.display = 'none';
-    document.getElementById('screen-report').style.display = 'block';
-
-  } catch(e) {
-    showError('Xəta: ' + e.message);
-  }
+function stanineBar(stanine){
+  const cells=[1,2,3,4,5,6,7,8,9].map(i=>`<div class="s-cell ${i===stanine?'cur':i<stanine?'on':''}">${i}</div>`).join('');
+  return `<div class="stanine-vis"><div class="s-cells">${cells}</div><div class="pct">${s2p(stanine)}%</div></div>`;
 }
 
-function getTestTypeFromReportType(rt) {
-  if (rt.startsWith('adaptg')) return 'adaptg';
-  if (rt.startsWith('16fq')) return '16fq';
-  if (rt.startsWith('ccsi')) return 'ccsi';
-  if (rt === 'consolidated') return 'adaptg';
-  return 'adaptg';
-}
+// ADAPT-G
+function buildAdaptG(){
+  const ss=reportData?.sectionScores||{};
+  const vP=ss.verbal?.score||0,nP=ss.numerical?.score||0,aP=ss.abstract?.score||0;
+  const gP=reportData?.totalScore||Math.round((vP+nP+aP)/3);
+  const vS=pct2s(vP),nS=pct2s(nP),aS=pct2s(aP),gS=pct2s(gP);
+  const date=new Date().toLocaleDateString('az-AZ',{year:'numeric',month:'long',day:'numeric'});
 
-// ==================== RENDER REPORT ====================
-function renderReport() {
-  const content = document.getElementById('report-content');
-  const date = new Date().toLocaleDateString('az-AZ', {year:'numeric',month:'long',day:'numeric'});
-
-  let html = `
-    <div class="report-header">
-      <div class="report-header-left">
-        <h1>${candidateInfo.name}</h1>
-        <p>${candidateInfo.position || 'Namizid'} · ${candidateInfo.email}</p>
-      </div>
-      <div class="report-header-right">
-        <div class="report-date">${date}</div>
-        <div class="report-company">🏢 ${candidateInfo.companyName || ''}</div>
-      </div>
-    </div>`;
-
-  if (reportType === 'adaptg-pdf') {
-    html += renderAdaptGReport();
-  } else if (reportType === '16fq-pdf') {
-    html += render16FQReport();
-  } else if (reportType === 'ccsi-pdf') {
-    html += renderCCSIReport();
-  } else if (reportType === 'consolidated') {
-    html += renderAdaptGReport() + renderCCSIReport();
-  }
-
-  html += `<div class="footer-note">
-    Bu hesabat PsychoAssess platforması tərəfindən avtomatik hazırlanmışdır. 
-    Hesabat yalnız HR qərar dəstəyi üçündür və tam psixoloji diaqnoz kimi qəbul edilməməlidir.
-    Nəticələr namizid ilə birgə müzakirə edilməsi tövsiyə olunur.
-  </div>`;
-
-  content.innerHTML = html;
-
-  // Animate bars
-  setTimeout(() => {
-    document.querySelectorAll('.section-bar-fill, .fq-bar-fill, .percentile-bar-fill').forEach(el => {
-      el.style.width = el.dataset.width || el.style.width;
-    });
-  }, 100);
-}
-
-// ==================== ADAPT-G REPORT ====================
-function renderAdaptGReport() {
-  const scores = reportData?.sectionScores || {};
-  const verbal = scores.verbal?.score || 0;
-  const numerical = scores.numerical?.score || 0;
-  const abstract = scores.abstract?.score || 0;
-  const total = reportData?.totalScore || Math.round((verbal+numerical+abstract)/3);
-  const sten = scoreToSten(total);
-  const percentile = stenToPercentile(sten);
-
-  const strengths = getAdaptGStrengths(verbal, numerical, abstract);
-  const weaknesses = getAdaptGWeaknesses(verbal, numerical, abstract);
-  const sectors = getSectors(verbal, numerical, abstract);
-  const trainings = getTrainings(verbal, numerical, abstract);
-  const verdict = getVerdict(total);
-
-  return `
-    <div class="overall-score-card">
-      <div>
-        <div class="overall-label">ADAPT-G — Ümumi G Xalı</div>
-        <div class="overall-value">${total}%</div>
-        <div class="overall-sub">Percentil: ${percentile}% · Sten: ${sten}/10</div>
-      </div>
-      <div class="sten-display">
-        <div class="sten-label">STEN ŞKALASI</div>
-        <div class="sten-bar">
-          ${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div class="sten-dot ${i<=sten?'active':''}">${i}</div>`).join('')}
-        </div>
-      </div>
-    </div>
-
-    <div class="section-grid">
-      <div class="section-card verbal">
-        <div class="section-label">📖 Verbal Reasoning</div>
-        <div class="section-score">${verbal}%</div>
-        <div class="section-bar"><div class="section-bar-fill" style="width:${verbal}%"></div></div>
-        <div class="section-level" style="color:${getLevelColor(verbal)}">${getLevel(verbal)}</div>
-      </div>
-      <div class="section-card numerical">
-        <div class="section-label">🔢 Numerical Reasoning</div>
-        <div class="section-score">${numerical}%</div>
-        <div class="section-bar"><div class="section-bar-fill" style="width:${numerical}%"></div></div>
-        <div class="section-level" style="color:${getLevelColor(numerical)}">${getLevel(numerical)}</div>
-      </div>
-      <div class="section-card abstract">
-        <div class="section-label">🔷 Abstract Reasoning</div>
-        <div class="section-score">${abstract}%</div>
-        <div class="section-bar"><div class="section-bar-fill" style="width:${abstract}%"></div></div>
-        <div class="section-level" style="color:${getLevelColor(abstract)}">${getLevel(abstract)}</div>
-      </div>
-    </div>
-
-    <div class="analysis-grid">
-      <div class="analysis-card">
-        <div class="analysis-title">💪 Güclü tərəflər</div>
-        ${strengths.map(s=>`<div class="strength-item"><span class="strength-dot"></span><span>${s}</span></div>`).join('')}
-      </div>
-      <div class="analysis-card">
-        <div class="analysis-title">📈 İnkişaf sahələri</div>
-        ${weaknesses.map(w=>`<div class="weakness-item"><span class="weakness-dot"></span><span>${w}</span></div>`).join('')}
-      </div>
-    </div>
-
-    <div class="recommendation-card">
-      <div class="rec-title">🎯 Tövsiyələr</div>
-      <div class="rec-grid">
-        ${trainings.slice(0,3).map(t=>`
-          <div class="rec-item">
-            <div class="rec-item-title">${t.title}</div>
-            <div class="rec-item-desc">${t.desc}</div>
-          </div>`).join('')}
-      </div>
-      <div class="verdict-box ${verdict.class}">
-        <div class="verdict-icon">${verdict.icon}</div>
-        <div>
-          <div class="verdict-title">${verdict.title}</div>
-          <div class="verdict-desc">${verdict.desc}</div>
-        </div>
-      </div>
-    </div>
-
-    <div class="sector-card">
-      <div class="rec-title">🏢 Uyğun Sahələr</div>
-      <div class="sector-grid">
-        ${sectors.map(s=>`
-          <div class="sector-item ${s.level}">
-            <span>${s.icon}</span><span>${s.name}</span>
-          </div>`).join('')}
-      </div>
-    </div>
-
-    <div class="training-card">
-      <div class="rec-title">📚 Təlim Tövsiyələri</div>
-      <div class="training-list">
-        ${trainings.map(t=>`
-          <div class="training-item">
-            <span>${t.icon}</span>
-            <span style="flex:1">${t.title} — <span style="color:var(--muted);font-size:13px;">${t.desc}</span></span>
-            <span class="training-priority priority-${t.priority}">${t.priority==='high'?'Prioritet':t.priority==='mid'?'Orta':'Əlavə'}</span>
-          </div>`).join('')}
-      </div>
-    </div>`;
-}
-
-// ==================== 16FQ REPORT ====================
-function render16FQReport() {
-  const scores = reportData?.sectionScores?.personality || {};
-  const factors = {
-    'A': { name:'Ünsiyyətcillik', high:'Açıq, ünsiyyətcil', low:'Çəkingən, qapalı' },
-    'B': { name:'Analitik düşüncə', high:'Güclü analiz', low:'Sadə düşüncə' },
-    'C': { name:'Emosional sabitlik', high:'Sakit, davamlı', low:'Əsəbi, qeyri-sabit' },
-    'E': { name:'Dominantlıq', high:'Lider, güclü', low:'Təvazökar, itaətkar' },
-    'F': { name:'Canlılıq', high:'Enerjili, şən', low:'Ciddi, ölçülü' },
-    'G': { name:'Qaydaya riayət', high:'Məsuliyyətli', low:'Ənənəsiz' },
-    'H': { name:'Sosial cəsarət', high:'Cəsur, açıq', low:'Utancaq, çəkingən' },
-    'I': { name:'Həssaslıq', high:'Empatik, incə', low:'Praktik, sərt' },
-    'L': { name:'Güvən', high:'Şübhəci', low:'Güvənən' },
-    'M': { name:'Abstrakt düşüncə', high:'Yaradıcı', low:'Praktik' },
-    'N': { name:'Özünə nəzarət', high:'Diplomatik', low:'Açıq fikirlı' },
-    'O': { name:'Özgüvən', high:'Narahat', low:'Güvənli' },
-    'Q1': { name:'Yeniliyə açıqlıq', high:'Eksperimental', low:'Ənənəvi' },
-    'Q2': { name:'Müstəqillik', high:'Özbaşına', low:'Qrupa bağlı' },
-    'Q3': { name:'Özünü idarə', high:'Nizam-intizam', low:'Pərişan' },
-    'Q4': { name:'Gərginlik', high:'Gərgin', low:'Rahat' }
+  const desc=(s,type)=>{
+    const lvl=s>=8?'exc':s>=7?'hi':s>=6?'abv':s>=5?'avg':s>=4?'blw':s>=3?'low':'vlow';
+    const nm=candidateInfo.name;
+    const map={
+      verbal:{exc:`${nm}-in verbal əsaslandırma qabiliyyəti müstəsna yüksəkdir. İstinad qrupunun yalnız ilk 4%-i bu nəticəni əldə edir. Mürəkkəb verbal anlayışları anlamaq, aralarındakı əlaqələri görmək və məntiqi nəticə çıxarmaq qabiliyyəti son dərəcə yüksəkdir. Mürəkkəb təlimatları anlamaq, çətin anlayışları başqalarına aydın şəkildə izah etmək və yeni verbal materialı tez mənimsəmək qabiliyyəti güclüdür.`,hi:`${nm}-in verbal əsaslandırma qabiliyyəti istinad qrupunun böyük əksəriyyətini üstələyir. Mürəkkəb verbal anlayışları anlamaq və məntiqi arqumentlər qurmaq üçün güclü qabiliyyəti var. Mürəkkəb izahatları asanlıqla anlayır, çətin konsepsiyaları başqalarına aydın şəkildə izah edə bilir.`,abv:`${nm} verbal əsaslandırmada ortalamanın üzərindədir. Kompleks verbal konsepsiyaları anlamaq və izah etmək üçün yaxşı qabiliyyəti var. Bu nəticə göstərir ki, o/ona şifahi əsaslı iş tələbləri ilə effektiv şəkildə öhdəsindən gələ bilər.`,avg:`${nm}-in verbal əsaslandırma qabiliyyəti istinad qrupu ilə müqayisədə orta səviyyədədir. Gündəlik iş tələblərini ödəmək üçün kifayət qədər verbal bacarığa malikdir.`,blw:`${nm}-in verbal əsaslandırma qabiliyyəti istinad qrupunun ortalamasının bir qədər aşağısındadır. Verbal bacarıqların inkişafı tövsiyə olunur.`,low:`${nm}-in verbal əsaslandırma qabiliyyəti istinad qrupunun əksəriyyətinin aşağısındadır.`,vlow:`${nm}-in verbal əsaslandırma nəticəsi aşağıdır.`},
+      numerical:{exc:`${nm}-in rəqəmsal əsaslandırma qabiliyyəti müstəsna yüksəkdir. Bu nəticə istinad qrupunun yalnız ilk 4%-i tərəfindən əldə edilir. Rəqəmlər arasındakı məntiqi əlaqələri dərk etmək, mürəkkəb riyazi əməliyyatlar aparmaq və rəqəmsal problemləri həll etmək potensialı əksər işçiləri çox üstələyir.`,hi:`${nm} rəqəmsal əsaslandırmada yüksək nəticə göstərmişdir. Mürəkkəb rəqəmsal anlayışları anlamaq, rəqəmsal məlumatları effektiv şəkildə emal etmək üçün güclü qabiliyyəti var.`,abv:`${nm}-in rəqəmsal əsaslandırma qabiliyyəti ortalamanın üzərindədir. Rəqəmsal məlumatlarla işləmək üçün yaxşı bacarığa malikdir.`,avg:`${nm} rəqəmsal əsaslandırmada orta səviyyəni göstərmişdir. Əksər iş vəziyyətlərinin rəqəmsal tələblərini ödəyə biləcək qabiliyyətə malikdir.`,blw:`${nm}-in rəqəmsal əsaslandırma qabiliyyəti orta səviyyənin bir qədər aşağısındadır.`,low:`${nm}-in rəqəmsal əsaslandırma nəticəsi istinad qrupunun əksəriyyətinin aşağısındadır.`,vlow:`${nm}-in rəqəmsal əsaslandırma nəticəsi aşağıdır.`},
+      abstract:{exc:`${nm}-in abstrakt əsaslandırma qabiliyyəti müstəsna yüksəkdir. Bu, əvvəlki təhsil və təcrübədən asılı olmayan xalis zehni potensialdır. Abstrakt məntiqi əlaqələri dərk etmək, yeni vəziyyətlərə uyğunlaşmaq üçün olduqca yüksək qabiliyyəti var. Bu göstərici onu yeni, intellektual cəhətdən tələbkar materialı digər işçilərdən daha tez öyrənə biləcəyini göstərir.`,hi:`${nm} abstrakt əsaslandırmada yüksək nəticə göstərmişdir. Şəkillər və fiqurlardakı məntiqi ardıcıllıqları müəyyən etmək qabiliyyəti güclüdür. Yeni anlayışları sürətlə mənimsəmək potensialına malikdir.`,abv:`${nm}-in abstrakt əsaslandırma qabiliyyəti ortalamanın üzərindədir. Yeni anlayışları öyrənmək və uyğunlaşmaq üçün yaxşı potensialı var.`,avg:`${nm} abstrakt əsaslandırmada orta nəticə göstərmişdir. Yeni məlumatları mənimsəmək üçün kifayət qədər qabiliyyəti var.`,blw:`${nm}-in abstrakt əsaslandırma qabiliyyəti orta səviyyənin aşağısındadır.`,low:`${nm}-in abstrakt əsaslandırma nəticəsi istinad qrupunun aşağı hissəsindədir.`,vlow:`${nm}-in abstrakt əsaslandırma nəticəsi aşağıdır.`},
+      g:{exc:`${nm} ümumi zehni qabiliyyət (g) baxımından müstəsna yüksək nəticə göstərmişdir. Bu nəticə istinad qrupunun yalnız ilk 4%-i tərəfindən əldə edilir. Ümumi zehni qabiliyyəti ona mürəkkəb ideyalar arasındakı əlaqələri görməyə, yeni material öyrənməyə, problemləri məntiqi şəkildə həll etməyə imkan verir. Çox yüksək zehni qabiliyyəti sayəsində yüksək intellektual tələblər olan vəzifələr üçün güclü namiziddir.`,hi:`${nm}-in ümumi zehni qabiliyyəti (g) istinad qrupunun böyük əksəriyyətini üstələyir. Yüksək zehni tələblər olan vəzifələr üçün güclü potensial nümayiş etdirir.`,abv:`${nm}-in ümumi zehni qabiliyyəti (g) ortalamanın üzərindədir. Mürəkkəb iş tələblərini ödəmək üçün yaxşı zehni resurslara malikdir.`,avg:`${nm}-in ümumi zehni qabiliyyəti (g) istinad qrupu ilə müqayisədə orta səviyyədədir.`,blw:`${nm}-in ümumi zehni qabiliyyəti (g) orta səviyyənin aşağısındadır.`,low:`${nm}-in ümumi zehni qabiliyyəti (g) istinad qrupunun əksəriyyətinin aşağısındadır.`,vlow:`${nm}-in ümumi zehni qabiliyyəti (g) aşağıdır.`}
+    };
+    return map[type]?.[lvl]||'';
   };
 
-  const factorScores = {};
-  Object.keys(factors).forEach(f => {
-    const data = scores[f];
-    if (data && data.total > 0) {
-      factorScores[f] = Math.round((data.agree / data.total) * 100);
-    } else {
-      factorScores[f] = 50;
-    }
+  const verdict=gS>=7?{cls:'v-suit',icon:'✅',t:'İşə qəbul tövsiyə olunur',d:'Namizid ümumi zehni qabiliyyət baxımından bu vəzifə üçün güclü namiziddir.'}:gS>=5?{cls:'v-cond',icon:'⚠️',t:'Müsahibə tövsiyə olunur',d:'Namizid orta səviyyədədir. Əlavə qiymətləndirmə tövsiyə edilir.'}:{cls:'v-unfit',icon:'❌',t:'Uyğun deyil',d:'Namizid tələb olunan zehni qabiliyyət səviyyəsini göstərməmişdir.'};
+
+  const sectors=[
+    {n:'Maliyyə/Bank',i:'🏦',s:nP},{n:'IT/Analitika',i:'💻',s:aP},{n:'Hüquq/HR',i:'⚖️',s:vP},
+    {n:'Menecment',i:'👔',s:(vP+nP+aP)/3},{n:'Marketing',i:'📢',s:(vP+aP)/2},{n:'Mühəndislik',i:'🔧',s:(nP+aP)/2}
+  ].sort((a,b)=>b.s-a.s).map(s=>({...s,lvl:s.s>=70?'high':s.s>=50?'mid':'low'}));
+
+  return `
+  <div class="cover-card" style="background:linear-gradient(135deg,#0057b8,#0ea5e9);">
+    <div>
+      <div class="cover-name">${candidateInfo.name}</div>
+      <div class="cover-meta">${candidateInfo.position||'Namizid'} · ${candidateInfo.email}</div>
+      <div class="cover-badge">🔵 ADAPT-G — Adaptiv Ümumi Əsaslandırma Testi · EKSPERT · STANDART HESABAT</div>
+    </div>
+    <div class="cover-right">
+      <div>${date}</div>
+      <div class="co">🏢 ${candidateInfo.companyName||''}</div>
+    </div>
+  </div>
+
+  <div class="ag-sum">
+    <div class="ag-stat"><div class="ag-val" style="color:#0891b2;">${vP}%</div><div class="ag-lbl">Verbal Reasoning</div><div class="ag-sub">Stanine: ${vS}/9 · %ile: ${s2p(vS)}</div></div>
+    <div class="ag-stat"><div class="ag-val" style="color:var(--success);">${nP}%</div><div class="ag-lbl">Numerical Reasoning</div><div class="ag-sub">Stanine: ${nS}/9 · %ile: ${s2p(nS)}</div></div>
+    <div class="ag-stat"><div class="ag-val" style="color:var(--warning);">${aP}%</div><div class="ag-lbl">Abstract Reasoning</div><div class="ag-sub">Stanine: ${aS}/9 · %ile: ${s2p(aS)}</div></div>
+    <div class="ag-stat" style="border-color:#bfdbfe;background:#eff6ff;"><div class="ag-val">${gP}%</div><div class="ag-lbl">Ümumi G Xalı</div><div class="ag-sub">Stanine: ${gS}/9 · %ile: ${s2p(gS)}</div></div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:var(--accent);">📊 NƏTİCƏLƏR XÜLASƏSİ — STANINE PROFİLİ</div>
+    <div class="section-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">STANINE: Orta=5, SD=2. Sağdakı rəqəm percentili göstərir. İstinad qrupu: Ümumi işçi populyasiyası.</p>
+      <table class="stanine-tbl">
+        <thead><tr><th>Şkala</th><th>Təsvir</th><th>1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9</th><th style="text-align:right">%ile</th></tr></thead>
+        <tbody>
+          <tr><td class="s-label" style="color:#0891b2;">Adapt-gV</td><td><div class="s-name">Verbal Reasoning</div><div class="s-desc">Söz əsaslı mühakimə</div></td><td>${stanineBar(vS)}</td><td class="pct">${s2p(vS)}</td></tr>
+          <tr><td class="s-label" style="color:var(--success);">Adapt-gN</td><td><div class="s-name">Numerical Reasoning</div><div class="s-desc">Rəqəm əsaslı mühakimə</div></td><td>${stanineBar(nS)}</td><td class="pct">${s2p(nS)}</td></tr>
+          <tr><td class="s-label" style="color:var(--warning);">Adapt-gA</td><td><div class="s-name">Abstract Reasoning</div><div class="s-desc">Abstrakt məntiqi düşüncə</div></td><td>${stanineBar(aS)}</td><td class="pct">${s2p(aS)}</td></tr>
+          <tr style="background:#eff6ff;"><td class="s-label" style="font-size:12px;">Adapt-g</td><td><div class="s-name" style="font-weight:800;">Ümumi Zehni Qabiliyyət (g)</div><div class="s-desc">Kompozit xal</div></td><td>${stanineBar(gS)}</td><td class="pct" style="font-size:15px;">${s2p(gS)}</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);">Kalibrə edilib: Verbal=3490 | Numerical=3582 | Abstract=3458 | G=3004 respondent</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:#0891b2;">📖 VERBAL REASONING</div>
+    <div class="section-body">
+      <div class="res-box"><div class="res-box-title">Nəticə Təsviri</div><div class="res-box-text">${desc(vS,'verbal')}</div></div>
+      <table class="stanine-tbl"><tbody><tr><td class="s-label" style="color:#0891b2;">Adapt-gV</td><td><div class="s-name">Verbal Reasoning</div></td><td>${stanineBar(vS)}</td><td class="pct">${s2p(vS)}</td></tr></tbody></table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">Kalibrə edilib: Verbal Reasoning = 3490 respondent</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:var(--success);">🔢 NUMERICAL REASONING</div>
+    <div class="section-body">
+      <div class="res-box" style="background:#f0fdf4;border-color:#bbf7d0;"><div class="res-box-title" style="color:var(--success);">Nəticə Təsviri</div><div class="res-box-text">${desc(nS,'numerical')}</div></div>
+      <table class="stanine-tbl"><tbody><tr><td class="s-label" style="color:var(--success);">Adapt-gN</td><td><div class="s-name">Numerical Reasoning</div></td><td>${stanineBar(nS)}</td><td class="pct">${s2p(nS)}</td></tr></tbody></table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">Kalibrə edilib: Numerical Reasoning = 3582 respondent</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:var(--warning);">🔷 ABSTRACT REASONING</div>
+    <div class="section-body">
+      <div class="res-box" style="background:#fffbeb;border-color:#fde68a;"><div class="res-box-title" style="color:var(--warning);">Nəticə Təsviri</div><div class="res-box-text">${desc(aS,'abstract')}</div></div>
+      <table class="stanine-tbl"><tbody><tr><td class="s-label" style="color:var(--warning);">Adapt-gA</td><td><div class="s-name">Abstract Reasoning</div></td><td>${stanineBar(aS)}</td><td class="pct">${s2p(aS)}</td></tr></tbody></table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">Kalibrə edilib: Abstract Reasoning = 3458 respondent</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:var(--accent);">🧠 ÜMUMİ ZEHNİ QABİLİYYƏT (g)</div>
+    <div class="section-body">
+      <div class="res-box"><div class="res-box-title">Nəticə Təsviri</div><div class="res-box-text">${desc(gS,'g')}</div></div>
+      <table class="stanine-tbl"><tbody><tr style="background:#eff6ff;"><td class="s-label">Adapt-g</td><td><div class="s-name" style="font-weight:800;">Ümumi Zehni Qabiliyyət (g)</div></td><td>${stanineBar(gS)}</td><td class="pct" style="font-size:15px;">${s2p(gS)}</td></tr></tbody></table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);">Kalibrə edilib: Ümumi Zehni Qabiliyyət (g) = 3004 respondent</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:var(--accent);">🎯 QİYMƏTLƏNDİRMƏ VƏ TÖVSİYƏ</div>
+    <div class="section-body">
+      <div class="verdict-box ${verdict.cls}"><div class="v-icon">${verdict.icon}</div><div><div class="v-title">${verdict.t}</div><div class="v-desc">${verdict.d}</div></div></div>
+      <div style="margin-top:16px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:10px;">Uyğun sahələr:</div>
+        <div>${sectors.map(s=>`<span class="sector-tag" style="background:${s.lvl==='high'?'#f0fdf4':s.lvl==='mid'?'#fffbeb':'#f8fafc'};border:1px solid ${s.lvl==='high'?'#bbf7d0':s.lvl==='mid'?'#fde68a':'#e2e8f0'};color:${s.lvl==='high'?'var(--success)':s.lvl==='mid'?'var(--warning)':'var(--muted)'};">${s.i} ${s.n}</span>`).join('')}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer"><strong>Məxfilik bildirişi:</strong> Bu hesabat ${candidateInfo.name} haqqında ciddi şəkildə məxfi qiymətləndirmə hesabatıdır və yalnız təlim keçmiş mütəxəssislərin rəhbərliyi altında istifadə edilməlidir. Bu profil özünü qiymətləndirmə anketindən əldə edilir və iş vəzifəsi kontekstini, faktiki təcrübəni, motivasiyanı, maraqları, dəyərləri, bacarıq və bilikləri nəzərə alaraq şərh edilməlidir.</div>`;
+}
+
+// 15FQ
+function build15FQ(){
+  const ss=reportData?.sectionScores?.personality||{};
+  const date=new Date().toLocaleDateString('az-AZ',{year:'numeric',month:'long',day:'numeric'});
+
+  const FACTORS={
+    FA:{lbl:'fA',nm:'İstiqanlılıq',l:'Soyuqqanlı, Məsafəli',r:'İstiqanlı, Empatik'},
+    B: {lbl:'β', nm:'İntellektans',l:'Aşağı intellektans',r:'Yüksək intellektans'},
+    FC:{lbl:'fC',nm:'Emosional Sabitlik',l:'Hisslərə tabe olan',r:'Emosional sabit'},
+    FE:{lbl:'fE',nm:'Dominantlıq',l:'Uyğunlaşan, Mülayim',r:'Dominant, İddialı'},
+    FF:{lbl:'fF',nm:'Canlılıq',l:'Ciddi, Tutumlu',r:'Enerjili, Şən'},
+    FG:{lbl:'fG',nm:'Qaydaya riayət',l:'Sərbəst, Öz istəyi',r:'Vicdanlı, Məsuliyyətli'},
+    FH:{lbl:'fH',nm:'Sosial Cəsarət',l:'Çəkingən, Utancaq',r:'Sosial cəsur, Açıq'},
+    FI:{lbl:'fI',nm:'Həssaslıq',l:'Praktik, Əməli',r:'Həssas, Estetik'},
+    FL:{lbl:'fL',nm:'Güvən',l:'Güvənən, Tolerant',r:'Şübhəci, Tənqidi'},
+    FM:{lbl:'fM',nm:'Abstrakt düşüncə',l:'Konkret, Realist',r:'Abstrakt, Xəyalpərəst'},
+    FN:{lbl:'fN',nm:'Özünə nəzarət',l:'Birbaşa, Açıq',r:'Diplomatik, Zirək'},
+    FO:{lbl:'fO',nm:'Özgüvən',l:'Güvənli, Arxayın',r:'Narahat, Şübhəli'},
+    FQ1:{lbl:'fQ₁',nm:'Yeniliyə açıqlıq',l:'Ənənəvi, Mühafizəkar',r:'Radikal, Eksperimental'},
+    FQ2:{lbl:'fQ₂',nm:'Müstəqillik',l:'Qrupa bağlı, Sosial',r:'Müstəqil, Özbaşına'},
+    FQ3:{lbl:'fQ₃',nm:'Özünü idarə',l:'Nizamsız, Öz istəyi',r:'Özünü idarə edən'},
+    FQ4:{lbl:'fQ₄',nm:'Gərginlik',l:'Sakit, Rahat',r:'Gərgin, Tələsik'}
+  };
+
+  const fS={};
+  Object.keys(FACTORS).forEach(f=>{
+    const d=ss[f];
+    fS[f]=d&&d.total>0?Math.max(1,Math.min(10,Math.round((d.agree/d.total)*10))):5;
   });
 
-  const topFactors = Object.entries(factorScores).sort((a,b)=>b[1]-a[1]).slice(0,5);
-  const lowFactors = Object.entries(factorScores).sort((a,b)=>a[1]-b[1]).slice(0,5);
+  const bf={
+    E:{l:'E',n:'Ekstraversiya',s:Math.round((fS.FA+fS.FF+fS.FH+(10-fS.FQ2))/4)},
+    N:{l:'N',n:'Həyəcanlılıq',s:Math.round((fS.FC+fS.FO+fS.FQ4+fS.FL)/4)},
+    O:{l:'O',n:'Açıqlıq',s:Math.round((fS.B+fS.FM+fS.FQ1+fS.FI)/4)},
+    A:{l:'A',n:'Xoşagəlimlilik',s:Math.round(((10-fS.FE)+(10-fS.FL)+fS.FA)/3)},
+    C:{l:'C',n:'Özünü idarə',s:Math.round((fS.FG+fS.FQ3+(10-fS.FO))/3)}
+  };
+
+  const nm=candidateInfo.name;
+  const interp=`${nm}-in şəxsiyyətlərarası üslubu ${fS.FH>=7?'sosial cəsarət nümayiş etdirir. Yeni insanlarla tanış olmaqda çətinlik çəkmir, ictimai mühitdə rahatlıqla hərəkət edir':'daha çəkingən sosial üslub göstərir. Tanış olmayan insanlarla ünsiyyətdə bir qədər ehtiyatlı davranmağa üstünlük verir'}. ${fS.FA>=7?'İstiqanlı, dəstəkləyici şəxs kimi tanınır, insanlarla güclü əlaqə qura bilir.':'Daha formal ünsiyyət üslubuna meyllidir.'} ${fS.FE>=7?'Münasibətlərdə dominant olma meyli var, öz fikrini açıq bildirməkdən çəkinmir.':'Münaqişəni minimuma endirən uyğunlaşma meyli göstərir.'} ${fS.FL>=7?'İnsanların gizli motivləri barədə tənqidi düşüncəyə malikdir.':'İnsanlara güvənir, dürüst münasibət sərgiləyir.'} ${fS.FQ2>=7?'Müstəqil işləməyi üstün tutur.':'Komanda şəraitini sevir, qrup dəstəyinə əhəmiyyət verir.'}`;
+
+  const think=`Düşüncə tərzi baxımından ${nm} ${fS.B>=7?'güclü analitik qabiliyyətə malikdir':'praktik düşüncə tərzi üstünlük edir'}. ${fS.FM>=7?'Abstrakt və konseptual düşüncəyə meyllidir, böyük mənzərəni görməyi bacarır.':'Praktik, real həll yollarına fokuslanır.'} ${fS.FG>=7?'Qaydalara riayət edir, detallara diqqət yetirir, məsuliyyətli münasibət sərgiləyir.':'Daha çevik yanaşma tərzi var, qaydaları situasiyaya uyğun şərh edir.'} ${fS.FQ1>=7?'Yeniliklərə açıqdır, eksperimental düşüncə tərzi var.':'Ənənəvi, sübut olunmuş yanaşmaları üstün tutur.'} ${fS.FI>=7?'Estetik həssaslığı yüksəkdir, hissiyyata əsaslanan qərarlar da verir.':'Pratik və əməli düşüncəni üstün tutur, utilitar yanaşma sərgiləyir.'}`;
+
+  const cope=`Mübarizə tərzi baxımından ${nm} ${fS.FC>=7?'emosional sabitlik nümayiş etdirir, stress altında da sakit qalmağı bacarır':'emosional baxımdan daha dəyişkəndir, tələbkar vəziyyətlərə həssas reaksiya göstərə bilər'}. ${fS.FO>=6?'Özgüvəni yüksəkdir, narahatçılığa az məruz qalır.':'Bəzən özünə şübhə duyur, narahatçılığa daha meyllidir.'} ${fS.FQ4<=4?'Sakit, rahat bir meyli var, gərginlik yaşamamır.':fS.FQ4>=7?'Gərginlik səviyyəsi yüksəkdir, tələsik və səbirsiz ola bilər.':'Orta səviyyədə gərginlik yaşayır, ümumiyyətlə öhdəsindən gəlir.'} ${fS.FL>=7?'Şübhəci münasibəti bəzən psixoloji gərginliyə səbəb ola bilər.':'İnsanlara güvəni psixoloji rifahını müsbət cəhətdən təsir edir.'}`;
+
+  const strengths=[];
+  const devs=[];
+  if(fS.FH>=7)strengths.push('Sosial cəsarəti yüksəkdir — insanlarla asanlıqla ünsiyyət qurur');
+  if(fS.FA>=7)strengths.push('İstiqanlı və empatik — kollektivdə müsbət atmosfer yaradır');
+  if(fS.B>=7)strengths.push('Yüksək intellektans — mürəkkəb anlayışları asanlıqla mənimsəyir');
+  if(fS.FC>=7)strengths.push('Emosional sabit — stress altında effektiv çalışır');
+  if(fS.FG>=7)strengths.push('Məsuliyyətli və dəqiq — tapşırıqları tam yerinə yetirir');
+  if(fS.FQ1>=7)strengths.push('Yeniliklərə açıqdır — dəyişikliklərlə asanlıqla uyğunlaşır');
+  if(fS.FE>=7)strengths.push('Liderlik keyfiyyətləri güclüdür');
+  if(strengths.length===0)strengths.push('Balanslaşdırılmış şəxsiyyət profili — çevik uyğunlaşma bacarığı');
+  if(fS.FG<=3)devs.push('Məsuliyyət və nizam-intizamın gücləndirilməsi tövsiyə olunur');
+  if(fS.FC<=3)devs.push('Emosional idarəetmə bacarıqlarının inkişafı faydalı ola bilər');
+  if(fS.FH<=3)devs.push('Sosial cəsarətin artırılması — ünsiyyət treninqləri tövsiyə olunur');
+  if(fS.B<=3)devs.push('Analitik düşüncə bacarıqlarının inkişafı tövsiyə olunur');
+  if(fS.FQ3<=3)devs.push('Özünü idarəetmə və planlaşdırma bacarıqlarının gücləndirilməsi');
+  if(devs.length===0)devs.push('Mövcud güclü tərəflərin daha da inkişaf etdirilməsi tövsiyə olunur');
+
+  const fRow=k=>{
+    const f=FACTORS[k];const sc=fS[k]||5;const st=sten2s(sc);
+    return `<tr><td style="width:50px;text-align:center;"><span style="display:inline-block;background:#5b21b6;color:white;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:700;">${f.lbl}</span></td><td><div class="s-name">${f.nm}</div><div class="s-desc">${f.l} ↔ ${f.r}</div></td><td>${stanineBar(st)}</td><td class="pct">${s2p(st)}</td></tr>`;
+  };
 
   return `
-    <div class="overall-score-card" style="background:linear-gradient(135deg,#7c3aed,#a855f7);">
-      <div>
-        <div class="overall-label">16FQ — Şəxsiyyət Profili</div>
-        <div class="overall-value" style="font-size:32px;margin-top:8px;">Tamamlandı</div>
-        <div class="overall-sub">16 faktor üzrə tam analiz</div>
-      </div>
-      <div style="font-size:56px;">🧠</div>
+  <div class="cover-card" style="background:linear-gradient(135deg,#5b21b6,#7c3aed);">
+    <div>
+      <div class="cover-name">${nm}</div>
+      <div class="cover-meta">${candidateInfo.position||'Namizid'} · ${candidateInfo.email}</div>
+      <div class="cover-badge">🟡 15FQ+ — On Beş Faktor Anket Plus · EKSPERT · STANDART HESABAT</div>
     </div>
+    <div class="cover-right"><div>${date}</div><div class="co">🏢 ${candidateInfo.companyName||''}</div></div>
+  </div>
 
-    <div class="fq-card">
-      <div class="rec-title">16 Faktor Profili</div>
-      <div class="fq-factor-list">
-        ${Object.entries(factors).map(([key, meta]) => {
-          const score = factorScores[key] || 50;
-          return `
-            <div class="fq-factor">
-              <div class="fq-factor-name">${key}: ${meta.name}</div>
-              <div class="fq-bar-wrap">
-                <div class="fq-bar-fill" style="width:${score}%"></div>
-              </div>
-              <div class="fq-score">${score}%</div>
-            </div>`;
-        }).join('')}
-      </div>
-    </div>
-
-    <div class="analysis-grid">
-      <div class="analysis-card">
-        <div class="analysis-title">💪 Dominant xüsusiyyətlər</div>
-        ${topFactors.map(([f, score]) => `
-          <div class="strength-item">
-            <span class="strength-dot"></span>
-            <span><strong>${factors[f]?.name}</strong> (${score}%) — ${factors[f]?.high}</span>
-          </div>`).join('')}
-      </div>
-      <div class="analysis-card">
-        <div class="analysis-title">📈 İnkişaf potensialı</div>
-        ${lowFactors.map(([f, score]) => `
-          <div class="weakness-item">
-            <span class="weakness-dot"></span>
-            <span><strong>${factors[f]?.name}</strong> (${score}%) — ${factors[f]?.low}</span>
-          </div>`).join('')}
-      </div>
-    </div>
-
-    <div class="recommendation-card">
-      <div class="rec-title">💼 İş davranışı proqnozu</div>
-      <div class="rec-grid">
-        <div class="rec-item">
-          <div class="rec-item-title">Komanda rolu</div>
-          <div class="rec-item-desc">${factorScores['A']>60?'Komanda yönümlü, əməkdaşlıq güclüdür':'Müstəqil işi üstün tutur'}</div>
-        </div>
-        <div class="rec-item">
-          <div class="rec-item-title">Liderlik potensialı</div>
-          <div class="rec-item-desc">${factorScores['E']>60?'Yüksək liderlik meyli var':'Liderlik inkişaf tələb edir'}</div>
-        </div>
-        <div class="rec-item">
-          <div class="rec-item-title">Stressə davamlılıq</div>
-          <div class="rec-item-desc">${factorScores['C']>60?'Yüksək stressə davamlıdır':'Stres idarəsi inkişaf lazımdır'}</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-// ==================== CCSI REPORT ====================
-function renderCCSIReport() {
-  const total = reportData?.totalScore || 0;
-  const sten = scoreToSten(total);
-  const verdict = getVerdict(total);
-
-  return `
-    <div class="overall-score-card" style="background:linear-gradient(135deg,#dc2626,#ef4444);">
-      <div>
-        <div class="overall-label">CCSI — Situasiya Mühakiməsi</div>
-        <div class="overall-value">${total}%</div>
-        <div class="overall-sub">Sten: ${sten}/10 · 24 ssenari</div>
-      </div>
-      <div style="font-size:56px;">💼</div>
-    </div>
-
-    <div class="analysis-grid">
-      <div class="analysis-card">
-        <div class="analysis-title">💪 Güclü davranış sahələri</div>
-        ${total>=70?`
-          <div class="strength-item"><span class="strength-dot"></span><span>Münaqişə idarəsində yüksək kompetensiya</span></div>
-          <div class="strength-item"><span class="strength-dot"></span><span>Müştəri ilə ünsiyyətdə effektivlik</span></div>
-          <div class="strength-item"><span class="strength-dot"></span><span>Qərar qəbulunda balans</span></div>
-        `:`
-          <div class="strength-item"><span class="strength-dot"></span><span>Sadə ssenarilərdə adekvat reaksiya</span></div>
-          <div class="strength-item"><span class="strength-dot"></span><span>Müstəqil tapşırıqlarda çalışqanlıq</span></div>
-        `}
-      </div>
-      <div class="analysis-card">
-        <div class="analysis-title">📈 İnkişaf sahələri</div>
-        ${total<70?`
-          <div class="weakness-item"><span class="weakness-dot"></span><span>Mürəkkəb ssenarilərə yanaşma</span></div>
-          <div class="weakness-item"><span class="weakness-dot"></span><span>Prioritet müəyyənləşdirmə</span></div>
-          <div class="weakness-item"><span class="weakness-dot"></span><span>Rəhbər ilə ünsiyyət taktikası</span></div>
-        `:`
-          <div class="weakness-item"><span class="weakness-dot"></span><span>Daha mürəkkəb liderlik ssenariləri</span></div>
-          <div class="weakness-item"><span class="weakness-dot"></span><span>Strateji qərar qəbulu</span></div>
-        `}
-      </div>
-    </div>
-
-    <div class="recommendation-card">
-      <div class="rec-title">🎯 Tövsiyə</div>
-      <div class="verdict-box ${verdict.class}" style="margin-top:0;">
-        <div class="verdict-icon">${verdict.icon}</div>
-        <div>
-          <div class="verdict-title">${verdict.title}</div>
-          <div class="verdict-desc">${verdict.desc}</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-// ==================== EXCEL PREVIEW ====================
-function renderExcelPreview() {
-  const content = document.getElementById('report-content');
-  const date = new Date().toLocaleDateString('az-AZ', {year:'numeric',month:'long',day:'numeric'});
-
-  // Sort by total score
-  const sorted = [...allCompanyResults].sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
-
-  let tableRows = sorted.map((r, idx) => {
-    const rank = idx + 1;
-    const verbal = r.sectionScores?.verbal?.score || 0;
-    const numerical = r.sectionScores?.numerical?.score || 0;
-    const abstract = r.sectionScores?.abstract?.score || 0;
-    const total = r.totalScore || 0;
-    const percentile = Math.round((1 - idx/sorted.length) * 100);
-    const level = getLevel(total);
-    const levelClass = total>=80?'high':total>=60?'mid':'low';
-    const rankClass = rank===1?'rank-1':rank===2?'rank-2':rank===3?'rank-3':'rank-other';
-
-    return `
-      <tr>
-        <td><div class="rank-badge ${rankClass}">${rank}</div></td>
-        <td style="font-weight:600;">${r.candidateName || '—'}</td>
-        <td><span class="score-cell" style="color:#06b6d4;">${verbal}%</span></td>
-        <td><span class="score-cell" style="color:#059669;">${numerical}%</span></td>
-        <td><span class="score-cell" style="color:#f59e0b;">${abstract}%</span></td>
-        <td><span class="score-cell" style="color:#4f46e5;">${total}%</span></td>
-        <td>
-          <div class="percentile-bar-wrap">
-            <div class="percentile-bar">
-              <div class="percentile-bar-fill" style="width:${percentile}%;background:${total>=80?'#059669':total>=60?'#d97706':'#dc2626'}"></div>
-            </div>
-            <span style="font-size:12px;font-weight:600;">${percentile}%</span>
-          </div>
-        </td>
-        <td><span class="level-badge level-${levelClass}">${level}</span></td>
-      </tr>`;
-  }).join('');
-
-  content.innerHTML = `
-    <div class="report-header">
-      <div class="report-header-left">
-        <h1>Adapt-G Qrup Skalası</h1>
-        <p>${sorted.length} namizid · ${candidateInfo.companyName}</p>
-      </div>
-      <div class="report-header-right">
-        <div class="report-date">${date}</div>
-        <div class="report-company">📊 Müqayisəli analiz</div>
-      </div>
-    </div>
-
-    <div class="scale-card">
-      <div class="rec-title" style="margin-bottom:16px;">Namizid Sıralama Cədvəli</div>
-      <table class="scale-table">
-        <thead>
-          <tr>
-            <th>Sıra</th>
-            <th>Ad Soyad</th>
-            <th>Verbal</th>
-            <th>Numerical</th>
-            <th>Abstract</th>
-            <th>Ümumi</th>
-            <th>Percentil</th>
-            <th>Səviyyə</th>
-          </tr>
-        </thead>
-        <tbody>${tableRows || '<tr><td colspan="8" style="text-align:center;padding:20px;color:#6b7280;">Nəticə yoxdur</td></tr>'}</tbody>
+  <div class="section-card">
+    <div class="section-hdr" style="background:#5b21b6;">📊 KLASSİK PROFİL — 15FQ+</div>
+    <div class="section-body">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">STEN şkalası: Orta=5.5, SD=2. İstinad qrupu: Professional İdarəedici (n=1186)</p>
+      <table class="stanine-tbl">
+        <thead><tr><th>Şkala</th><th>Faktor</th><th>1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9</th><th style="text-align:right">%ile</th></tr></thead>
+        <tbody>${Object.keys(FACTORS).map(k=>fRow(k)).join('')}</tbody>
       </table>
     </div>
+  </div>
 
-    <div class="footer-note">
-      Bu cədvəl şirkət daxilindəki bütün Adapt-G test nəticələrini əks etdirir. 
-      Percentil namizidин şirkət daxilindəki digər namizidlərə nisbətdə harada yerləşdiyini göstərir.
-    </div>`;
+  <div class="section-card">
+    <div class="section-hdr" style="background:#5b21b6;">⬡ BEŞ BÖYÜK FAKTOR — Big Five</div>
+    <div class="section-body">
+      <div class="bf-grid">
+        ${Object.values(bf).map(f=>`<div class="bf-item"><div class="bf-letter">${f.l}</div><div class="bf-score">${f.s}</div><div class="bf-bar"><div class="bf-bar-fill" style="width:${f.s*10}%"></div></div><div class="bf-lbl">${f.n}</div></div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:#5b21b6;">🧠 ŞƏXSİYYƏT QİYMƏTLƏNDİRMƏSİ</div>
+    <div class="section-body">
+      <div class="narr-title">Şəxsiyyətlərarası Üslub</div>
+      <div class="narr-text">${interp}</div>
+      <div class="narr-title">Düşüncə Tərzi</div>
+      <div class="narr-text">${think}</div>
+      <div class="narr-title">Mübarizə Tərzi</div>
+      <div class="narr-text">${cope}</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:#5b21b6;">💡 ƏLAVƏ ŞƏRHLƏR</div>
+    <div class="section-body">
+      <div class="sw-grid">
+        <div class="sw-box sw-str">
+          <div class="sw-title" style="color:var(--success);">💪 Potensial Güclü Tərəflər</div>
+          ${strengths.map(s=>`<div class="sw-item"><div class="sw-dot" style="background:var(--success);"></div><span>${s}</span></div>`).join('')}
+        </div>
+        <div class="sw-box sw-dev">
+          <div class="sw-title" style="color:var(--warning);">📈 Potensial İnkişaf Ehtiyacları</div>
+          ${devs.map(d=>`<div class="sw-item"><div class="sw-dot" style="background:var(--warning);"></div><span>${d}</span></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="disclaimer"><strong>Məxfilik bildirişi:</strong> Bu hesabat ${nm} haqqında ciddi şəkildə məxfi qiymətləndirmə hesabatıdır. Özünü qiymətləndirmə anketindən əldə edilir və mövcud məlumatlar kontekstində şərh edilməlidir.</div>`;
 }
 
-// ==================== HELPERS ====================
-function scoreToSten(score) {
-  if (score >= 96) return 10;
-  if (score >= 89) return 9;
-  if (score >= 80) return 8;
-  if (score >= 70) return 7;
-  if (score >= 60) return 6;
-  if (score >= 50) return 5;
-  if (score >= 40) return 4;
-  if (score >= 30) return 3;
-  if (score >= 20) return 2;
-  return 1;
+// CCSI
+function buildCCSI(){
+  const total=reportData?.totalScore||0;
+  const st=pct2s(total);
+  const date=new Date().toLocaleDateString('az-AZ',{year:'numeric',month:'long',day:'numeric'});
+  const v=total>=70?{cls:'v-suit',i:'✅',t:'İşə qəbul tövsiyə olunur',d:'Namizid situasiya mühakiməsi baxımından güclü namiziddir.'}:total>=50?{cls:'v-cond',i:'⚠️',t:'Müsahibə tövsiyə olunur',d:'Orta nəticə. Əlavə müsahibə tövsiyə olunur.'}:{cls:'v-unfit',i:'❌',t:'Uyğun deyil',d:'Tələb olunan iş davranışı səviyyəsi göstərilməmişdir.'};
+
+  return `
+  <div class="cover-card" style="background:linear-gradient(135deg,#b45309,#d97706);">
+    <div>
+      <div class="cover-name">${candidateInfo.name}</div>
+      <div class="cover-meta">${candidateInfo.position||'Namizid'} · ${candidateInfo.email}</div>
+      <div class="cover-badge">🟠 CCSI — Situasiya Mühakiməsi İnventarı</div>
+    </div>
+    <div class="cover-right"><div>${date}</div><div class="co">🏢 ${candidateInfo.companyName||''}</div></div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-hdr" style="background:#b45309;">📊 NƏTİCƏLƏR PROFİLİ</div>
+    <div class="section-body">
+      <table class="stanine-tbl"><tbody>
+        <tr><td class="s-label" style="color:#d97706;">CCSI</td><td><div class="s-name">Situasiya Mühakiməsi</div><div class="s-desc">İş davranışı və qərar vermə</div></td><td>${stanineBar(st)}</td><td class="pct">${s2p(st)}</td></tr>
+      </tbody></table>
+      <div class="res-box" style="margin-top:16px;background:#fffbeb;border-color:#fde68a;">
+        <div class="res-box-title" style="color:#b45309;">Nəticə Təsviri</div>
+        <div class="res-box-text">${candidateInfo.name}-in situasiya mühakiməsi nəticəsi ${total>=70?'iş ssenarilərini effektiv şəkildə həll etmək qabiliyyətini nümayiş etdirir. Mürəkkəb iş vəziyyətlərini idarə etmək, müştərilərlə ünsiyyət qurmaq və düzgün qərarlar qəbul etmək sahəsindəki potensialı yüksəkdir.':total>=50?'iş ssenarilərini orta səviyyədə həll etmək qabiliyyətini göstərir. Bəzi vəziyyətlərdə daha optimal yanaşmalar mövcuddur.':'iş ssenarilərini həll etməkdə çətinlik olduğunu göstərir.'}</div>
+      </div>
+      <div class="sw-grid" style="margin-top:14px;">
+        <div class="sw-box sw-str"><div class="sw-title" style="color:var(--success);">💪 Güclü davranış sahələri</div>
+          ${total>=70?`<div class="sw-item"><div class="sw-dot" style="background:var(--success);"></div><span>Müştəri ilə ünsiyyətdə yüksək kompetensiya</span></div><div class="sw-item"><div class="sw-dot" style="background:var(--success);"></div><span>Münaqişə vəziyyətlərini konstruktiv həll edir</span></div><div class="sw-item"><div class="sw-dot" style="background:var(--success);"></div><span>Prioritetləri düzgün müəyyənləşdirir</span></div>`:`<div class="sw-item"><div class="sw-dot" style="background:var(--success);"></div><span>Sadə iş ssenarilərini adekvat həll edir</span></div>`}
+        </div>
+        <div class="sw-box sw-dev"><div class="sw-title" style="color:var(--warning);">📈 İnkişaf sahələri</div>
+          ${total<70?`<div class="sw-item"><div class="sw-dot" style="background:var(--warning);"></div><span>Mürəkkəb ssenarilərə yanaşma bacarığı</span></div><div class="sw-item"><div class="sw-dot" style="background:var(--warning);"></div><span>Prioritet müəyyənləşdirmə</span></div>`:`<div class="sw-item"><div class="sw-dot" style="background:var(--warning);"></div><span>Strateji liderlik ssenarilərinin inkişafı</span></div>`}
+        </div>
+      </div>
+      <div class="verdict-box ${v.cls}" style="margin-top:14px;"><div class="v-icon">${v.i}</div><div><div class="v-title">${v.t}</div><div class="v-desc">${v.d}</div></div></div>
+    </div>
+  </div>
+  <div class="disclaimer"><strong>Məxfilik bildirişi:</strong> Bu hesabat ${candidateInfo.name} haqqında ciddi şəkildə məxfi qiymətləndirmə hesabatıdır.</div>`;
 }
 
-function stenToPercentile(sten) {
-  const map = {1:2,2:7,3:16,4:31,5:50,6:69,7:84,8:93,9:98,10:99};
-  return map[sten] || 50;
-}
-
-function getLevel(score) {
-  if (score >= 80) return '🟢 Yüksək';
-  if (score >= 60) return '🟡 Orta';
-  if (score >= 40) return '🟠 Aşağı-orta';
-  return '🔴 Aşağı';
-}
-
-function getLevelColor(score) {
-  if (score >= 80) return '#059669';
-  if (score >= 60) return '#d97706';
-  if (score >= 40) return '#ea580c';
-  return '#dc2626';
-}
-
-function getVerdict(score) {
-  if (score >= 70) return {
-    class:'suitable', icon:'✅',
-    title:'Vəzifəyə uyğundur',
-    desc:'Namizid ümumi əqli qabiliyyət baxımından bu vəzifə üçün güclü namiziddir.'
-  };
-  if (score >= 50) return {
-    class:'conditional', icon:'⚠️',
-    title:'Şərti uyğundur',
-    desc:'Namizid orta səviyyədədir. Müsahibə və əlavə qiymətləndirmə tövsiyə olunur.'
-  };
-  return {
-    class:'unsuitable', icon:'❌',
-    title:'Uyğun deyil',
-    desc:'Namizid bu vəzifə üçün tələb olunan əqli qabiliyyət səviyyəsini göstərməyib.'
-  };
-}
-
-function getAdaptGStrengths(v, n, a) {
-  const s = [];
-  if (v >= 70) s.push('Verbal kommunikasiya və analiz güclüdür');
-  if (n >= 70) s.push('Rəqəmsal mühakimə və hesablama yüksəkdir');
-  if (a >= 70) s.push('Məntiqi düşüncə və problem həlli mükəmməldir');
-  if (v >= 60 && n >= 60) s.push('Kompleks məlumatları anlama bacarığı var');
-  if (a >= 60) s.push('Yeni vəziyyətlərə uyğunlaşma qabiliyyəti yaxşıdır');
-  if (s.length === 0) s.push('Əsas qabiliyyətlər orta səviyyədədir');
-  return s.slice(0,4);
-}
-
-function getAdaptGWeaknesses(v, n, a) {
-  const w = [];
-  if (v < 60) w.push('Verbal reasoning inkişaf tələb edir');
-  if (n < 60) w.push('Rəqəmsal analiz gücləndirilməlidir');
-  if (a < 60) w.push('Abstrakt düşüncə inkişaf potensialı var');
-  if (Math.max(v,n,a) - Math.min(v,n,a) > 25) w.push('Qabiliyyətlər arasında fərq böyükdür');
-  if (w.length === 0) w.push('Bütün sahələr balanslaşdırılmış inkişaf göstərir');
-  return w.slice(0,4);
-}
-
-function getSectors(v, n, a) {
-  const sectors = [
-    { name:'Maliyyə/Bank', icon:'🏦', score: n },
-    { name:'IT/Analitika', icon:'💻', score: a },
-    { name:'Hüquq/HR', icon:'⚖️', score: v },
-    { name:'Marketing', icon:'📢', score: (v+a)/2 },
-    { name:'Mühəndislik', icon:'🔧', score: (n+a)/2 },
-    { name:'Menecment', icon:'👔', score: (v+n+a)/3 },
-    { name:'Satış', icon:'🤝', score: (v+a)/2 },
-    { name:'Mühasibat', icon:'📊', score: n },
-    { name:'Təhsil', icon:'🎓', score: v }
-  ];
-  return sectors
-    .sort((a,b) => b.score - a.score)
-    .map(s => ({...s, level: s.score>=70?'high':s.score>=50?'mid':'low'}));
-}
-
-function getTrainings(v, n, a) {
-  const t = [];
-  if (v < 70) t.push({ icon:'📚', title:'Verbal Reasoning Təlimi', desc:'Oxuma anlama, tənqidi düşüncə', priority:'high' });
-  if (n < 70) t.push({ icon:'🔢', title:'Rəqəmsal Analiz Kursu', desc:'Statistika, maliyyə hesablamaları', priority:'high' });
-  if (a < 70) t.push({ icon:'🧩', title:'Məntiqi Düşüncə Təlimi', desc:'Problem həlli, pattern tanıma', priority:'mid' });
-  t.push({ icon:'💡', title:'Tənqidi Düşüncə', desc:'Kompleks qərar qəbulu', priority:'mid' });
-  t.push({ icon:'⏱', title:'Vaxt İdarəsi', desc:'Sürət və dəqiqlik balansı', priority:'low' });
-  return t.slice(0,5);
-}
-
-// ==================== EXPORT PDF ====================
-async function exportPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const W = 210, margin = 15;
-  let y = 20;
-
-  const scores = reportData?.sectionScores || {};
-  const verbal = scores.verbal?.score || 0;
-  const numerical = scores.numerical?.score || 0;
-  const abstract = scores.abstract?.score || 0;
-  const total = reportData?.totalScore || 0;
-  const sten = scoreToSten(total);
-  const percentile = stenToPercentile(sten);
-  const date = new Date().toLocaleDateString('az-AZ');
-
-  // Header
-  doc.setFillColor(79,70,229);
-  doc.rect(0,0,W,28,'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(18);
-  doc.setFont('helvetica','bold');
-  doc.text('PsychoAssess', margin, 12);
-  doc.setFontSize(10);
-  doc.setFont('helvetica','normal');
-  doc.text('HR Qiymetlendirme Sistemi', margin, 20);
-  doc.text(date, W-margin, 20, {align:'right'});
-
-  y = 38;
-
-  // Candidate info
-  doc.setTextColor(26,26,46);
-  doc.setFontSize(16);
-  doc.setFont('helvetica','bold');
-  doc.text(candidateInfo.name, margin, y);
-  y += 7;
-  doc.setFontSize(10);
-  doc.setFont('helvetica','normal');
-  doc.setTextColor(107,114,128);
-  doc.text((candidateInfo.position||'Namizid') + ' | ' + candidateInfo.email, margin, y);
-  doc.text(candidateInfo.companyName||'', W-margin, y, {align:'right'});
-  y += 12;
-
-  // Report type
-  const typeLabels = {
-    'adaptg-pdf':'ADAPT-G Hesabat',
-    '16fq-pdf':'16FQ Seksiyyet Hesabat',
-    'ccsi-pdf':'CCSI Hesabat',
-    'consolidated':'Konsolide Hesabat'
-  };
-  doc.setFillColor(238,242,255);
-  doc.roundedRect(margin, y-4, W-2*margin, 10, 2, 2, 'F');
-  doc.setTextColor(79,70,229);
-  doc.setFontSize(9);
-  doc.setFont('helvetica','bold');
-  doc.text(typeLabels[reportType]||'Hesabat', W/2, y+2, {align:'center'});
-  y += 14;
-
-  if (reportType === 'adaptg-pdf' || reportType === 'consolidated') {
-    // Overall score box
-    doc.setFillColor(79,70,229);
-    doc.roundedRect(margin, y, W-2*margin, 22, 3, 3, 'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(22);
-    doc.setFont('helvetica','bold');
-    doc.text(total+'%', margin+10, y+14);
-    doc.setFontSize(9);
-    doc.setFont('helvetica','normal');
-    doc.text('Umumi G Xali', margin+10, y+20);
-    doc.text('Sten: '+sten+'/10', W/2, y+10, {align:'center'});
-    doc.text('Percentil: '+percentile+'%', W/2, y+17, {align:'center'});
-    doc.text(getVerdict(total).title, W-margin-2, y+10, {align:'right'});
-    y += 28;
-
-    // Section scores
-    const sections = [
-      { label:'Verbal Reasoning', score:verbal, color:[6,182,212] },
-      { label:'Numerical Reasoning', score:numerical, color:[5,150,105] },
-      { label:'Abstract Reasoning', score:abstract, color:[245,158,11] }
-    ];
-
-    sections.forEach(s => {
-      doc.setTextColor(26,26,46);
-      doc.setFontSize(10);
-      doc.setFont('helvetica','bold');
-      doc.text(s.label, margin, y+4);
-      doc.setTextColor(...s.color);
-      doc.text(s.score+'%', W-margin, y+4, {align:'right'});
-
-      // Progress bar
-      doc.setFillColor(240,242,248);
-      doc.roundedRect(margin, y+6, W-2*margin, 5, 1, 1, 'F');
-      doc.setFillColor(...s.color);
-      doc.roundedRect(margin, y+6, (W-2*margin)*(s.score/100), 5, 1, 1, 'F');
-
-      doc.setTextColor(107,114,128);
-      doc.setFontSize(8);
-      doc.setFont('helvetica','normal');
-      doc.text(getLevel(s.score), margin, y+17);
-      y += 20;
-    });
-
-    y += 4;
-
-    // Strengths & Weaknesses
-    const strengths = getAdaptGStrengths(verbal, numerical, abstract);
-    const weaknesses = getAdaptGWeaknesses(verbal, numerical, abstract);
-
-    doc.setTextColor(26,26,46);
-    doc.setFontSize(11);
-    doc.setFont('helvetica','bold');
-    doc.text('Guclu Terefleri', margin, y);
-    doc.text('Inkisaf Saheleri', W/2+5, y);
-    y += 6;
-
-    const maxLen = Math.max(strengths.length, weaknesses.length);
-    for (let i=0; i<maxLen; i++) {
-      doc.setFontSize(8);
-      doc.setFont('helvetica','normal');
-      if (strengths[i]) {
-        doc.setTextColor(5,150,105);
-        doc.text('• ' + strengths[i].substring(0,45), margin, y);
-      }
-      if (weaknesses[i]) {
-        doc.setTextColor(220,38,38);
-        doc.text('• ' + weaknesses[i].substring(0,45), W/2+5, y);
-      }
-      y += 6;
-    }
-
-    y += 4;
-
-    // Verdict
-    const verdict = getVerdict(total);
-    const vColor = total>=70?[240,253,244]:total>=50?[255,251,235]:[254,242,242];
-    doc.setFillColor(...vColor);
-    doc.roundedRect(margin, y, W-2*margin, 16, 3, 3, 'F');
-    doc.setTextColor(26,26,46);
-    doc.setFontSize(10);
-    doc.setFont('helvetica','bold');
-    doc.text(verdict.title, margin+6, y+7);
-    doc.setFontSize(8);
-    doc.setFont('helvetica','normal');
-    doc.setTextColor(107,114,128);
-    doc.text(verdict.desc.substring(0,80), margin+6, y+13);
-    y += 22;
-
-    // Trainings
-    doc.setTextColor(26,26,46);
-    doc.setFontSize(11);
-    doc.setFont('helvetica','bold');
-    doc.text('Telim Tovsiyyeleri', margin, y);
-    y += 7;
-
-    const trainings = getTrainings(verbal, numerical, abstract);
-    trainings.forEach(t => {
-      doc.setFontSize(9);
-      doc.setFont('helvetica','bold');
-      doc.setTextColor(79,70,229);
-      doc.text('• ' + t.title, margin, y);
-      doc.setFont('helvetica','normal');
-      doc.setTextColor(107,114,128);
-      doc.text(t.desc, margin+4, y+5);
-      y += 11;
-    });
-  }
-
-  // Footer
-  doc.setFillColor(248,250,252);
-  doc.rect(0,280,W,17,'F');
-  doc.setTextColor(107,114,128);
-  doc.setFontSize(7);
-  doc.text('Bu hesabat PsychoAssess platformasi terefinden avtomatik hazirlanmisdir.', W/2, 287, {align:'center'});
-  doc.text('Yalniz HR qerar destekleme ucundur.', W/2, 292, {align:'center'});
-
-  doc.save(`${candidateInfo.name}_${reportType}_${date}.pdf`);
-}
-
-// ==================== EXPORT EXCEL ====================
-function exportExcel() {
-  const sorted = [...allCompanyResults].sort((a,b) => (b.totalScore||0) - (a.totalScore||0));
-  const date = new Date().toLocaleDateString('az-AZ');
-
-  const wsData = [
-    ['PsychoAssess - Adapt-G Qrup Skalasi', '', '', '', '', '', '', ''],
-    [candidateInfo.companyName + ' | ' + date, '', '', '', '', '', '', ''],
+// EXCEL
+function exportExcel(){
+  const date=new Date().toLocaleDateString('az-AZ');
+  const sorted=[...allCompanyResults].sort((a,b)=>(b.totalScore||0)-(a.totalScore||0));
+  const wsData=[
+    ['PsychoAssess — Adapt-G Qrup Skala Hesabatı','','','','','','','','','','','',''],
+    [candidateInfo.companyName+' | '+date,'','','','','','','','','','','',''],
     [''],
-    ['Sira', 'Ad Soyad', 'Verbal (%)', 'Numerical (%)', 'Abstract (%)', 'Umumi (%)', 'Sten', 'Percentil', 'Seviyye', 'Tovsiyye']
+    ['Sıra','Ad Soyad','Verbal (%)','Verbal Stanine','Numerical (%)','Num. Stanine','Abstract (%)','Abs. Stanine','Ümumi (%)','Ümumi Stanine','Percentil','Səviyyə','Qiymət']
   ];
-
-  sorted.forEach((r, idx) => {
-    const rank = idx + 1;
-    const v = r.sectionScores?.verbal?.score || 0;
-    const n = r.sectionScores?.numerical?.score || 0;
-    const a = r.sectionScores?.abstract?.score || 0;
-    const total = r.totalScore || 0;
-    const sten = scoreToSten(total);
-    const percentile = Math.round((1 - idx/sorted.length) * 100);
-    const verdict = getVerdict(total);
-
-    wsData.push([
-      rank,
-      r.candidateName || '—',
-      v, n, a, total,
-      sten,
-      percentile + '%',
-      total>=80?'Yuksek':total>=60?'Orta':'Asagi',
-      verdict.title
-    ]);
+  sorted.forEach((r,idx)=>{
+    const rank=idx+1,v=r.sectionScores?.verbal?.score||0,n=r.sectionScores?.numerical?.score||0,a=r.sectionScores?.abstract?.score||0,g=r.totalScore||0;
+    const gS=pct2s(g),pct=s2p(gS);
+    wsData.push([rank,r.candidateName||'—',v,pct2s(v),n,pct2s(n),a,pct2s(a),g,gS,pct+'%',gS>=7?'Yüksək':gS>=5?'Orta':'Aşağı',gS>=5?'✅ Uyğun':'❌ Uyğun deyil']);
   });
-
-  // Stats rows
   wsData.push(['']);
-  wsData.push(['Statistika', '', '', '', '', '', '', '', '', '']);
-  if (sorted.length > 0) {
-    const totals = sorted.map(r => r.totalScore||0);
-    const avg = Math.round(totals.reduce((s,v)=>s+v,0)/totals.length);
-    const max = Math.max(...totals);
-    const min = Math.min(...totals);
-    wsData.push(['Ortalama', '', '', '', '', avg, '', '', '', '']);
-    wsData.push(['Maksimum', '', '', '', '', max, '', '', '', '']);
-    wsData.push(['Minimum', '', '', '', '', min, '', '', '', '']);
+  wsData.push(['STATİSTİKA','','','','','','','','','','','','']);
+  const totals=sorted.map(r=>r.totalScore||0);
+  if(totals.length>0){
+    const avg=Math.round(totals.reduce((s,v)=>s+v,0)/totals.length);
+    wsData.push(['Ortalama','','','','','','','','',avg,'','','']);
+    wsData.push(['Maksimum','','','','','','','','',Math.max(...totals),'','','']);
+    wsData.push(['Minimum','','','','','','','','',Math.min(...totals),'','','']);
+    wsData.push(['Uyğun (Stanine≥5)','','','','','','','','',sorted.filter(r=>pct2s(r.totalScore||0)>=5).length,'','','']);
+    wsData.push(['Uyğun deyil','','','','','','','','',sorted.filter(r=>pct2s(r.totalScore||0)<5).length,'','','']);
   }
-
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-
-  ws['!cols'] = [
-    {wch:6}, {wch:22}, {wch:12}, {wch:14}, {wch:14}, {wch:12}, {wch:8}, {wch:10}, {wch:12}, {wch:20}
-  ];
-
-  ws['!merges'] = [
-    { s:{r:0,c:0}, e:{r:0,c:9} },
-    { s:{r:1,c:0}, e:{r:1,c:9} }
-  ];
-
-  XLSX.utils.book_append_sheet(wb, ws, 'Adapt-G Skala');
-  XLSX.writeFile(wb, `${candidateInfo.companyName}_AdaptG_Skala_${date}.xlsx`);
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols']=[{wch:6},{wch:22},{wch:10},{wch:14},{wch:12},{wch:12},{wch:12},{wch:12},{wch:10},{wch:14},{wch:10},{wch:10},{wch:14}];
+  ws['!merges']=[{s:{r:0,c:0},e:{r:0,c:12}},{s:{r:1,c:0},e:{r:1,c:12}}];
+  XLSX.utils.book_append_sheet(wb,ws,'Adapt-G Skala');
+  XLSX.writeFile(wb,`${candidateInfo.companyName}_AdaptG_${date}.xlsx`);
 }
 
-function showError(msg) {
-  document.getElementById('screen-loading').style.display = 'none';
-  document.getElementById('screen-error').style.display = 'flex';
-  document.getElementById('err-msg').textContent = msg;
+// INIT
+auth.onAuthStateChanged(async user=>{
+  if(!user){showErr('Giriş tələb olunur.');return;}
+  if(!candidateId){showErr('Namizid ID tapılmadı.');return;}
+  try{
+    const cd=await db.collection('candidates').doc(candidateId).get();
+    if(!cd.exists){showErr('Namizid tapılmadı.');return;}
+    candidateInfo={id:candidateId,...cd.data()};
+    const tt=reportType.startsWith('adaptg')?'adaptg':reportType.startsWith('16fq')?'16fq':reportType.startsWith('ccsi')?'ccsi':'adaptg';
+    if(reportType==='adaptg-excel'){
+      document.getElementById('btn-excel-top').style.display='flex';
+      const allS=await db.collection('testResults').where('companyId','==',candidateInfo.companyId).where('testType','==','adaptg').get();
+      allCompanyResults=allS.docs.map(d=>({id:d.id,...d.data()}));
+      document.getElementById('report-content').innerHTML=`<div class="cover-card" style="background:linear-gradient(135deg,#0057b8,#0ea5e9);"><div><div class="cover-name">Adapt-G Qrup Skala</div><div class="cover-meta">${candidateInfo.companyName} · ${allCompanyResults.length} nəticə</div></div></div><div class="section-card"><div class="section-hdr" style="background:var(--accent);">📊 Excel yükləmək üçün yuxarıdakı düyməni basın</div><div class="section-body" style="text-align:center;padding:40px;color:var(--muted);font-size:15px;">📊 ${allCompanyResults.length} namizid nəticəsi hazırdır</div></div>`;
+    } else {
+      const snap=await db.collection('testResults').where('candidateId','==',candidateId).where('testType','==',tt).get();
+      if(snap.empty){showErr('Test nəticəsi tapılmadı.');return;}
+      reportData=snap.docs[0].data();
+      let html='';
+      if(reportType==='adaptg-pdf')html=buildAdaptG();
+      else if(reportType==='16fq-pdf')html=build15FQ();
+      else if(reportType==='ccsi-pdf')html=buildCCSI();
+      else if(reportType==='consolidated'){
+        html=buildAdaptG();
+        const fqs=await db.collection('testResults').where('candidateId','==',candidateId).where('testType','==','16fq').get();
+        if(!fqs.empty){reportData=fqs.docs[0].data();html+=build15FQ();}
+        const cs=await db.collection('testResults').where('candidateId','==',candidateId).where('testType','==','ccsi').get();
+        if(!cs.empty){reportData=cs.docs[0].data();html+=buildCCSI();}
+      }
+      document.getElementById('report-content').innerHTML=html||'<p style="padding:40px;text-align:center;color:var(--muted);">Hesabat hazırlana bilmədi.</p>';
+    }
+    document.getElementById('screen-loading').style.display='none';
+    document.getElementById('screen-report').style.display='block';
+  }catch(e){showErr('Xəta: '+e.message);console.error(e);}
+});
+
+function showErr(msg){
+  document.getElementById('screen-loading').style.display='none';
+  document.getElementById('screen-error').style.display='flex';
+  document.getElementById('err-msg').textContent=msg;
 }
 </script>
 </body>
