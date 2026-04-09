@@ -1307,7 +1307,7 @@ async function loadCandidates() {
       const tests = data.assignedTests || [];
       const completed = data.completedTests || [];
       const isDone = completed.length >= tests.length && tests.length > 0;
-      const testLink = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${id}`;
+      const testLink = `${window.location.origin}/test?c=${id}`;
 
       html += `<tr>
         <td>
@@ -1447,7 +1447,7 @@ async function createCandidate() {
     });
 
     closeModal('modal-candidate');
-    document.getElementById('test-link-url').textContent = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${ref.id}`;
+    document.getElementById('test-link-url').textContent = `${window.location.origin}/test?c=${ref.id}`;
     openModal('modal-link');
     showToast(`${name} əlavə edildi ✓`, 'success');
     loadCandidates();
@@ -1458,7 +1458,7 @@ async function createCandidate() {
 }
 
 function showLink(candidateId) {
-  const link = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${candidateId}`;
+  const link = `${window.location.origin}/test?c=${candidateId}`;
   document.getElementById('test-link-url').textContent = link;
   openModal('modal-link');
 }
@@ -1723,7 +1723,7 @@ async function loadProjectCandidates() {
     let html = '';
     currentProjectCandidates.forEach((c, idx) => {
       const rank = idx + 1;
-      const testLink = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${c.id}`;
+      const testLink = `${window.location.origin}/test?c=${c.id}`;
 
       if (!c.hasResult) {
         html += `<tr>
@@ -1814,7 +1814,7 @@ async function addCandidateToProject() {
     await db.collection('projects').doc(currentProjectId).update({
       candidateCount: firebase.firestore.FieldValue.increment(1)
     });
-    const link = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${ref.id}`;
+    const link = `${window.location.origin}/test?c=${ref.id}`;
     closeModal('modal-add-to-project');
     showToast(`${name} əlavə edildi ✓`,'success');
     navigator.clipboard.writeText(link).catch(()=>{});
@@ -1924,7 +1924,7 @@ async function addExistingToProject() {
       candidateCount: firebase.firestore.FieldValue.increment(1)
     });
     const cand = allCompanyCandidates.find(c=>c.id===selectedExistingCandId);
-    const link = `${window.location.origin}${window.location.pathname.replace('company-admin.html','test.html')}?c=${selectedExistingCandId}`;
+    const link = `${window.location.origin}/test?c=${selectedExistingCandId}`;
     closeModal('modal-add-to-project');
     showToast(`${cand?.name||'Namizid'} layihəyə əlavə edildi ✓`,'success');
     navigator.clipboard.writeText(link).catch(()=>{});
