@@ -6,9 +6,9 @@
 <title>PsychoAssess — Şirkət Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.min.js"></script>
 <style>
   :root {
     --bg: #f4f6fb;
@@ -814,7 +814,7 @@
           <div class="credit-warning-icon">⚠️</div>
           <div class="credit-warning-title">Kredit azalıb!</div>
           <div class="credit-warning-text">Kredit yenilənməsi üçün bizimlə əlaqə saxlayın.</div>
-          <a href="/cdn-cgi/l/email-protection#3e5f5a5357507e4e4d475d56515f4d4d5b4d4d105f44" style="display:inline-block;margin-top:12px;background:var(--danger);color:white;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">📧 Müraciət et</a>
+          <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:12px;background:var(--danger);color:white;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">📧 Müraciət et</a>
         </div>
 
         <div class="card">
@@ -1018,7 +1018,7 @@
       <div class="credit-warning-icon">😔</div>
       <div class="credit-warning-title">Kredit yetərli deyil</div>
       <div class="credit-warning-text">Zəhmət olmasa super adminlə əlaqə saxlayın.</div>
-      <a href="/cdn-cgi/l/email-protection#0f6e6b6266614f7f7c766c67606e7c7c6a7c7c216e75" style="display:inline-block;margin-top:10px;background:var(--danger);color:white;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Müraciət et</a>
+      <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:10px;background:var(--danger);color:white;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Müraciət et</a>
     </div>
 
     <button class="btn-primary" onclick="downloadReport()" id="btn-download-report" style="display:none;margin-top:8px;">📥 Hesabatı yüklə</button>
@@ -1120,14 +1120,14 @@
     <div id="gc-no-credit" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;">
       <div style="font-size:24px;margin-bottom:8px;">😔</div>
       <div style="font-weight:700;color:var(--danger);margin-bottom:4px;">Kredit yetərli deyil</div>
-      <a href="/cdn-cgi/l/email-protection#b0d1d4ddd9def0c0c3c9d3d8dfd1c3c3d5c3c39ed1ca" style="color:var(--danger);font-size:13px;">Adminlə əlaqə saxlayın</a>
+      <a href="mailto:admin@psychoassess.az" style="color:var(--danger);font-size:13px;">Adminlə əlaqə saxlayın</a>
     </div>
     <button class="btn-primary" id="gc-confirm-btn" onclick="confirmGroupExcel()" style="background:var(--success);">🔓 Kredit ödə, nəticələri aç və Excel yüklə</button>
   </div>
 </div>
 <div class="toast" id="toast"></div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
   authDomain: "hr-testing-48e31.firebaseapp.com",
@@ -1309,7 +1309,7 @@ async function loadCandidates() {
       const isDone = completed.length >= tests.length && tests.length > 0;
       const testLink = `${window.location.origin}/test?c=${id}`;
 
-      html += `<tr>
+      html += `<tr data-id="${id}">
         <td>
           <div class="candidate-name">${data.name}</div>
           <div class="candidate-email">${data.email}</div>
@@ -1320,7 +1320,7 @@ async function loadCandidates() {
         <td>
           <div class="action-btns">
             <button class="btn-sm btn-link" onclick="showLink('${id}')">🔗 Link</button>
-            <button class="btn-sm btn-danger" onclick="deleteCandidate('${id}','${data.name}')">🗑️</button>
+            <button class="btn-sm btn-danger" onclick="deleteCandidate('${id}')">🗑️</button>
           </div>
         </td>
         <td>
@@ -1732,7 +1732,7 @@ async function loadProjectCandidates() {
           <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
           <td colspan="5" style="color:var(--muted);font-size:12px;font-style:italic;">Test hələ keçilməyib</td>
           <td><span style="font-size:12px;color:var(--muted);">⏳ Gözləyir</span></td>
-          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
         </tr>`;
         return;
       }
@@ -1747,7 +1747,7 @@ async function loadProjectCandidates() {
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td><span class="badge" style="background:#fffbeb;color:var(--warning);border:1px solid #fde68a;">✓ Bitdi</span></td>
-          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
         </tr>`;
         return;
       }
@@ -1777,7 +1777,7 @@ async function loadProjectCandidates() {
         <td style="font-weight:800;font-size:16px;color:var(--accent);">${totalPct}%</td>
         <td>${stenBar}</td>
         <td>${qiymət}</td>
-        <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}','${c.name}')">🗑️</button></td>
+        <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
       </tr>`;
     });
     tbody.innerHTML = html;
@@ -1947,11 +1947,12 @@ function unlockProjectResults() {
   openModal('modal-group-credit');
 }
 
-async function deleteCandidate(id, name) {
-  if (!confirm(`"${name}" namizidini silmək istəyirsiniz? Bu əməliyyat geri alına bilməz.`)) return;
+async function deleteCandidate(id) {
+  if (!confirm('Bu namizidi silmək istəyirsiniz? Bu əməliyyat geri alına bilməz.')) return;
   try {
+    const doc = await db.collection('candidates').doc(id).get();
+    const name = doc.exists ? doc.data().name : 'Namizid';
     await db.collection('candidates').doc(id).delete();
-    // Test nəticələrini də sil
     const results = await db.collection('testResults').where('candidateId','==',id).get();
     await Promise.all(results.docs.map(d => d.ref.delete()));
     showToast(`${name} silindi ✓`, 'success');
@@ -1959,10 +1960,11 @@ async function deleteCandidate(id, name) {
   } catch(e) { showToast('Xəta: '+e.message, 'error'); }
 }
 
-async function deleteProjCandidate(id, name) {
-  if (!confirm(`"${name}" namizidini layihədən silmək istəyirsiniz?`)) return;
+async function deleteProjCandidate(id) {
+  if (!confirm('Bu namizidi layihədən çıxarmaq istəyirsiniz?')) return;
   try {
-    // Namizidi layihədən çıxart (tam silmirik, yalnız layihə bağlantısını kəsirik)
+    const doc = await db.collection('candidates').doc(id).get();
+    const name = doc.exists ? doc.data().name : 'Namizid';
     await db.collection('candidates').doc(id).update({
       projectId: firebase.firestore.FieldValue.delete(),
       projectName: firebase.firestore.FieldValue.delete()
@@ -2117,4 +2119,13 @@ window.addExistingToProject = addExistingToProject;
 window.addCandidateToProject = addCandidateToProject;
 window.unlockProjectResults = unlockProjectResults;
 window.exportGroupExcel = exportGroupExcel;
-window.confirmGroupExcel = confirmGroupExce
+window.confirmGroupExcel = confirmGroupExcel;
+window.copyToClipboard = copyToClipboard;
+window.deleteProject = deleteProject;
+window.deleteCandidate = deleteCandidate;
+window.deleteProjCandidate = deleteProjCandidate;
+
+</script>
+</body>
+</html>
+
