@@ -667,6 +667,9 @@
       <div class="nav-item" onclick="showPage('credits')" id="nav-credits">
         <span>💳</span> Kreditlər
       </div>
+      <div class="nav-item" onclick="showPage('ideal')" id="nav-ideal">
+        <span>🎯</span> İdeal Profillər
+      </div>
     </div>
 
     <div class="content">
@@ -834,6 +837,52 @@
               <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <!-- İDEAL PROFİLLƏR PAGE -->
+      <div class="page" id="page-ideal">
+        <div class="page-title">🎯 İdeal Profillər</div>
+        <div class="page-sub">Hər vəzifə üçün ideal namizid profili qurun. Namizidlərin 15FQ+ nəticəsi bu profillə müqayisə ediləcək.</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openCreateIdealProfile()">+ Yeni İdeal Profil</button>
+        </div>
+        <div id="ideal-profiles-list">
+          <div class="loading"><div class="spinner"></div>Yüklənir...</div>
+        </div>
+      </div>
+
+      <!-- İDEAL PROFİL BUILDER PAGE -->
+      <div class="page" id="page-ideal-builder">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button onclick="showPage('ideal')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Geri</button>
+          <div>
+            <div class="page-title" id="ideal-builder-title" style="margin-bottom:0;">Yeni İdeal Profil</div>
+            <div class="page-sub" style="margin-bottom:0;">16 faktor üçün ideal STEN aralığını seçin</div>
+          </div>
+          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;" onclick="saveIdealProfile()">💾 Saxla</button>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><div class="card-title">Profil Məlumatları</div></div>
+          <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div class="field-label" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Profil adı</div>
+              <input type="text" class="field-input" id="ip-name" placeholder="məs. Müştəri Xidmətləri Nümayəndəsi">
+            </div>
+            <div>
+              <div class="field-label" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Vəzifə</div>
+              <input type="text" class="field-input" id="ip-pos" placeholder="məs. Call Center Agent">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">16 Faktor — İdeal STEN Aralığı</div></div>
+          <div style="padding:20px;">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Hər faktor üçün <b>minimum</b> və <b>maksimum</b> STEN dəyərini seçin. Namizidlərin cavabları bu aralıqla müqayisə ediləcək.</p>
+            <div id="ip-factors-grid"></div>
+          </div>
         </div>
       </div>
 
@@ -1252,6 +1301,8 @@ function showPage(page) {
   if (page === 'projects') loadProjects();
   if (page === 'results') loadResults();
   if (page === 'credits') loadCreditLogs();
+  if (page === 'ideal') loadIdealProfiles();
+  if(page==='ideal-builder'){const pn=document.getElementById('nav-ideal');if(pn)pn.classList.add('active');}
 }
 
 function loadAll() {
@@ -2149,6 +2200,240 @@ async function refreshIdealProfiles() {
   } catch(e) {}
 }
 
+
+// ============================================================
+// İDEAL PROFİL SİSTEMİ
+// ============================================================
+const IP_FACTORS = [
+  {key:'FA',lbl:'fA',name:'İstiqanlılıq',l:'Soyuqqanlı',r:'İstiqanlı',
+   tips:['','Son dərəcə soyuqqanlı','Çox məsafəli','Formal davranır','Bir qədər çəkimli','Balanslaşdırılmış','İnsanlarla yaxşı ünsiyyət','Mehriban, dəstəkləyici','Çox istiqanlı','Son dərəcə empatik']},
+  {key:'B',lbl:'β',name:'İntellektans',l:'Aşağı intellektans',r:'Yüksək intellektans',
+   tips:['','Çox sadə tapşırıq','Məhdud analitik','Konkret düşüncə','Orta analitik','Adekvat intellekt','Analitik inkişaf etmiş','Zirək, tez həll edir','Güclü analitik','Son dərəcə intellektual']},
+  {key:'FC',lbl:'fC',name:'Emosional Sabitlik',l:'Hisslərə tabe',r:'Emosional sabit',
+   tips:['','Stress altında çöküş','Tez-tez narahat','Emosional dalgalanma','Bəzən stressdən etkilənir','Normal tarazlıq','Ümumiyyətlə sakit','Stressə effektiv cavab','Emosional güclü','Heç nəy sarsılmır']},
+  {key:'FE',lbl:'fE',name:'Dominantlıq',l:'Uyğunlaşan',r:'Dominant',
+   tips:['','Həmişə boyun əyir','Çox uyğunlaşan','Münaqişədən qaçır','Bəzən öz fikrini bildirir','Balanslaşdırılmış','Lazım olanda mövqeyini tutur','Qərar verici','Güclü dominant','Son dərəcə rəqabətcil']},
+  {key:'FF',lbl:'fF',name:'Canlılıq',l:'Ciddi',r:'Enerjili',
+   tips:['','Son dərəcə ciddi','Çox tutumlu','Ciddi, işə fokuslanmış','Bir qədər ciddi','Balanslaşdırılmış','Açıq, mehriban','Enerjili, canlandırır','Çox şən','Son dərəcə enerjili']},
+  {key:'FG',lbl:'fG',name:'Qaydaya riayət',l:'Sərbəst',r:'Vicdanlı',
+   tips:['','Qaydaları nəzərə almır','Çox az məsuliyyət','Çevik, az bağlı','Bəzən riayət edir','Orta məsuliyyət','Adətən vicdanlı','Məsuliyyəti yüksək','Güclü etik','Son dərəcə intizamlı']},
+  {key:'FH',lbl:'fH',name:'Sosial Cəsarət',l:'Çəkingən',r:'Sosial cəsur',
+   tips:['','Son dərəcə utancaq','Çox çəkingən','Kütlə qarşısında narahat','Bir qədər çəkimli','Situasiyaya görə','Ümumiyyətlə rahat','Sosial, tanışlıqları xoşlayır','Çox sosial cəsur','Hamısı ilə asanlıqla danışır']},
+  {key:'FI',lbl:'fI',name:'Həssaslıq',l:'Praktik',r:'Həssas',
+   tips:['','Hisslər qərarına təsir etmir','Son dərəcə praktik','Məntiqə əsaslanan','Adətən faktlara baxır','Balanslaşdırılmış','Bəzən hisslərini nəzərə alır','Həssas, insanlara yaxın','Güclü empatiya','Son dərəcə həssas']},
+  {key:'FL',lbl:'fL',name:'Güvən',l:'Güvənən',r:'Şübhəci',
+   tips:['','Hamıya körüklə güvənir','Çox sadəlövh','Asanlıqla güvənir','Ümumiyyətlə güvənir','Balanslaşdırılmış','Bir qədər ehtiyatlı','Şübhəci, dəqiq yoxlayır','Çox şübhəci','Heç kimə tam güvənmir']},
+  {key:'FM',lbl:'fM',name:'Abstrakt düşüncə',l:'Konkret',r:'Abstrakt',
+   tips:['','Yalnız əlinskini görür','Son dərəcə konkret','Praktik, realist','Adətən konkret','Balanslaşdırılmış','Bəzən abstrakt','Yaradıcı, böyük mənzərə','Güclü abstrakt','Son dərəcə visioner']},
+  {key:'FN',lbl:'fN',name:'Diplomatiya',l:'Birbaşa',r:'Diplomatik',
+   tips:['','Heç filter yoxdur','Çox birbaşa','Açıq, filtersiz','Adətən birbaşa','Balanslaşdırılmış','Bir qədər diplomatik','Diplomatik','Çox zirək','Son dərəcə diplomatik']},
+  {key:'FO',lbl:'fO',name:'Özgüvən',l:'Güvənli',r:'Narahat',
+   tips:['','Heç nədən şübhə etmir','Güclü özgüvən','Özünə güvənir','Adətən əmindir','Orta özgüvən','Bəzən şübhə edir','Özünə tənqidi','Çox az özgüvən','Daim özünü şübhə edir']},
+  {key:'FQ1',lbl:'fQ₁',name:'Yeniliyə açıqlıq',l:'Mühafizəkar',r:'Radikal',
+   tips:['','Dəyişikliyə kəskin müqavimət','Son dərəcə mühafizəkar','Ənənəvi','Köhnə üsulları üstün tutur','Balanslaşdırılmış','Yeniliklərə açıqdır','Dəyişikliyi sevir','Radikal, innovativ','Son dərəcə eksperimental']},
+  {key:'FQ2',lbl:'fQ₂',name:'Müstəqillik',l:'Qrupa bağlı',r:'Müstəqil',
+   tips:['','Tək qalmaqdan qorxur','Qrupa çox bağlı','Komandanı üstün tutur','Adətən qrupda','Balanslaşdırılmış','Həm tək həm qrupda','Müstəqili üstün tutur','Çox müstəqil','Son dərəcə özbaşına']},
+  {key:'FQ3',lbl:'fQ₃',name:'Özünü idarə',l:'Nizamsız',r:'Özünü idarə edən',
+   tips:['','Tamamilə impulsiv','Çox nizamsız','Plansız davranır','Bəzən idarə edə bilir','Orta idarəetmə','Adətən planlı','Planlı, məqsədyönlü','Güclü idarəetmə','Son dərəcə mükəmməlçi']},
+  {key:'FQ4',lbl:'fQ₄',name:'Gərginlik',l:'Sakit',r:'Gərgin',
+   tips:['','Heç nə üçün narahat olmur','Çox sakit','Ümumiyyətlə rahat','Az gərginlik','Orta gərginlik','Bəzən narahat','Tez-tez gərgin','Çox tələsik','Son dərəcə gərgin']}
+];
+
+let currentIdealProfile = {}; // key → {min, max, weight}
+let editingIdealId = null;
+
+// İdeal profil başlat
+function initIdealProfile() {
+  IP_FACTORS.forEach(f => {
+    currentIdealProfile[f.key] = {min:4, max:7, weight:'medium'};
+  });
+}
+initIdealProfile();
+
+// İdeal Profillər siyahısını yüklə
+async function loadIdealProfiles() {
+  const el = document.getElementById('ideal-profiles-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Yüklənir...</div>';
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    if(snap.empty) {
+      el.innerHTML = `<div class="card" style="padding:48px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:12px;">🎯</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Hələ ideal profil yoxdur</div>
+        <div style="color:var(--muted);font-size:13px;margin-bottom:20px;">İdeal profil yaradın ki, namizidlərin şəxsiyyəti ilə müqayisə edə biləsiniz</div>
+        <button class="btn-primary" style="width:auto;padding:10px 24px;" onclick="openCreateIdealProfile()">+ İlk profili yarat</button>
+      </div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const data = d.data();
+      return `<div class="card" style="margin-bottom:12px;padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div>
+            <div style="font-size:16px;font-weight:700;">${data.name}</div>
+            <div style="font-size:13px;color:var(--muted);margin-top:2px;">${data.position||'—'} · ${(Object.keys(data.factors||{})).length} faktor qurulub</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn-sm btn-report" onclick="editIdealProfile('${d.id}')">✏️ Düzəlt</button>
+            <button class="btn-sm btn-danger" onclick="deleteIdealProfile('${d.id}','${data.name}')">🗑️</button>
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;">
+          ${IP_FACTORS.map(f => {
+            const v = data.factors?.[f.key];
+            if(!v) return '';
+            return `<span style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--accent);">${f.lbl}: ${v.min}–${v.max}</span>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>'; }
+}
+
+// Yeni ideal profil yarat
+function openCreateIdealProfile() {
+  editingIdealId = null;
+  initIdealProfile();
+  document.getElementById('ip-name').value = '';
+  document.getElementById('ip-pos').value = '';
+  document.getElementById('ideal-builder-title').textContent = 'Yeni İdeal Profil';
+  renderIPFactors();
+  showPage('ideal-builder');
+}
+
+// Mövcud ideal profili düzəlt
+async function editIdealProfile(id) {
+  try {
+    const doc = await db.collection('idealProfiles').doc(id).get();
+    const data = doc.data();
+    editingIdealId = id;
+    currentIdealProfile = data.factors || {};
+    // Çatışmayanları tamamla
+    IP_FACTORS.forEach(f => {
+      if(!currentIdealProfile[f.key]) currentIdealProfile[f.key] = {min:4,max:7,weight:'medium'};
+    });
+    document.getElementById('ip-name').value = data.name || '';
+    document.getElementById('ip-pos').value = data.position || '';
+    document.getElementById('ideal-builder-title').textContent = data.name + ' — Düzəliş';
+    renderIPFactors();
+    showPage('ideal-builder');
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+// Faktor UI-ni render et
+function renderIPFactors() {
+  const grid = document.getElementById('ip-factors-grid');
+  grid.innerHTML = IP_FACTORS.map(f => {
+    const v = currentIdealProfile[f.key] || {min:4,max:7,weight:'medium'};
+    const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
+      `<span style="display:inline-flex;width:26px;height:26px;border-radius:5px;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</span>`
+    ).join('');
+    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;" id="iprow-${f.key}">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="background:var(--accent);color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;">${f.lbl}</span>
+          <span style="font-size:14px;font-weight:700;">${f.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <select onchange="updateIPWeight('${f.key}',this.value)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">
+            <option value="high" ${v.weight==='high'?'selected':''}>⭐ Çox vacib</option>
+            <option value="medium" ${v.weight==='medium'||!v.weight?'selected':''}>• Vacib</option>
+            <option value="low" ${v.weight==='low'?'selected':''}>◦ Az vacib</option>
+          </select>
+          <span style="font-size:12px;color:var(--accent);font-weight:700;font-family:'JetBrains Mono',monospace;" id="ipval-${f.key}">${v.min}–${v.max}</span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;">
+        <span>← ${f.l}</span><span>${f.r} →</span>
+      </div>
+      <div style="position:relative;height:32px;display:flex;align-items:center;margin-bottom:8px;">
+        <div style="position:absolute;left:0;right:0;height:6px;background:#e2e6f0;border-radius:3px;">
+          <div id="ipfill-${f.key}" style="position:absolute;height:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;left:${((v.min-1)/9)*100}%;width:${((v.max-v.min)/9)*100}%;"></div>
+        </div>
+        <input type="range" min="1" max="10" value="${v.min}" style="position:absolute;width:100%;background:transparent;-webkit-appearance:none;height:6px;pointer-events:none;" class="ip-range"
+          oninput="updateIPRange('${f.key}','min',this.value)">
+        <input type="range" min="1" max="10" value="${v.max}" style="position:absolute;width:100%;background:transparent;-webkit-appearance:none;height:6px;z-index:1;" class="ip-range"
+          oninput="updateIPRange('${f.key}','max',this.value)">
+      </div>
+      <div style="display:flex;gap:3px;" id="ipcells-${f.key}">${cells}</div>
+      <div style="font-size:11px;color:var(--accent);margin-top:6px;" id="iptip-${f.key}">
+        Min: ${f.tips[v.min]||''} · Max: ${f.tips[v.max]||''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Range slider thumb CSS
+  if(!document.getElementById('ip-range-style')) {
+    const style = document.createElement('style');
+    style.id = 'ip-range-style';
+    style.textContent = `.ip-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2.5px solid white;box-shadow:0 2px 6px rgba(79,70,229,0.4);cursor:pointer;pointer-events:all;}.ip-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:2.5px solid white;cursor:pointer;pointer-events:all;}`;
+    document.head.appendChild(style);
+  }
+}
+
+function updateIPRange(key, type, val) {
+  val = parseInt(val);
+  const f = IP_FACTORS.find(x=>x.key===key);
+  if(!f) return;
+  const v = currentIdealProfile[key];
+  if(type==='min') { v.min = Math.min(val, v.max); }
+  else { v.max = Math.max(val, v.min); }
+
+  // Fill yenilə
+  const fill = document.getElementById(`ipfill-${key}`);
+  if(fill) { fill.style.left=`${((v.min-1)/9)*100}%`; fill.style.width=`${((v.max-v.min)/9)*100}%`; }
+
+  // Val yenilə
+  const valEl = document.getElementById(`ipval-${key}`);
+  if(valEl) valEl.textContent = `${v.min}–${v.max}`;
+
+  // Cells yenilə
+  const cells = document.getElementById(`ipcells-${key}`);
+  if(cells) cells.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(i =>
+    `<span style="display:inline-flex;width:26px;height:26px;border-radius:5px;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</span>`
+  ).join('');
+
+  // Tip yenilə
+  const tip = document.getElementById(`iptip-${key}`);
+  if(tip) tip.textContent = `Min: ${f.tips[v.min]||''} · Max: ${f.tips[v.max]||''}`;
+}
+
+function updateIPWeight(key, val) {
+  currentIdealProfile[key].weight = val;
+}
+
+// Saxla
+async function saveIdealProfile() {
+  const name = document.getElementById('ip-name').value.trim();
+  const pos = document.getElementById('ip-pos').value.trim();
+  if(!name) { showToast('Profil adı daxil edin','error'); return; }
+  try {
+    const data = {
+      name, position:pos, companyId, companyName:companyData.name,
+      factors: currentIdealProfile,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if(editingIdealId) {
+      await db.collection('idealProfiles').doc(editingIdealId).update(data);
+      showToast(`"${name}" yeniləndi ✓`,'success');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('idealProfiles').add(data);
+      showToast(`"${name}" saxlandı ✓`,'success');
+    }
+    showPage('ideal');
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+async function deleteIdealProfile(id, name) {
+  if(!confirm(`"${name}" profilini silmək istəyirsiniz?`)) return;
+  try {
+    await db.collection('idealProfiles').doc(id).delete();
+    showToast(`${name} silindi`,'success');
+    loadIdealProfiles();
+  } catch(e) { showToast('Xəta','error'); }
+}
+
 function scoreToSten(score) {
   if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
   if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
@@ -2298,6 +2583,12 @@ window.deleteCandidate = deleteCandidate;
 window.deleteProjCandidate = deleteProjCandidate;
 window.openIdealProfile = openIdealProfile;
 window.openIdealProfileBuilder = openIdealProfileBuilder;
+window.openCreateIdealProfile = openCreateIdealProfile;
+window.editIdealProfile = editIdealProfile;
+window.deleteIdealProfile = deleteIdealProfile;
+window.saveIdealProfile = saveIdealProfile;
+window.updateIPRange = updateIPRange;
+window.updateIPWeight = updateIPWeight;
 window.calcBSD = calcBSD;
 
 </script>
