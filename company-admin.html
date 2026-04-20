@@ -352,6 +352,31 @@
   .btn-danger { background: #fef2f2; border-color: #fecaca; color: var(--danger); }
   .btn-danger:hover { background: #fee2e2; }
 
+  /* İDEAL PROFİL SLIDER UI */
+  .ip-factor-row {
+    background: #f8fafc; border: 1.5px solid #e2e8f0;
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .ip-factor-row:hover { border-color: var(--accent); background: #eff6ff; }
+  .ip-factor-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .ip-badge { background:var(--accent); color:white; border-radius:6px; padding:3px 10px; font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+  .ip-poles { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .ip-range-wrap { position:relative; height:34px; display:flex; align-items:center; margin-bottom:6px; }
+  .ip-track { position:absolute; left:0; right:0; height:8px; background:#e2e8f0; border-radius:4px; }
+  .ip-fill { position:absolute; height:8px; background:linear-gradient(90deg,#4f46e5,#7c3aed); border-radius:4px; pointer-events:none; }
+  .ip-range-input { position:absolute; width:100%; height:8px; background:transparent; -webkit-appearance:none; appearance:none; pointer-events:none; }
+  .ip-range-input::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 8px rgba(79,70,229,0.4); cursor:pointer; pointer-events:all; }
+  .ip-range-input.upper { z-index:1; }
+  .ip-sten-cells { display:flex; gap:3px; margin-bottom:6px; }
+  .ip-cell { flex:1; height:22px; border-radius:4px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#94a3b8; font-family:'JetBrains Mono',monospace; transition:all 0.2s; }
+  .ip-cell.on { background:var(--accent); color:white; }
+  .ip-desc-text { font-size:11px; color:var(--accent); font-weight:600; min-height:15px; }
+  .ip-weight-sel { padding:5px 10px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; background:white; }
+  .ip-weight-sel.high { border-color:#10b981; color:#059669; background:#f0fdf4; }
+  .ip-weight-sel.med { border-color:#f59e0b; color:#d97706; background:#fffbeb; }
+  .ip-weight-sel.low { border-color:#94a3b8; color:#64748b; background:#f8fafc; }
+
   /* MODAL */
   .modal-overlay {
     position: fixed;
@@ -2267,27 +2292,91 @@ async function loadIdealProfiles() {
     }
     el.innerHTML = snap.docs.map(d => {
       const data = d.data();
-      return `<div class="card" style="margin-bottom:12px;padding:20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;">
+      // Skala önizlə
+      const scalePreview = IP_FACTORS.map(f => {
+        const v = data.factors?.[f.key];
+        if(!v) return '';
+        const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
+          `<div style="width:16px;height:16px;border-radius:3px;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</div>`
+        ).join('');
+        return `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="background:var(--accent);color:white;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:32px;text-align:center;">${f.lbl}</span>
+          <span style="font-size:12px;font-weight:600;min-width:140px;">${f.name}</span>
+          <div style="display:flex;gap:2px;">${cells}</div>
+        </div>`;
+      }).join('');
+
+      return `<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden;">
+        <div style="padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;">
           <div>
-            <div style="font-size:16px;font-weight:700;">${data.name}</div>
-            <div style="font-size:13px;color:var(--muted);margin-top:2px;">${data.position||'—'} · ${(Object.keys(data.factors||{})).length} faktor qurulub</div>
+            <div style="font-size:16px;font-weight:700;">🎯 ${data.name}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">${data.position||'—'}</div>
           </div>
-          <div style="display:flex;gap:8px;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+            <button class="btn-sm" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;" onclick="createIdealTestLink('${d.id}','${data.name.replace(/'/g,"\'")}')">🔗 Link Yarat</button>
             <button class="btn-sm btn-report" onclick="editIdealProfile('${d.id}')">✏️ Düzəlt</button>
-            <button class="btn-sm btn-danger" onclick="deleteIdealProfile('${d.id}','${data.name}')">🗑️</button>
+            <button class="btn-sm btn-danger" onclick="deleteIdealProfile('${d.id}','${data.name.replace(/'/g,"\'")}')">🗑️</button>
           </div>
         </div>
-        <div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;">
-          ${IP_FACTORS.map(f => {
-            const v = data.factors?.[f.key];
-            if(!v) return '';
-            return `<span style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--accent);">${f.lbl}: ${v.min}–${v.max}</span>`;
-          }).join('')}
+        <div style="padding:12px 20px;max-height:280px;overflow-y:auto;">
+          ${scalePreview}
         </div>
       </div>`;
     }).join('');
   } catch(e) { el.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>'; }
+}
+
+// İdeal profil üçün test linki yarat
+async function createIdealTestLink(idealProfileId, profileName) {
+  // Namizid adı və email al
+  const name = prompt('Namizid adı:');
+  if(!name || !name.trim()) return;
+  const email = prompt('Namizid e-poçtu:');
+  if(!email || !email.trim()) return;
+
+  try {
+    const ref = await db.collection('candidates').add({
+      name: name.trim(),
+      email: email.trim(),
+      companyId,
+      companyName: companyData.name,
+      idealProfileId,
+      assignedTests: ['16fq'],
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    navigator.clipboard.writeText(link).catch(()=>{});
+    // Modal ilə göstər
+    showLinkModal(link, name.trim(), profileName);
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+function showLinkModal(link, name, profileName) {
+  // Mövcud modal varsa istifadə et, yoxdursa yarat
+  let modal = document.getElementById('modal-ideal-link');
+  if(!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-ideal-link';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `<div class="modal" style="max-width:480px;">
+      <div class="modal-close" onclick="closeModal('modal-ideal-link')">✕</div>
+      <div class="modal-title">🔗 Test Linki Hazırdır</div>
+      <div id="ideal-link-content"></div>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+  document.getElementById('ideal-link-content').innerHTML = `
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:4px;">✅ Link kopyalandı!</div>
+      <div style="font-size:12px;color:var(--muted);">${name} üçün · ${profileName}</div>
+    </div>
+    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:16px;word-break:break-all;font-family:'JetBrains Mono',monospace;font-size:12px;">${link}</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Namizid bu linki açanda yalnız <b>15FQ+ şəxsiyyət testi</b> keçəcək. Test bitdikdə nəticə ideal profilinizlə müqayisə ediləcək.</p>
+    <button class="btn-primary" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Linki yenidən kopyala</button>
+  `;
+  modal.classList.add('active');
 }
 
 // Yeni ideal profil yarat
@@ -2320,55 +2409,47 @@ async function editIdealProfile(id) {
   } catch(e) { showToast('Xəta: '+e.message,'error'); }
 }
 
-// Faktor UI-ni render et
+// Faktor UI-ni render et — köhnə ideal-profile.html UI kimi
 function renderIPFactors() {
   const grid = document.getElementById('ip-factors-grid');
   grid.innerHTML = IP_FACTORS.map(f => {
     const v = currentIdealProfile[f.key] || {min:4,max:7,weight:'medium'};
+    const wCls = v.weight==='high'?'high':v.weight==='low'?'low':'med';
     const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
-      `<span style="display:inline-flex;width:26px;height:26px;border-radius:5px;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</span>`
+      `<div class="ip-cell${i>=v.min&&i<=v.max?' on':''}" id="ipc-${f.key}-${i}">${i}</div>`
     ).join('');
-    return `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;" id="iprow-${f.key}">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+    const leftPct = ((v.min-1)/9)*100;
+    const widthPct = ((v.max-v.min)/9)*100;
+    return `<div class="ip-factor-row" id="iprow-${f.key}">
+      <div class="ip-factor-header">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="background:var(--accent);color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;">${f.lbl}</span>
-          <span style="font-size:14px;font-weight:700;">${f.name}</span>
+          <span class="ip-badge">${f.lbl}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text);">${f.name}</span>
         </div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <select onchange="updateIPWeight('${f.key}',this.value)" style="padding:5px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select class="ip-weight-sel ${wCls}" id="ipwgt-${f.key}"
+            onchange="updateIPWeight('${f.key}',this.value)">
             <option value="high" ${v.weight==='high'?'selected':''}>⭐ Çox vacib</option>
-            <option value="medium" ${v.weight==='medium'||!v.weight?'selected':''}>• Vacib</option>
+            <option value="medium" ${!v.weight||v.weight==='medium'?'selected':''}>• Vacib</option>
             <option value="low" ${v.weight==='low'?'selected':''}>◦ Az vacib</option>
           </select>
-          <span style="font-size:12px;color:var(--accent);font-weight:700;font-family:'JetBrains Mono',monospace;" id="ipval-${f.key}">${v.min}–${v.max}</span>
+          <span style="font-size:12px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;min-width:48px;text-align:right;" id="ipval-${f.key}">${v.min}–${v.max}</span>
         </div>
       </div>
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;">
-        <span>← ${f.l}</span><span>${f.r} →</span>
-      </div>
-      <div style="position:relative;height:32px;display:flex;align-items:center;margin-bottom:8px;">
-        <div style="position:absolute;left:0;right:0;height:6px;background:#e2e6f0;border-radius:3px;">
-          <div id="ipfill-${f.key}" style="position:absolute;height:6px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;left:${((v.min-1)/9)*100}%;width:${((v.max-v.min)/9)*100}%;"></div>
+      <div class="ip-poles"><span>← ${f.l}</span><span>${f.r} →</span></div>
+      <div class="ip-range-wrap">
+        <div class="ip-track">
+          <div class="ip-fill" id="ipfill-${f.key}" style="left:${leftPct}%;width:${widthPct}%;"></div>
         </div>
-        <input type="range" min="1" max="10" value="${v.min}" style="position:absolute;width:100%;background:transparent;-webkit-appearance:none;height:6px;pointer-events:none;" class="ip-range"
+        <input type="range" class="ip-range-input" min="1" max="10" value="${v.min}"
           oninput="updateIPRange('${f.key}','min',this.value)">
-        <input type="range" min="1" max="10" value="${v.max}" style="position:absolute;width:100%;background:transparent;-webkit-appearance:none;height:6px;z-index:1;" class="ip-range"
+        <input type="range" class="ip-range-input upper" min="1" max="10" value="${v.max}"
           oninput="updateIPRange('${f.key}','max',this.value)">
       </div>
-      <div style="display:flex;gap:3px;" id="ipcells-${f.key}">${cells}</div>
-      <div style="font-size:11px;color:var(--accent);margin-top:6px;" id="iptip-${f.key}">
-        Min: ${f.tips[v.min]||''} · Max: ${f.tips[v.max]||''}
-      </div>
+      <div class="ip-sten-cells" id="ipcells-${f.key}">${cells}</div>
+      <div class="ip-desc-text" id="iptip-${f.key}">${f.tips[v.min]||''} — ${f.tips[v.max]||''}</div>
     </div>`;
   }).join('');
-
-  // Range slider thumb CSS
-  if(!document.getElementById('ip-range-style')) {
-    const style = document.createElement('style');
-    style.id = 'ip-range-style';
-    style.textContent = `.ip-range::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);border:2.5px solid white;box-shadow:0 2px 6px rgba(79,70,229,0.4);cursor:pointer;pointer-events:all;}.ip-range::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--accent);border:2.5px solid white;cursor:pointer;pointer-events:all;}`;
-    document.head.appendChild(style);
-  }
 }
 
 function updateIPRange(key, type, val) {
@@ -2388,18 +2469,20 @@ function updateIPRange(key, type, val) {
   if(valEl) valEl.textContent = `${v.min}–${v.max}`;
 
   // Cells yenilə
-  const cells = document.getElementById(`ipcells-${key}`);
-  if(cells) cells.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(i =>
-    `<span style="display:inline-flex;width:26px;height:26px;border-radius:5px;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</span>`
-  ).join('');
+  for(let i=1;i<=10;i++){
+    const cell = document.getElementById(`ipc-${key}-${i}`);
+    if(cell){ cell.className=`ip-cell${i>=v.min&&i<=v.max?' on':''}`; }
+  }
 
   // Tip yenilə
   const tip = document.getElementById(`iptip-${key}`);
-  if(tip) tip.textContent = `Min: ${f.tips[v.min]||''} · Max: ${f.tips[v.max]||''}`;
+  if(tip) tip.textContent = `${f.tips[v.min]||''} — ${f.tips[v.max]||''}`;
 }
 
 function updateIPWeight(key, val) {
   currentIdealProfile[key].weight = val;
+  const sel = document.getElementById(`ipwgt-${key}`);
+  if(sel) sel.className = `ip-weight-sel ${val==='high'?'high':val==='low'?'low':'med'}`;
 }
 
 // Saxla
@@ -2589,6 +2672,8 @@ window.deleteIdealProfile = deleteIdealProfile;
 window.saveIdealProfile = saveIdealProfile;
 window.updateIPRange = updateIPRange;
 window.updateIPWeight = updateIPWeight;
+window.createIdealTestLink = createIdealTestLink;
+window.showLinkModal = showLinkModal;
 window.calcBSD = calcBSD;
 
 </script>
