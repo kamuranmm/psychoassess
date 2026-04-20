@@ -885,7 +885,7 @@
             <div class="page-title" id="ideal-builder-title" style="margin-bottom:0;">Yeni İdeal Profil</div>
             <div class="page-sub" style="margin-bottom:0;">16 faktor üçün ideal STEN aralığını seçin</div>
           </div>
-          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);" onclick="saveAndCreateLink()">🔗 Link Yarat</button>
+          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);" onclick="saveAndCreateLink()">🎯 İdeal Profil Testi Yarat</button>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -2313,7 +2313,7 @@ async function loadIdealProfiles() {
             <div style="font-size:12px;color:var(--muted);margin-top:2px;">${data.position||'—'}</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
-            <button class="btn-sm" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;" onclick="createIdealTestLink('${d.id}','${data.name.replace(/'/g,"\'")}')">🔗 Link Yarat</button>
+            <button class="btn-sm" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;" onclick="createIdealTestLink('${d.id}','${data.name.replace(/'/g,"\'")}')">🎯 Test Linki Yarat</button>
             <button class="btn-sm btn-report" onclick="editIdealProfile('${d.id}')">✏️ Düzəlt</button>
             <button class="btn-sm btn-danger" onclick="deleteIdealProfile('${d.id}','${data.name.replace(/'/g,"\'")}')">🗑️</button>
           </div>
@@ -2326,9 +2326,9 @@ async function loadIdealProfiles() {
   } catch(e) { el.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>'; }
 }
 
-// İdeal profil üçün test linki yarat — siyahıdan
+// İdeal profil üçün test linki yarat — siyahıdan basanda
 async function createIdealTestLink(idealProfileId, profileName) {
-  openLinkCreateModal(idealProfileId, profileName);
+  await createDirectTestLink(idealProfileId, profileName);
 }
 
 // Yeni ideal profil yarat
@@ -2461,18 +2461,64 @@ async function saveIdealProfile() {
   } catch(e) { showToast('Xəta: '+e.message,'error'); return null; }
 }
 
-// Profili saxla + namizid məlumatı al + link yarat
+// Profili saxla + birbaşa ümumi test linki yarat
 async function saveAndCreateLink() {
   const name = document.getElementById('ip-name').value.trim();
-  const pos = document.getElementById('ip-pos').value.trim();
   if(!name) { showToast('Profil adı daxil edin','error'); return; }
 
   // Əvvəlcə profili saxla
   const profileId = await saveIdealProfile();
   if(!profileId) return;
 
-  // Namizid məlumatı al
-  openLinkCreateModal(profileId, name);
+  // Birbaşa ümumi link yarat — ad/email lazım deyil
+  await createDirectTestLink(profileId, name);
+}
+
+async function createDirectTestLink(profileId, profileName) {
+  try {
+    // Ümumi "placeholder" namizid yarat — link paylaşılacaq
+    const ref = await db.collection('candidates').add({
+      name: '—',
+      email: '—',
+      companyId,
+      companyName: companyData.name,
+      idealProfileId: profileId,
+      idealProfileName: profileName,
+      assignedTests: ['16fq'],
+      completedTests: [],
+      isIdealTest: true,
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    navigator.clipboard.writeText(link).catch(()=>{});
+    showDirectLinkResult(link, profileName);
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+function showDirectLinkResult(link, profileName) {
+  // Builder page-də nəticəni göstər
+  let resultDiv = document.getElementById('ip-link-result');
+  if(!resultDiv) {
+    resultDiv = document.createElement('div');
+    resultDiv.id = 'ip-link-result';
+    // Saxla düyməsinin yanına əlavə et
+    const btn = document.querySelector('[onclick="saveAndCreateLink()"]');
+    if(btn && btn.parentNode) {
+      btn.parentNode.insertAdjacentElement('afterend', resultDiv);
+    }
+  }
+  resultDiv.innerHTML = `
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:16px;">
+      <div style="font-size:14px;font-weight:700;color:var(--success);margin-bottom:8px;">✅ Test linki hazırdır və kopyalandı!</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">📋 "${profileName}" ideal profili üçün 15FQ+ test linki</div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:10px;">${link}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Bu linki namizidlərə göndərin. Test bitdikdə nəticə ideal profilinizlə müqayisə ediləcək.</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm btn-report" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Yenidən kopyala</button>
+        <button class="btn-sm" style="background:#eff6ff;color:var(--accent);" onclick="showPage('ideal')">← Profillərə qayıt</button>
+      </div>
+    </div>`;
 }
 
 // Link yaratma modal-ı
@@ -2499,7 +2545,7 @@ function openLinkCreateModal(profileId, profileName) {
         <input type="text" class="field-input" id="lc-pos" placeholder="Satış mütəxəssisi">
       </div>
       <div id="lc-result" style="display:none;"></div>
-      <button class="btn-primary" id="lc-btn" onclick="generateTestLink()">🔗 Link Yarat</button>
+      <button class="btn-primary" id="lc-btn" onclick="generateTestLink()">🎯 Test Linki Yarat</button>
     </div>`;
     document.body.appendChild(modal);
   }
