@@ -442,227 +442,206 @@ const FQ15=[
 // ADAPT-G SUALLAR — 3 səviyyə × 3 alt-test
 // ============================================================
 const VERBAL_E=[
-{q:'Alma meyvədir. Kərpic nədir?',o:['Meyvədir','Meyvə deyil','Bitki növüdür','Heyvan növüdür'],c:1},
-{q:'"Böyük" sözünün antonimi hansıdır?',o:['Nəhəng','Geniş','Kiçik','Uzun'],c:2},
-{q:'"Sürətli" sözünün sinonimi hansıdır?',o:['Yavaş','Cəld','Ağır','Sakit'],c:1},
-{q:'Aşağıdakılardan hansı "nəqliyyat vasitəsi" deyil?',o:['Avtomobil','Təyyarə','Stol','Gəmi'],c:2},
-{q:'"Sevincli" sözünün antonimi hansıdır?',o:['Şən','Xoşbəxt','Kədərli','Həvəsli'],c:2},
-{q:'Bütün itlər heyvandır. Reks itdir. Reks nədir?',o:['Quşdur','Heyvandır','Heyvan deyil','Bəlkə heyvandır'],c:1},
-{q:'Aşağıdakılardan hansı "meyvə" deyil?',o:['Gilas','Ərik','Kələm','Üzüm'],c:2},
-{q:'"Gec" sözünün antonimi hansıdır?',o:['Birdən','Tez','Yavaş','Uzun'],c:1},
-{q:'"Dürüst" sözünün sinonimi hansıdır?',o:['Yalançı','Səmimi','Xain','Laqeyd'],c:1},
-{q:'Aşağıdakılardan hansı "rəng" deyil?',o:['Mavi','Yaşıl','Dairə','Sarı'],c:2},
-{q:'"Soyuq" sözünün antonimi hansıdır?',o:['Mülayim','İsti','Dondurucu','Nəm'],c:1},
-{q:'Bütün müəllimlər insandır. Aynur müəllimədir. Aynur nədir?',o:['Heyvandır','Mütləq insandır','İnsan deyil','Bəlkə insandır'],c:1},
-{q:'Aşağıdakılardan hansı "rəng" deyil?',o:['Narıncı','Bənövşəyi','Kvadrat','Qırmızı'],c:2},
-{q:'"Çətin" sözünün antonimi hansıdır?',o:['Ağır','Mürəkkəb','Asan','Uzun'],c:2},
-{q:'İt, pişik, quş — bunların ortaq cəhəti nədir?',o:['Hamısı quşdur','Hamısı heyvandır','Hamısı sürünəndir','Hamısı balıqdır'],c:1},
-{q:'"Şad" sözünün sinonimi hansıdır?',o:['Kədərli','Qəmgin','Xoşbəxt','Sıxıntılı'],c:2},
-{q:'Aşağıdakılardan hansı "ölkə" deyil?',o:['Fransa','Bakı','Almaniya','Braziliya'],c:1},
-{q:'"Güclü" sözünün antonimi hansıdır?',o:['İri','Böyük','Zəif','Enli'],c:2},
-{q:'Hamı istirahət günü evdə olur. Bu gün istirahət günüdür. Nəticə?',o:['Hamı bayırdadır','Hamı evdədir','Bəziləri evdədir','Heç kim evdə deyil'],c:1},
-{q:'Aşağıdakılardan hansı "musiqi aləti" deyil?',o:['Fortepiano','Gitara','Skripka','Qayçı'],c:3},
-{q:'"Həqiqi" sözünün sinonimi hansıdır?',o:['Saxta','Yalançı','Real','Xəyali'],c:2},
-{q:'Bütün proqramçılar kompüterlə işləyir. Kamran proqramçıdır. Nəticə?',o:['Kamran kompüterlə işləmir','Kamran kompüterlə işləyir','Kamran müəllimdirdir','Kamran həkim deyil'],c:1},
-{q:'Aşağıdakılardan hansı "planet" deyil?',o:['Zöhrə','Mərs','Günəş','Yupiter'],c:2},
-{q:'"Dar" sözünün antonimi hansıdır?',o:['Kiçik','Geniş','Qısa','Uzun'],c:1},
-{q:'Şirkətin satışı yanvarda 1000, fevralda 1200 manat oldu. Artım nə qədərdir?',o:['100 manat','150 manat','200 manat','250 manat'],c:2}
+{q:'Alma meyvədir. Kərpic nədir?',o:['Meyvədir','Meyvə deyil','Bitki növüdür','Heyvan növüdür'],c:1,b:-1.4},
+{q:'"Böyük" sözünün antonimi hansıdır?',o:['Nəhəng','Geniş','Kiçik','Uzun'],c:2,b:-1.0},
+{q:'"Sürətli" sözünün sinonimi hansıdır?',o:['Yavaş','Cəld','Ağır','Sakit'],c:1,b:-1.5},
+{q:'Aşağıdakılardan hansı "nəqliyyat vasitəsi" deyil?',o:['Avtomobil','Təyyarə','Stol','Gəmi'],c:2,b:-1.4},
+{q:'"Sevincli" sözünün antonimi hansıdır?',o:['Şən','Xoşbəxt','Kədərli','Həvəsli'],c:2,b:-0.9},
+{q:'Bütün itlər heyvandır. Reks itdir. Reks nədir?',o:['Quşdur','Heyvandır','Heyvan deyil','Bəlkə heyvandır'],c:1,b:-1.6},
+{q:'Aşağıdakılardan hansı "meyvə" deyil?',o:['Gilas','Ərik','Kələm','Üzüm'],c:2,b:-1.0},
+{q:'"Gec" sözünün antonimi hansıdır?',o:['Birdən','Tez','Yavaş','Uzun'],c:1,b:-1.1},
+{q:'"Dürüst" sözünün sinonimi hansıdır?',o:['Yalançı','Səmimi','Xain','Laqeyd'],c:1,b:-0.9},
+{q:'Aşağıdakılardan hansı "rəng" deyil?',o:['Mavi','Yaşıl','Dairə','Sarı'],c:2,b:-1.5},
+{q:'"Soyuq" sözünün antonimi hansıdır?',o:['Mülayim','İsti','Dondurucu','Nəm'],c:1,b:-0.9},
+{q:'Bütün müəllimlər insandır. Aynur müəllimədir. Aynur nədir?',o:['Heyvandır','Mütləq insandır','İnsan deyil','Bəlkə insandır'],c:1,b:-1.1},
+{q:'"Çətin" sözünün antonimi hansıdır?',o:['Ağır','Mürəkkəb','Asan','Uzun'],c:2,b:-1.4},
+{q:'İt, pişik, quş — bunların ortaq cəhəti nədir?',o:['Hamısı quşdur','Hamısı heyvandır','Hamısı sürünəndir','Hamısı balıqdır'],c:1,b:-1.6},
+{q:'"Şad" sözünün sinonimi hansıdır?',o:['Kədərli','Qəmgin','Xoşbəxt','Sıxıntılı'],c:2,b:-1.1},
+{q:'Aşağıdakılardan hansı "ölkə" deyil?',o:['Fransa','Bakı','Almaniya','Braziliya'],c:1,b:-1.7},
+{q:'"Güclü" sözünün antonimi hansıdır?',o:['İri','Böyük','Zəif','Enli'],c:2,b:-1.1},
+{q:'Hamı istirahət günü evdə olur. Bu gün istirahət günüdür. Nəticə?',o:['Hamı bayırdadır','Hamı evdədir','Bəziləri evdədir','Heç kim evdə deyil'],c:1,b:-1.7},
+{q:'Aşağıdakılardan hansı "musiqi aləti" deyil?',o:['Fortepiano','Gitara','Skripka','Qayçı'],c:3,b:-1.7},
+{q:'"Həqiqi" sözünün sinonimi hansıdır?',o:['Saxta','Yalançı','Real','Xəyali'],c:2,b:-0.8},
+{q:'Bütün proqramçılar kompüterlə işləyir. Kamran proqramçıdır. Nəticə?',o:['Kamran kompüterlə işləmir','Kamran kompüterlə işləyir','Kamran müəllimdirdir','Kamran həkim deyil'],c:1,b:-1.2},
+{q:'Aşağıdakılardan hansı "planet" deyil?',o:['Zöhrə','Mərs','Günəş','Yupiter'],c:2,b:-1.3},
+{q:'"Dar" sözünün antonimi hansıdır?',o:['Kiçik','Geniş','Qısa','Uzun'],c:1,b:-1.4},
+{q:'Şirkətin satışı yanvarda 1000, fevralda 1200 manat oldu. Artım nə qədərdir?',o:['100 manat','150 manat','200 manat','250 manat'],c:2,b:-1.2}
 ]
 const VERBAL_M=[
-{q:'Mətn: "Şirkət bu rübdə gəlirini 15% artırdı, lakin xərclər 22% artdı." Nəticə hansıdır?',o:['Mənfəət artdı','Mənfəət azaldı','Gəlir xərclərdən çoxdur','Xərclər azaldı'],c:1},
-{q:'"İstedad lazımdır, amma yalnız çalışqanlıq uğur gətirir." Nəticə hansıdır?',o:['İstedadlı olmaq kifayətdir','Çalışqanlıq istedad olmadan faydasızdır','Uğur üçün hər ikisi lazımdır','İstedad daha vacibdir'],c:2},
-{q:'Bütün rəhbərlər qərar qəbul edir. Əli qərar qəbul edir. Bu barədə nə deyə bilərik?',o:['Əli mütləq rəhbərdir','Əli rəhbər olmaya bilər','Əli heç vaxt rəhbər deyil','Qərar qəbul edənlər rəhbərdir'],c:1},
-{q:'Bütün kvadratlar düzbucaqlıdır. Bütün düzbucaqlıların 4 tərəfi var. Nəticə?',o:['Bütün düzbucaqlılar kvadratdır','Bəzi kvadratların 4-dən çox tərəfi var','Bütün kvadratların 4 tərəfi var','Heç bir kvadrat düzbucaqlı deyil'],c:2},
-{q:'Mətn: "Yeni texnologiyalar məhsuldarlığı artırır, amma işçilərin bir hissəsini işsiz qoyur." Hansı nəticə doğrudur?',o:['Texnologiya həmişə yaxşıdır','Texnologiyanın həm fayda, həm zərəri var','Texnologiya işçilər üçün tamamilə ziyanlıdır','Məhsuldarlıq azalır'],c:1},
-{q:'"Əgər yağış yağırsa, küçələr islanır. Küçələr islanmayıb." Nəticə?',o:['Yağış yağır','Yağış yağmayıb','Küçələr quruyub','Hava buludludur'],c:1},
-{q:'Mətn: "Bütün uğurlu sahibkarlar risk alır. Leyla uğurlu sahibkardır." Nəticə?',o:['Leyla risk almır','Leyla risk alır','Risk alan hamı uğurludur','Leyla uğursuz ola bilər'],c:1},
-{q:'Hesabatda: "Satışlar 30% artıb, lakin müştəri şikayətləri 45% artıb." Ən uyğun nəticə?',o:['Şirkət tamamilə yaxşı gedir','Artım var, amma keyfiyyət problemləri var','Şikayətlər əhəmiyyətsizdir','Satışlar azalacaq'],c:1},
-{q:'"Bütün layihə rəhbərləri planlaşdırma bacarığına malikdir. Nicat layihə rəhbəridir." Nəticə?',o:['Nicat planlaşdıra bilmir','Nicat planlaşdırma bacarığına malikdir','Nicat adi işçidir','Planlaşdırma bacarığı vacib deyil'],c:1},
-{q:'Hesabatda: "Əmək haqqı 10% artdı, amma inflasiya 15% oldu." Real əmək haqqı nə etdi?',o:['Artdı','Azaldı','Eyni qaldı','İki dəfə artdı'],c:1},
-{q:'"Əgər A doğrudursa, B doğrudur. Əgər B doğrudursa, C doğrudur. A doğrudur." Nəticə?',o:['Yalnız B doğrudur','B və C doğrudur','Yalnız C doğrudur','Heç biri doğru deyil'],c:1},
-{q:'Mətn: "Bu ilin ilk yarısında satışlar 20% artdı, ikinci yarısında 25% azaldı." İlin sonunda satışlar necədir?',o:['Əvvəldən çoxdur','Əvvəldən azdır','Eynidir','Dəqiq demək olmaz'],c:1},
-{q:'Mətn: "Şirkətlər sosial məsuliyyət proqramlarına xərc çəkirlər. Tədqiqatlar göstərir ki, bu şirkətlərin uzunmüddətli mənfəəti daha yüksəkdir." Hansı nəticə MƏNTİQİ deyil?',o:['Sosial məsuliyyət uzunmüddətli fayda verir','Sosial məsuliyyət qısamüddətli xərcdir','Sosial məsuliyyət gəlirlidir','Sosial məsuliyyətə yatırım kimi baxmaq olmaz'],c:3},
-{q:'"Heç bir sənəd imzalanmadan qüvvəyə minmir. Bu sənəd imzalanıb." Nəticə?',o:['Sənəd qüvvəyə minməyib','Sənəd qüvvəyə minib','Sənəd imzalanmayıb','Nəticə çıxarmaq olmaz'],c:1},
-{q:'Azərbaycanda son 5 ildə turizm 40% artdı. Ən güclü nəticə hansıdır?',o:['Turizm gələcəkdə azalacaq','Azərbaycan populyar turizm məkanına çevrilir','Turistlər yalnız xaricdən gəlir','Otellərin sayı artdı'],c:1},
-{q:'"Bütün müvəffəqiyyətli insanlar çox çalışır. Bəzi çox çalışan insanlar müvəffəq deyil." Nəticə?',o:['Çox çalışmaq müvəffəqiyyəti zəmanət verir','Çox çalışmaq lazımdır amma kifayət deyil','Çox çalışmaq lazım deyil','Müvəffəqiyyətlilər çox çalışmır'],c:1},
-{q:'"Əgər layihə gecikirsə, müştəri narazı olur. Müştəri narazı deyil." Nəticə?',o:['Layihə gecikib','Layihə gecikməyib','Müştəri razıdır','Müştəri gecikməni bilmir'],c:1},
-{q:'Mətn: "Şirkətin satışları artır, amma bazar payı azalır." Bu necə mümkündür?',o:['Mümkün deyil — ziddiyyətdir','Bazar ümumi böyüyür, şirkət isə bazardan yavaş böyüyür','Rəqiblər bazardan çıxıb','Şirkətin qiyməti düşüb'],c:1},
-{q:'Məntiqi: "Heç bir sürünən quş deyil. Bəzi heyvanlar sürünəndir." Nəticə?',o:['Bəzi heyvanlar quşdur','Bəzi heyvanlar quş deyil','Bütün heyvanlar sürünəndir','Quşlar heyvan deyil'],c:1},
-{q:'Mətn: "Müştərilərin 70%-i məhsuldan razıdır. Geri qaytarma 5% artıb." Ən dəqiq nəticə?',o:['Müştərilər tamamilə razıdır','Razılıq yüksək olsa da, problem var','Geri qaytarma əhəmiyyətsizdir','Məhsul keyfiyyətsizdir'],c:1},
-{q:'Analitik: "A şirkəti B şirkətini aldı. B şirkətinin borcları A-ya keçdi." A-nın maliyyə vəziyyəti necə dəyişdi?',o:['Yaxşılaşdı','Pisləşdi','Eyni qaldı','Dəyişdi, amma istiqaməti bilinmir'],c:3},
-{q:'Mətn: "Şirkətimiz 3 il dalbadal zərərlə işləyib." Ən zəif nəticə hansıdır?',o:['Şirkət maliyyə çətinliyi keçirir','Şirkət gələn il mütləq bağlanacaq','Şirkətin strategiyası dəyişməlidir','İnvestorlar narahat ola bilər'],c:1},
-{q:'"Əgər A və B doğrudursa, C doğrudur. Əgər C doğrudursa, D yanlışdır. A doğrudur, B doğrudur." D haqqında nə deyə bilərik?',o:['D doğrudur','D yanlışdır','D haqqında nəticə çıxarmaq olmaz','D həm doğru, həm yanlış ola bilər'],c:1},
-{q:'Hesabatda: "Yeni məhsulun bazara çıxışından sonra köhnə məhsulun satışları 30% düşdü." Nəticə?',o:['Şirkətin ümumi gəliri mütləq azaldı','Yeni məhsul köhnənin yerini tutdu','Müştərilər məhsuldan narazıdır','Şirkət bazardan çıxır'],c:1},
-{q:'Mətn: "İşçilərin 80%-i iş yerlərindən razıdır. Kadr dövriyyəsi 25% artıb." Ən dəqiq nəticə?',o:['İşçilər tamamilə razıdır','Razılıq yüksək olsa da, ayrılma problemi var','Kadr dövriyyəsi əhəmiyyətsizdir','Şirkət işçi axtarır'],c:1}
+{q:'Mətn: "Şirkət bu rübdə gəlirini 15% artırdı, lakin xərclər 22% artdı." Nəticə hansıdır?',o:['Mənfəət artdı','Mənfəət azaldı','Gəlir xərclərdən çoxdur','Xərclər azaldı'],c:1,b:0.1},
+{q:'"İstedad lazımdır, amma yalnız çalışqanlıq uğur gətirir." Nəticə hansıdır?',o:['İstedadlı olmaq kifayətdir','Çalışqanlıq istedad olmadan faydasızdır','Uğur üçün hər ikisi lazımdır','İstedad daha vacibdir'],c:2,b:0.1},
+{q:'Bütün rəhbərlər qərar qəbul edir. Əli qərar qəbul edir. Bu barədə nə deyə bilərik?',o:['Əli mütləq rəhbərdir','Əli rəhbər olmaya bilər','Əli heç vaxt rəhbər deyil','Qərar qəbul edənlər rəhbərdir'],c:1,b:-0.4},
+{q:'Bütün kvadratlar düzbucaqlıdır. Bütün düzbucaqlıların 4 tərəfi var. Nəticə?',o:['Bütün düzbucaqlılar kvadratdır','Bəzi kvadratların 4-dən çox tərəfi var','Bütün kvadratların 4 tərəfi var','Heç bir kvadrat düzbucaqlı deyil'],c:2,b:-0.1},
+{q:'Mətn: "Yeni texnologiyalar məhsuldarlığı artırır, amma işçilərin bir hissəsini işsiz qoyur." Hansı nəticə doğrudur?',o:['Texnologiya həmişə yaxşıdır','Texnologiyanın həm fayda, həm zərəri var','Texnologiya işçilər üçün tamamilə ziyanlıdır','Məhsuldarlıq azalır'],c:1,b:0.3},
+{q:'"Əgər yağış yağırsa, küçələr islanır. Küçələr islanmayıb." Nəticə?',o:['Yağış yağır','Yağış yağmayıb','Küçələr quruyub','Hava buludludur'],c:1,b:0.2},
+{q:'Mətn: "Bütün uğurlu sahibkarlar risk alır. Leyla uğurlu sahibkardır." Nəticə?',o:['Leyla risk almır','Leyla risk alır','Risk alan hamı uğurludur','Leyla uğursuz ola bilər'],c:1,b:0.2},
+{q:'Hesabatda: "Satışlar 30% artıb, lakin müştəri şikayətləri 45% artıb." Ən uyğun nəticə?',o:['Şirkət tamamilə yaxşı gedir','Artım var, amma keyfiyyət problemləri var','Şikayətlər əhəmiyyətsizdir','Satışlar azalacaq'],c:1,b:-0.2},
+{q:'"Bütün layihə rəhbərləri planlaşdırma bacarığına malikdir. Nicat layihə rəhbəridir." Nəticə?',o:['Nicat planlaşdıra bilmir','Nicat planlaşdırma bacarığına malikdir','Nicat adi işçidir','Planlaşdırma bacarığı vacib deyil'],c:1,b:-0.1},
+{q:'Hesabatda: "Əmək haqqı 10% artdı, amma inflasiya 15% oldu." Real əmək haqqı nə etdi?',o:['Artdı','Azaldı','Eyni qaldı','İki dəfə artdı'],c:1,b:0.1},
+{q:'"Əgər A doğrudursa, B doğrudur. Əgər B doğrudursa, C doğrudur. A doğrudur." Nəticə?',o:['Yalnız B doğrudur','B və C doğrudur','Yalnız C doğrudur','Heç biri doğru deyil'],c:1,b:-0.1},
+{q:'Mətn: "Bu ilin ilk yarısında satışlar 20% artdı, ikinci yarısında 25% azaldı." İlin sonunda satışlar necədir?',o:['Əvvəldən çoxdur','Əvvəldən azdır','Eynidir','Dəqiq demək olmaz'],c:1,b:0.3},
+{q:'Mətn: "Şirkətlər sosial məsuliyyət proqramlarına xərc çəkirlər. Tədqiqatlar göstərir ki, bu şirkətlərin uzunmüddətli mənfəəti daha yüksəkdir." Hansı nəticə MƏNTİQİ deyil?',o:['Sosial məsuliyyət uzunmüddətli fayda verir','Sosial məsuliyyət qısamüddətli xərcdir','Sosial məsuliyyət gəlirlidir','Sosial məsuliyyətə yatırım kimi baxmaq olmaz'],c:3,b:0.2},
+{q:'"Heç bir sənəd imzalanmadan qüvvəyə minmir. Bu sənəd imzalanıb." Nəticə?',o:['Sənəd qüvvəyə minməyib','Sənəd qüvvəyə minib','Sənəd imzalanmayıb','Nəticə çıxarmaq olmaz'],c:1,b:0.4},
+{q:'Azərbaycanda son 5 ildə turizm 40% artdı. Ən güclü nəticə hansıdır?',o:['Turizm gələcəkdə azalacaq','Azərbaycan populyar turizm məkanına çevrilir','Turistlər yalnız xaricdən gəlir','Otellərin sayı artdı'],c:1,b:0.2},
+{q:'"Bütün müvəffəqiyyətli insanlar çox çalışır. Bəzi çox çalışan insanlar müvəffəq deyil." Nəticə?',o:['Çox çalışmaq müvəffəqiyyəti zəmanət verir','Çox çalışmaq lazımdır amma kifayət deyil','Çox çalışmaq lazım deyil','Müvəffəqiyyətlilər çox çalışmır'],c:1,b:-0.2},
+{q:'"Əgər layihə gecikirsə, müştəri narazı olur. Müştəri narazı deyil." Nəticə?',o:['Layihə gecikib','Layihə gecikməyib','Müştəri razıdır','Müştəri gecikməni bilmir'],c:1,b:0.3},
+{q:'Mətn: "Şirkətin satışları artır, amma bazar payı azalır." Bu necə mümkündür?',o:['Mümkün deyil — ziddiyyətdir','Bazar ümumi böyüyür, şirkət isə bazardan yavaş böyüyür','Rəqiblər bazardan çıxıb','Şirkətin qiyməti düşüb'],c:1,b:-0.1},
+{q:'Məntiqi: "Heç bir sürünən quş deyil. Bəzi heyvanlar sürünəndir." Nəticə?',o:['Bəzi heyvanlar quşdur','Bəzi heyvanlar quş deyil','Bütün heyvanlar sürünəndir','Quşlar heyvan deyil'],c:1,b:-0.3},
+{q:'Mətn: "Müştərilərin 70%-i məhsuldan razıdır. Geri qaytarma 5% artıb." Ən dəqiq nəticə?',o:['Müştərilər tamamilə razıdır','Razılıq yüksək olsa da, problem var','Geri qaytarma əhəmiyyətsizdir','Məhsul keyfiyyətsizdir'],c:1,b:0.1},
+{q:'Analitik: "A şirkəti B şirkətini aldı. B şirkətinin borcları A-ya keçdi." A-nın maliyyə vəziyyəti necə dəyişdi?',o:['Yaxşılaşdı','Pisləşdi','Eyni qaldı','Dəyişdi, amma istiqaməti bilinmir'],c:3,b:0.0},
+{q:'Mətn: "Şirkətimiz 3 il dalbadal zərərlə işləyib." Ən zəif nəticə hansıdır?',o:['Şirkət maliyyə çətinliyi keçirir','Şirkət gələn il mütləq bağlanacaq','Şirkətin strategiyası dəyişməlidir','İnvestorlar narahat ola bilər'],c:1,b:-0.2},
+{q:'"Əgər A və B doğrudursa, C doğrudur. Əgər C doğrudursa, D yanlışdır. A doğrudur, B doğrudur." D haqqında nə deyə bilərik?',o:['D doğrudur','D yanlışdır','D haqqında nəticə çıxarmaq olmaz','D həm doğru, həm yanlış ola bilər'],c:1,b:-0.3},
+{q:'Hesabatda: "Yeni məhsulun bazara çıxışından sonra köhnə məhsulun satışları 30% düşdü." Nəticə?',o:['Şirkətin ümumi gəliri mütləq azaldı','Yeni məhsul köhnənin yerini tutdu','Müştərilər məhsuldan narazıdır','Şirkət bazardan çıxır'],c:1,b:-0.3},
+{q:'Mətn: "İşçilərin 80%-i iş yerlərindən razıdır. Kadr dövriyyəsi 25% artıb." Ən dəqiq nəticə?',o:['İşçilər tamamilə razıdır','Razılıq yüksək olsa da, ayrılma problemi var','Kadr dövriyyəsi əhəmiyyətsizdir','Şirkət işçi axtarır'],c:1,b:0.3}
 ]
 const VERBAL_H=[
-{q:'Tədqiqatlar göstərir ki, uzun iş saatları məhsuldarlığı azaldır. Lakin şirkətlərin 60%-i 50+ saat tələb edir. Ən məntiqi nəticə?',o:['Şirkətlər tədqiqatları bilmirlər','Şirkətlər bilsələr də dəyişmirlər','Tədqiqatlar yanlışdır','Məhsuldarlıq artdı'],c:1},
-{q:'Əgər iqtisadiyyat böyüyürsə, işsizlik azalır. İşsizlik azalmayıb. Nəticə?',o:['İqtisadiyyat böyüyür','İqtisadiyyat böyümür','İşsizlik artıb','İqtisadiyyat sabitdir'],c:1},
-{q:'Şirkət A bazarda 35% pay tutur. Son rübdə 5% pay itirdi. İndi neçə faiz payı var?',o:['30%','25%','32%','28%'],c:0},
-{q:'Bütün innovativ şirkətlər R&D-ə investisiya qoyur. Bu şirkət R&D-ə investisiya qoymur. Nəticə?',o:['Bu şirkət innovativdir','Bu şirkət innovativ deyil','Bu şirkət R&D planlaşdırır','Nəticə çıxarmaq mümkün deyil'],c:1},
-{q:'"Bu cümlə yanlışdır." Bu cümlə haqqında ən dəqiq ifadə?',o:['Cümlə doğrudur','Cümlə yanlışdır','Nə doğru, nə yanlış deyil','Məntiqi paradoksdur'],c:3},
-{q:'Analitik mətn: "Şirkətlər sosial məsuliyyət proqramlarına xərc çəkirlər. Tədqiqatlar göstərir ki, bu şirkətlərin uzunmüddətli mənfəəti daha yüksəkdir." Hansı nəticə MƏNTİQİ deyil?',o:['Sosial məsuliyyət uzunmüddətli fayda verir','Sosial məsuliyyət qısamüddətli xərcdir','Sosial məsuliyyət gəlirlidir','Sosial məsuliyyətə yatırım kimi baxmaq olmaz'],c:3},
-{q:'"Əgər A və B doğrudursa, C doğrudur. Əgər C doğrudursa, D yanlışdır. A doğrudur, B doğrudur." D haqqında nə deyə bilərik?',o:['D doğrudur','D yanlışdır','D haqqında nəticə çıxarmaq olmaz','D həm doğru, həm yanlış ola bilər'],c:1},
-{q:'Mətn: "Şirkətin satışları artır, amma bazar payı azalır." Bu necə mümkündür?',o:['Mümkün deyil — ziddiyyətdir','Bazar ümumi böyüyür, şirkət isə bazardan yavaş böyüyür','Rəqiblər bazardan çıxıb','Şirkətin qiyməti düşüb'],c:1},
-{q:'Məntiqi: "Heç bir sürünən quş deyil. Bəzi heyvanlar sürünəndir." Nəticə?',o:['Bəzi heyvanlar quşdur','Bəzi heyvanlar quş deyil','Bütün heyvanlar sürünəndir','Quşlar heyvan deyil'],c:1},
-{q:'Paradoks: "Bu qayda istisnasız tətbiq olunur — istisna olmaq daxil." Nəticə?',o:['Qayda doğrudur','Qayda yanlışdır','Qayda özünə ziddir','Qayda tətbiq olunmur'],c:2},
-{q:'Mətn: "Müştərilərin 70%-i məhsuldan razıdır. Geri qaytarma 5% artıb." Ən dəqiq nəticə?',o:['Müştərilər tamamilə razıdır','Razılıq yüksək olsa da, problem var','Geri qaytarma əhəmiyyətsizdir','Məhsul keyfiyyətsizdir'],c:1},
-{q:'"Bütün müvəffəqiyyətli insanlar çox çalışır. Bəzi çox çalışan insanlar müvəffəq deyil." Nəticə?',o:['Çox çalışmaq müvəffəqiyyəti zəmanət verir','Çox çalışmaq lazımdır amma kifayət deyil','Çox çalışmaq lazım deyil','Müvəffəqiyyətlilər çox çalışmır'],c:1},
-{q:'Analitik: "A şirkəti B şirkətini aldı. B şirkətinin borcları A-ya keçdi." A-nın maliyyə vəziyyəti necə dəyişdi?',o:['Yaxşılaşdı','Pisləşdi','Eyni qaldı','Dəyişdi, amma istiqaməti bilinmir'],c:3},
-{q:'"Əgər layihə gecikirsə, müştəri narazı olur. Müştəri narazı deyil." Nəticə?',o:['Layihə gecikib','Layihə gecikməyib','Müştəri razıdır','Müştəri gecikməni bilmir'],c:1},
-{q:'Mürəkkəb məntiqi: "A=>B, B=>C, C yanlışdır. A doğrudurmu?"',o:['A doğrudur','A yanlışdır','A haqqında nəticə çıxarmaq olmaz','A həm doğru, həm yanlış ola bilər'],c:1}
-,
-{q:'Tədqiqatlar göstərir ki, uzun iş saatları məhsuldarlığı azaldır. Lakin şirkətlərin 60%-i 50+ saat tələb edir. Ən məntiqi nəticə?',o:['Şirkətlər tədqiqatları bilmirlər','Şirkətlər bilsələr də dəyişmirlər','Tədqiqatlar yanlışdır','Məhsuldarlıq artdı'],c:1},
-{q:'Əgər iqtisadiyyat böyüyürsə, işsizlik azalır. İşsizlik azalmayıb. Nəticə?',o:['İqtisadiyyat böyüyür','İqtisadiyyat böyümür','İşsizlik artıb','İqtisadiyyat sabitdir'],c:1},
-{q:'Şirkət A bazarda 35% pay tutur. Son rübdə 5% pay itirdi. İndi neçə faiz payı var?',o:['30%','25%','32%','28%'],c:0},
-{q:'Bütün innovativ şirkətlər R&D-ə investisiya qoyur. Bu şirkət R&D-ə investisiya qoymur. Nəticə?',o:['Bu şirkət innovativdir','Bu şirkət innovativ deyil','Bu şirkət R&D planlaşdırır','Nəticə çıxarmaq mümkün deyil'],c:1},
-{q:'Mürəkkəb məntiqi: "A=>B, B=>C, C yanlışdır. A doğrudurmu?"',o:['A doğrudur','A yanlışdır','A haqqında nəticə çıxarmaq olmaz','A həm doğru həm yanlış ola bilər'],c:1}];
+{q:'Tədqiqatlar göstərir ki, uzun iş saatları məhsuldarlığı azaldır. Lakin şirkətlərin 60%-i 50+ saat tələb edir. Ən məntiqi nəticə?',o:['Şirkətlər tədqiqatları bilmirlər','Şirkətlər bilsələr də dəyişmirlər','Tədqiqatlar yanlışdır','Məhsuldarlıq artdı'],c:1,b:1.6},
+{q:'Əgər iqtisadiyyat böyüyürsə, işsizlik azalır. İşsizlik azalmayıb. Nəticə?',o:['İqtisadiyyat böyüyür','İqtisadiyyat böyümür','İşsizlik artıb','İqtisadiyyat sabitdir'],c:1,b:0.6},
+{q:'Şirkət A bazarda 35% pay tutur. Son rübdə 5% pay itirdi. İndi neçə faiz payı var?',o:['30%','25%','32%','28%'],c:0,b:1.2},
+{q:'Bütün innovativ şirkətlər R&D-ə investisiya qoyur. Bu şirkət R&D-ə investisiya qoymur. Nəticə?',o:['Bu şirkət innovativdir','Bu şirkət innovativ deyil','Bu şirkət R&D planlaşdırır','Nəticə çıxarmaq mümkün deyil'],c:1,b:1.0},
+{q:'"Bu cümlə yanlışdır." Bu cümlə haqqında ən dəqiq ifadə?',o:['Cümlə doğrudur','Cümlə yanlışdır','Nə doğru, nə yanlış deyil','Məntiqi paradoksdur'],c:3,b:1.1},
+{q:'Analitik mətn: "Şirkətlər sosial məsuliyyət proqramlarına xərc çəkirlər. Tədqiqatlar göstərir ki, bu şirkətlərin uzunmüddətli mənfəəti daha yüksəkdir." Hansı nəticə MƏNTİQİ deyil?',o:['Sosial məsuliyyət uzunmüddətli fayda verir','Sosial məsuliyyət qısamüddətli xərcdir','Sosial məsuliyyət gəlirlidir','Sosial məsuliyyətə yatırım kimi baxmaq olmaz'],c:3,b:1.5},
+{q:'Paradoks: "Bu qayda istisnasız tətbiq olunur — istisna olmaq daxil." Nəticə?',o:['Qayda doğrudur','Qayda yanlışdır','Qayda özünə ziddir','Qayda tətbiq olunmur'],c:2,b:1.0},
+{q:'Mürəkkəb məntiqi: "A=>B, B=>C, C yanlışdır. A doğrudurmu?"',o:['A doğrudur','A yanlışdır','A haqqında nəticə çıxarmaq olmaz','A həm doğru, həm yanlış ola bilər'],c:1,b:0.8},
+{q:'Tədqiqatlar göstərir ki, uzun iş saatları məhsuldarlığı azaldır. Lakin şirkətlərin 60%-i 50+ saat tələb edir. Ən məntiqi nəticə?',o:['Şirkətlər tədqiqatları bilmirlər','Şirkətlər bilsələr də dəyişmirlər','Tədqiqatlar yanlışdır','Məhsuldarlıq artdı'],c:1,b:0.8},
+{q:'Əgər iqtisadiyyat böyüyürsə, işsizlik azalır. İşsizlik azalmayıb. Nəticə?',o:['İqtisadiyyat böyüyür','İqtisadiyyat böyümür','İşsizlik artıb','İqtisadiyyat sabitdir'],c:1,b:0.9},
+{q:'Şirkət A bazarda 35% pay tutur. Son rübdə 5% pay itirdi. İndi neçə faiz payı var?',o:['30%','25%','32%','28%'],c:0,b:1.0},
+{q:'Bütün innovativ şirkətlər R&D-ə investisiya qoyur. Bu şirkət R&D-ə investisiya qoymur. Nəticə?',o:['Bu şirkət innovativdir','Bu şirkət innovativ deyil','Bu şirkət R&D planlaşdırır','Nəticə çıxarmaq mümkün deyil'],c:1,b:1.1},
+{q:'Mürəkkəb məntiqi: "A=>B, B=>C, C yanlışdır. A doğrudurmu?"',o:['A doğrudur','A yanlışdır','A haqqında nəticə çıxarmaq olmaz','A həm doğru həm yanlış ola bilər'],c:1,b:1.4},
+{q:'Paradoks: "Bu qayda istisnasız tətbiq olunur — istisna olmaq daxil." Nəticə?',o:['Qayda doğrudur','Qayda yanlışdır','Qayda özünə ziddir','Qayda tətbiq olunmur'],c:2,b:1.6},
+{q:'"Bu cümlə yanlışdır." Bu cümlə haqqında ən dəqiq ifadə?',o:['Cümlə doğrudur','Cümlə yanlışdır','Nə doğru nə yanlış deyil','Məntiqi paradoksdur'],c:3,b:1.8}
+];
 
 const NUMERICAL_E=[
-{q:'10 + 5 × 2 = ?',o:['30','20','15','25'],c:1},
-{q:'100-dən 20%-ni çıxın.',o:['70','75','80','85'],c:2},
-{q:'5 alma var, 3-ü yeyildi. Neçəsi qaldı?',o:['1','2','3','4'],c:1},
-{q:'Bir məhsul 50 manata alınıb, 60 manata satılıb. Mənfəət nə qədərdir?',o:['5 manat','8 manat','10 manat','12 manat'],c:2},
-{q:'Gündə 8 saat işləyən işçi həftədə (5 gün) neçə saat işləyir?',o:['32','35','40','45'],c:2},
-{q:'500 manatlıq məhsula 20% endirim edildi. Yeni qiymət nə qədərdir?',o:['380','400','420','450'],c:1},
-{q:'3 saatda 120 km yol getdilər. Orta sürət nə qədərdir?',o:['30 km/s','40 km/s','45 km/s','50 km/s'],c:1},
-{q:'15 işçidən 6-sı qadındır. Qadınların faizi nə qədərdir?',o:['30%','40%','45%','50%'],c:1},
-{q:'Bir məhsul 80 manata alınıb, 100 manata satılıb. Mənfəət faizi nə qədərdir?',o:['15%','20%','25%','30%'],c:2},
-{q:'Bir mağazada 240 məhsul var. 25%-i satıldı. Neçəsi qaldı?',o:['160','170','180','190'],c:2},
-{q:'Avtomobil saatda 80 km sürətlə gedir. 2.5 saatda neçə km yol qət edir?',o:['160','180','200','220'],c:2},
-{q:'400 manatlıq əmək haqqına 25% artım verildi. Yeni əmək haqqı nə qədərdir?',o:['450','480','500','520'],c:2},
-{q:'Bir kitab mağazası gündə 45 kitab satır. 3 həftədə neçə kitab satır?',o:['840','900','945','990'],c:2},
-{q:'8 fəhlə bir işi 6 gündə bitirir. Eyni işi 4 fəhlə neçə gündə bitirir?',o:['8','10','12','14'],c:2},
-{q:'Sinifdə 30 tələbə var. 40%-i qız, qalanı oğlandır. Neçə oğlan var?',o:['12','16','18','20'],c:2},
-{q:'Bir məhsulun qiyməti 150 manatdan 120 manata düşdü. Azalma faizi nə qədərdir?',o:['15%','20%','25%','30%'],c:1},
-{q:'5 nəfər bir işi 8 saatda bitirir. 10 nəfər eyni işi neçə saatda bitirir?',o:['2','3','4','5'],c:2},
-{q:'12 nəfərlik qrupda hər kəs digərlərini bir dəfə salamladı. Ümumi neçə salam var?',o:['66','72','132','144'],c:0},
-{q:'Mağazada 3 qələm 6 manata satılır. 7 qələm neçəyədir?',o:['12','13','14','15'],c:2},
-{q:'Bir hovuz 6 saatda dolur. 4 saatda hovuzun neçə faizi dolar?',o:['55%','60%','65%','67%'],c:3},
-{q:'200 manatdan 15% vergi tutuldu. Əldə edilən məbləğ?',o:['160','165','170','175'],c:2},
-{q:'Bir şirkətdə 120 işçi var. 30%-i menecerdir. Menecer sayı nə qədərdir?',o:['30','36','40','42'],c:1},
-{q:'Günlük 3 litr su içən insan həftədə neçə litr su içir?',o:['18','19','20','21'],c:3},
-{q:'Bir otağın sahəsi 6m × 4m-dir. Sahəsi nə qədərdir?',o:['20 m²','22 m²','24 m²','26 m²'],c:2},
-{q:'Maaş 600 manatdır. 10% artırıldı, sonra 5% azaldıldı. Son maaş nə qədərdir?',o:['621','624','627','630'],c:2}
+{q:'10 + 5 × 2 = ?',o:['30','20','15','25'],c:1,b:-1.3},
+{q:'100-dən 20%-ni çıxın.',o:['70','75','80','85'],c:2,b:-1.0},
+{q:'5 alma var, 3-ü yeyildi. Neçəsi qaldı?',o:['1','2','3','4'],c:1,b:-1.4},
+{q:'Bir məhsul 50 manata alınıb, 60 manata satılıb. Mənfəət nə qədərdir?',o:['5 manat','8 manat','10 manat','12 manat'],c:2,b:-1.5},
+{q:'Gündə 8 saat işləyən işçi həftədə (5 gün) neçə saat işləyir?',o:['32','35','40','45'],c:2,b:-1.0},
+{q:'500 manatlıq məhsula 20% endirim edildi. Yeni qiymət nə qədərdir?',o:['380','400','420','450'],c:1,b:-1.4},
+{q:'3 saatda 120 km yol getdilər. Orta sürət nə qədərdir?',o:['30 km/s','40 km/s','45 km/s','50 km/s'],c:1,b:-1.5},
+{q:'15 işçidən 6-sı qadındır. Qadınların faizi nə qədərdir?',o:['30%','40%','45%','50%'],c:1,b:-1.7},
+{q:'Bir məhsul 80 manata alınıb, 100 manata satılıb. Mənfəət faizi nə qədərdir?',o:['15%','20%','25%','30%'],c:2,b:-1.0},
+{q:'Bir mağazada 240 məhsul var. 25%-i satıldı. Neçəsi qaldı?',o:['160','170','180','190'],c:2,b:-1.5},
+{q:'Avtomobil saatda 80 km sürətlə gedir. 2.5 saatda neçə km yol qət edir?',o:['160','180','200','220'],c:2,b:-1.0},
+{q:'400 manatlıq əmək haqqına 25% artım verildi. Yeni əmək haqqı nə qədərdir?',o:['450','480','500','520'],c:2,b:-1.6},
+{q:'Bir kitab mağazası gündə 45 kitab satır. 3 həftədə neçə kitab satır?',o:['840','900','945','990'],c:2,b:-1.7},
+{q:'8 fəhlə bir işi 6 gündə bitirir. Eyni işi 4 fəhlə neçə gündə bitirir?',o:['8','10','12','14'],c:2,b:-0.9},
+{q:'Sinifdə 30 tələbə var. 40%-i qız, qalanı oğlandır. Neçə oğlan var?',o:['12','16','18','20'],c:2,b:-1.1},
+{q:'Bir məhsulun qiyməti 150 manatdan 120 manata düşdü. Azalma faizi nə qədərdir?',o:['15%','20%','25%','30%'],c:1,b:-1.0},
+{q:'5 nəfər bir işi 8 saatda bitirir. 10 nəfər eyni işi neçə saatda bitirir?',o:['2','3','4','5'],c:2,b:-0.9},
+{q:'12 nəfərlik qrupda hər kəs digərlərini bir dəfə salamladı. Ümumi neçə salam var?',o:['66','72','132','144'],c:0,b:-1.3},
+{q:'Mağazada 3 qələm 6 manata satılır. 7 qələm neçəyədir?',o:['12','13','14','15'],c:2,b:-1.1},
+{q:'Bir hovuz 6 saatda dolur. 4 saatda hovuzun neçə faizi dolar?',o:['55%','60%','65%','67%'],c:3,b:-1.0},
+{q:'200 manatdan 15% vergi tutuldu. Əldə edilən məbləğ?',o:['160','165','170','175'],c:2,b:-0.9},
+{q:'Bir şirkətdə 120 işçi var. 30%-i menecerdir. Menecer sayı nə qədərdir?',o:['30','36','40','42'],c:1,b:-1.4},
+{q:'Günlük 3 litr su içən insan həftədə neçə litr su içir?',o:['18','19','20','21'],c:3,b:-1.0},
+{q:'Bir otağın sahəsi 6m × 4m-dir. Sahəsi nə qədərdir?',o:['20 m²','22 m²','24 m²','26 m²'],c:2,b:-1.4},
+{q:'Maaş 600 manatdır. 10% artırıldı, sonra 5% azaldıldı. Son maaş nə qədərdir?',o:['621','624','627','630'],c:2,b:-1.4}
 ]
 const NUMERICAL_M=[
-{q:'Jan=45k, Feb=52k, Mar=48k, Apr=61k. 4 aylıq ortalama?',o:['48.5k','51.5k','50.5k','52k'],c:1},
-{q:'Maaş ötən il 8% artdı, bu il 12% artacaq. Ümumi artım?',o:['20%','20.96%','21.12%','21.5%'],c:1},
-{q:'Xərclərin 35%-i maaş, 25%-i icarə, 20%-i xammal. Digər xərclər neçə faizdir?',o:['10%','15%','20%','25%'],c:2},
-{q:'200 manatlıq məhsul hər ay 5% artdı. 3 aydan sonra?',o:['215.25','230.5','231.53','225'],c:2},
-{q:'Şirkətin xərclərinin 40%-i dəyişən, 60%-i sabit xərclərdir. Ümumi xərc 500k olarsa, dəyişən xərc?',o:['150k','200k','250k','300k'],c:1},
-{q:'10 işçidən 3-ü xəstələndi. Qalan işçilərin 40%-i istirahətə çıxdı. İşdə neçə nəfər var?',o:['3','4','5','6'],c:1},
-{q:'Şirkət A-nın xərci Şirkət B-nin xərclərinin 1.5 mislidir. B 200k xərc edirsə, A+B cəmi?',o:['400k','450k','500k','550k'],c:2},
-{q:'Bir investisiyanın illik gəliri 15%. 3 ildən sonra 100k investisiya neçəyə çatır?',o:['142.5k','152.09k','145k','160k'],c:1},
-{q:'Satış komissiyası: İlk 10.000 manat üçün 5%, sonrakı hər manat üçün 8%. 15.000 manatlıq satışda komissiya?',o:['900','950','1000','1050'],c:2},
-{q:'Layihənin büdcəsi 500k. İlk ay 120k, ikinci ay büdcənin 30%-i xərcləndi. Neçə manat qaldı?',o:['220k','230k','250k','280k'],c:0},
-{q:'Müştəri bazası hər il 20% artır. 3 ildən sonra 1000 müştəri neçəyə çatır?',o:['1440','1728','1800','2000'],c:1},
-{q:'Bir şirkətin gəliri 3 ildə iki dəfə artdı. İllik orta artım faizi nə qədərdir? (yuvarlaq)',o:['22%','24%','26%','28%'],c:1},
-{q:'Cədvəl: Q1=120k, Q2=144k. Q1-dən Q2-yə eyni faiz artımla Q3 nə qədərdir?',o:['158k','162k','172.8k','180k'],c:2},
-{q:'Əgər 1 dollar = 1.7 manat olarsa, 250 dollar neçə manat edir? 10% vergi tutulsa, əldə edilən məbləğ?',o:['382.5','385','405','425'],c:0},
-{q:'A şirkəti hər ay 12% böyüyür. 6 ayda neçə dəfə böyüyür? (yuvarlaqlaşdırın)',o:['1.7','1.9','2.0','2.1'],c:3},
-{q:'Bir işin 60%-i 3 işçi tərəfindən 4 gündə görüldü. Qalan 40%-i 2 işçi neçə gündə görər?',o:['3','4','5','6'],c:1},
-{q:'Gəlir vergisindən əvvəl maaş 2000 manat. 15% vergi tutuldusa, əldə edilən maaş?',o:['1600','1650','1700','1750'],c:2},
-{q:'Bir otelin 80 otağından 65-i doludur. Doluluq faizi nə qədərdir?',o:['75.5%','80%','81.25%','82%'],c:2},
-{q:'Şirkətin gəliri 2020-də 500k, 2023-də 800k oldu. 3 illik artım faizi nə qədərdir?',o:['50%','55%','60%','65%'],c:2},
-{q:'100 işçinin orta maaşı 1200 manatdır. 5 yeni işçi 2000 manatla işə başladı. Yeni ortalama?',o:['1230','1238','1247','1254'],c:1},
-{q:'Satışlar yanvarda 10% artdı, fevralda 8% düşdü. Yanvar əvvəlindəki 100k-dan sonra nə var?',o:['100.8k','101.2k','101.8k','102k'],c:0},
-{q:'2 saat 30 dəqiqə + 1 saat 45 dəqiqə = ?',o:['3 saat 55 dəq','4 saat 5 dəq','4 saat 15 dəq','4 saat 25 dəq'],c:2},
-{q:'Bir şirkətin aktivləri 1.2M, öhdəlikləri 450k. Kapital (aktiv-öhdəlik) nə qədərdir?',o:['650k','700k','750k','800k'],c:2},
-{q:'4 saatda 160 sənəd işləndi. Saatda neçə sənəd işlənir? Gündə 7 saatda neçəsi işlənər?',o:['250','270','280','300'],c:2},
-{q:'Gündə 250 zəng gəlir. Onların 60%-i həll olunur. Həll olunmayan zənglər neçədir?',o:['90','95','100','105'],c:2}
+{q:'Jan=45k, Feb=52k, Mar=48k, Apr=61k. 4 aylıq ortalama?',o:['48.5k','51.5k','50.5k','52k'],c:1,b:0.4},
+{q:'Maaş ötən il 8% artdı, bu il 12% artacaq. Ümumi artım?',o:['20%','20.96%','21.12%','21.5%'],c:1,b:0.2},
+{q:'Xərclərin 35%-i maaş, 25%-i icarə, 20%-i xammal. Digər xərclər neçə faizdir?',o:['10%','15%','20%','25%'],c:2,b:-0.0},
+{q:'200 manatlıq məhsul hər ay 5% artdı. 3 aydan sonra?',o:['215.25','230.5','231.53','225'],c:2,b:0.3},
+{q:'Şirkətin xərclərinin 40%-i dəyişən, 60%-i sabit xərclərdir. Ümumi xərc 500k olarsa, dəyişən xərc?',o:['150k','200k','250k','300k'],c:1,b:0.2},
+{q:'10 işçidən 3-ü xəstələndi. Qalan işçilərin 40%-i istirahətə çıxdı. İşdə neçə nəfər var?',o:['3','4','5','6'],c:1,b:-0.0},
+{q:'Şirkət A-nın xərci Şirkət B-nin xərclərinin 1.5 mislidir. B 200k xərc edirsə, A+B cəmi?',o:['400k','450k','500k','550k'],c:2,b:0.0},
+{q:'Bir investisiyanın illik gəliri 15%. 3 ildən sonra 100k investisiya neçəyə çatır?',o:['142.5k','152.09k','145k','160k'],c:1,b:0.1},
+{q:'Satış komissiyası: İlk 10.000 manat üçün 5%, sonrakı hər manat üçün 8%. 15.000 manatlıq satışda komissiya?',o:['900','950','1000','1050'],c:2,b:-0.1},
+{q:'Layihənin büdcəsi 500k. İlk ay 120k, ikinci ay büdcənin 30%-i xərcləndi. Neçə manat qaldı?',o:['220k','230k','250k','280k'],c:0,b:0.1},
+{q:'Müştəri bazası hər il 20% artır. 3 ildən sonra 1000 müştəri neçəyə çatır?',o:['1440','1728','1800','2000'],c:1,b:0.0},
+{q:'Bir şirkətin gəliri 3 ildə iki dəfə artdı. İllik orta artım faizi nə qədərdir? (yuvarlaq)',o:['22%','24%','26%','28%'],c:1,b:-0.2},
+{q:'Cədvəl: Q1=120k, Q2=144k. Q1-dən Q2-yə eyni faiz artımla Q3 nə qədərdir?',o:['158k','162k','172.8k','180k'],c:2,b:-0.0},
+{q:'Əgər 1 dollar = 1.7 manat olarsa, 250 dollar neçə manat edir? 10% vergi tutulsa, əldə edilən məbləğ?',o:['382.5','385','405','425'],c:0,b:0.2},
+{q:'A şirkəti hər ay 12% böyüyür. 6 ayda neçə dəfə böyüyür? (yuvarlaqlaşdırın)',o:['1.7','1.9','2.0','2.1'],c:3,b:0.3},
+{q:'Bir işin 60%-i 3 işçi tərəfindən 4 gündə görüldü. Qalan 40%-i 2 işçi neçə gündə görər?',o:['3','4','5','6'],c:1,b:-0.1},
+{q:'Gəlir vergisindən əvvəl maaş 2000 manat. 15% vergi tutuldusa, əldə edilən maaş?',o:['1600','1650','1700','1750'],c:2,b:0.4},
+{q:'Bir otelin 80 otağından 65-i doludur. Doluluq faizi nə qədərdir?',o:['75.5%','80%','81.25%','82%'],c:2,b:0.3},
+{q:'Şirkətin gəliri 2020-də 500k, 2023-də 800k oldu. 3 illik artım faizi nə qədərdir?',o:['50%','55%','60%','65%'],c:2,b:0.2},
+{q:'100 işçinin orta maaşı 1200 manatdır. 5 yeni işçi 2000 manatla işə başladı. Yeni ortalama?',o:['1230','1238','1247','1254'],c:1,b:0.2},
+{q:'Satışlar yanvarda 10% artdı, fevralda 8% düşdü. Yanvar əvvəlindəki 100k-dan sonra nə var?',o:['100.8k','101.2k','101.8k','102k'],c:0,b:-0.3},
+{q:'2 saat 30 dəqiqə + 1 saat 45 dəqiqə = ?',o:['3 saat 55 dəq','4 saat 5 dəq','4 saat 15 dəq','4 saat 25 dəq'],c:2,b:-0.2},
+{q:'Bir şirkətin aktivləri 1.2M, öhdəlikləri 450k. Kapital (aktiv-öhdəlik) nə qədərdir?',o:['650k','700k','750k','800k'],c:2,b:0.0},
+{q:'4 saatda 160 sənəd işləndi. Saatda neçə sənəd işlənir? Gündə 7 saatda neçəsi işlənər?',o:['250','270','280','300'],c:2,b:0.1},
+{q:'Gündə 250 zəng gəlir. Onların 60%-i həll olunur. Həll olunmayan zənglər neçədir?',o:['90','95','100','105'],c:2,b:-0.4}
 ]
 const NUMERICAL_H=[
-{q:'Şirkət A-nın gəliri şirkət B-nin 2.4 mislidir. B-nin gəliri 850.000 manatdırsa, A+B cəmi?',o:['2,890,000','2,040,000','3,040,000','2,550,000'],c:0},
-{q:'100 vahid məhsulun dəyişən xərci 45 manat, sabit xərc aylıq 2700 manat. Zərərsizlik nöqtəsi?',o:['55','58','60','64'],c:2},
-{q:'Şirkətin mənfəəti 1-ci rübdə 120k, 2-ci rübdə 15% artdı, 3-cü rübdə 10% azaldı. 3-cü rüb?',o:['122.1k','124.2k','126k','128k'],c:0},
-{q:'İki investisiya: A=12%, B=9%. 10.000 manat bölünür, ümumi gəlir 1050 manat. A-ya nə qoyulub?',o:['4000','4500','5000','5500'],c:2},
-{q:'200 manat 3 il 8% illik mürəkkəb faizlə. Son məbləğ?',o:['240.00','251.94','248.32','245.00'],c:1},
-{q:'Cari nisbət (current ratio) 2.5, cari öhdəliklər 400k. Cari aktivlər nə qədərdir?',o:['800k','1000k','1200k','1600k'],c:1},
-{q:'NPV: İlkin investisiya 100k. 1-ci il 40k, 2-ci il 50k, 3-cü il 40k gəlir. Diskont 10%. NPV?',o:['+8.4k','+12.6k','+14.2k','+16.8k'],c:0},
-{q:'EBITDA marjası 25%, gəlir 4M. Faiz+vergi ödənişləri 600k. Xalis mənfəət?',o:['200k','300k','400k','500k'],c:2},
-{q:'İki şirkətin P/E nisbəti: A=15, B=20. A-nın EPS-i 4 manat, B-nin 3 manat. Hansının bazar qiyməti yüksəkdir?',o:['A: 60 manat','B: 60 manat','Bərabərdir','Kifayət məlumat yoxdur'],c:2},
-{q:'Layihənin IRR-i 15%, kapitalın dəyəri 12%. Layihəni qəbul etmək lazımdırmı?',o:['Xeyr, IRR azdır','Bəli, IRR > kapitalın dəyəri','IRR = kapitalın dəyəri, fərq etməz','IRR yetərli deyil'],c:1},
-{q:'Standart sapma 8, ortalama 50 olan normal paylanmada dəyərlərin 68%-i hansı aralıqdadır?',o:['[34,66]','[42,58]','[26,74]','[38,62]'],c:1},
-{q:'Şirkətin levericli ROE-si 18%, ROA 12%, xalis mənfəəti 600k. Ümumi kapital nə qədərdir?',o:['3.33M','4M','5M','6M'],c:2},
-{q:'Gəlirlilik indeksi (PI) = 1.25, ilkin investisiya 800k. NPV nə qədərdir?',o:['100k','150k','200k','250k'],c:2},
-{q:'İki portfelin Sharpe nisbəti: A=1.2, B=0.9. Risk-free rate 5%. A-nın standart sapması 10%, B-nin 15%. A-nın gözlənilən gəliri?',o:['15%','17%','19%','21%'],c:1},
-{q:'DCF modelində terminal dəyər = FCF×(1+g)/(r-g). FCF=100k, g=3%, r=10%. Terminal dəyər?',o:['1.1M','1.3M','1.47M','1.6M'],c:2}
-,
-{q:'Şirkət A-nın gəliri şirkət B-nin 2.4 mislidir. B-nin gəliri 850.000 manatdırsa, A+B cəmi?',o:['2,890,000','2,040,000','3,040,000','2,550,000'],c:0},
-{q:'100 vahid məhsulun dəyişən xərci 45 manat, sabit xərc aylıq 2700 manat. Zərərsizlik nöqtəsi?',o:['55','58','60','64'],c:2},
-{q:'İki investisiya: A=12%, B=9%. 10.000 manat bölünür, ümumi gəlir 1050 manat. A-ya nə qoyulub?',o:['4000','4500','5000','5500'],c:2},
-{q:'200 manat 3 il 8% illik mürəkkəb faizlə. Son məbləğ?',o:['240.00','251.94','248.32','245.00'],c:1},
-{q:'Gəlirlilik indeksi (PI)=1.25, ilkin investisiya 800k. NPV nə qədərdir?',o:['100k','150k','200k','250k'],c:2}];
+{q:'Şirkət A-nın gəliri şirkət B-nin 2.4 mislidir. B-nin gəliri 850.000 manatdırsa, A+B cəmi?',o:['2,890,000','2,040,000','3,040,000','2,550,000'],c:0,b:1.2},
+{q:'100 vahid məhsulun dəyişən xərci 45 manat, sabit xərc aylıq 2700 manat. Zərərsizlik nöqtəsi?',o:['55','58','60','64'],c:2,b:1.6},
+{q:'Şirkətin mənfəəti 1-ci rübdə 120k, 2-ci rübdə 15% artdı, 3-cü rübdə 10% azaldı. 3-cü rüb?',o:['122.1k','124.2k','126k','128k'],c:0,b:1.3},
+{q:'İki investisiya: A=12%, B=9%. 10.000 manat bölünür, ümumi gəlir 1050 manat. A-ya nə qoyulub?',o:['4000','4500','5000','5500'],c:2,b:1.4},
+{q:'200 manat 3 il 8% illik mürəkkəb faizlə. Son məbləğ?',o:['240.00','251.94','248.32','245.00'],c:1,b:0.9},
+{q:'Cari nisbət (current ratio) 2.5, cari öhdəliklər 400k. Cari aktivlər nə qədərdir?',o:['800k','1000k','1200k','1600k'],c:1,b:1.3},
+{q:'NPV: İlkin investisiya 100k. 1-ci il 40k, 2-ci il 50k, 3-cü il 40k gəlir. Diskont 10%. NPV?',o:['+8.4k','+12.6k','+14.2k','+16.8k'],c:0,b:1.0},
+{q:'EBITDA marjası 25%, gəlir 4M. Faiz+vergi ödənişləri 600k. Xalis mənfəət?',o:['200k','300k','400k','500k'],c:2,b:1.1},
+{q:'İki şirkətin P/E nisbəti: A=15, B=20. A-nın EPS-i 4 manat, B-nin 3 manat. Hansının bazar qiyməti yüksəkdir?',o:['A: 60 manat','B: 60 manat','Bərabərdir','Kifayət məlumat yoxdur'],c:2,b:1.2},
+{q:'Layihənin IRR-i 15%, kapitalın dəyəri 12%. Layihəni qəbul etmək lazımdırmı?',o:['Xeyr, IRR azdır','Bəli, IRR > kapitalın dəyəri','IRR = kapitalın dəyəri, fərq etməz','IRR yetərli deyil'],c:1,b:1.3},
+{q:'Standart sapma 8, ortalama 50 olan normal paylanmada dəyərlərin 68%-i hansı aralıqdadır?',o:['[34,66]','[42,58]','[26,74]','[38,62]'],c:1,b:1.8},
+{q:'Şirkətin levericli ROE-si 18%, ROA 12%, xalis mənfəəti 600k. Ümumi kapital nə qədərdir?',o:['3.33M','4M','5M','6M'],c:2,b:0.9},
+{q:'Gəlirlilik indeksi (PI) = 1.25, ilkin investisiya 800k. NPV nə qədərdir?',o:['100k','150k','200k','250k'],c:2,b:1.8},
+{q:'İki portfelin Sharpe nisbəti: A=1.2, B=0.9. Risk-free rate 5%. A-nın standart sapması 10%, B-nin 15%. A-nın gözlənilən gəliri?',o:['15%','17%','19%','21%'],c:1,b:1.2},
+{q:'DCF modelində terminal dəyər = FCF×(1+g)/(r-g). FCF=100k, g=3%, r=10%. Terminal dəyər?',o:['1.1M','1.3M','1.47M','1.6M'],c:2,b:1.2},
+{q:'Gəlirlilik indeksi (PI)=1.25, ilkin investisiya 800k. NPV nə qədərdir?',o:['100k','150k','200k','250k'],c:2,b:1.5}
+];
 
 const ABSTRACT_E=[
-{q:'Ardıcıllıqda "?" nə olmalıdır?',grid:{type:'row',cells:[circle(8,'#3b82f6'),circle(14,'#3b82f6'),circle(20,'#3b82f6'),qmark()]},opts:[circle(14,'#3b82f6'),circle(26,'#3b82f6'),circle(20,'#3b82f6'),triangle('#3b82f6')],c:1},
-{q:'Sıradakı fiqur hansı olmalıdır?',grid:{type:'row',cells:[square(14),square(22),square(30),qmark()]},opts:[square(38),square(30),circle(18),triangle()],c:0},
-{q:'Hansı fiqur sıraya uyğundur?',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),qmark()]},opts:[dots(5,'#3b82f6'),dots(4,'#3b82f6'),dots(3,'#3b82f6'),dots(6,'#3b82f6')],c:1},
-{q:'Nümunəyə uyğun "?" fiqurunu seçin:',grid:{type:'row',cells:[triangle('none','#06b6d4'),triangle('#06b6d4','#06b6d4'),circle(10,'none','#10b981'),qmark()]},opts:[circle(10,'#10b981','#10b981'),circle(10,'none','#06b6d4'),triangle('#10b981','#10b981'),square(16,'#10b981')],c:0},
-{q:'Ardıcıllıqda boş yer hansı fiqur olmalıdır?',grid:{type:'row',cells:[cross('#3b82f6'),diamond(),cross('#10b981'),qmark()]},opts:[diamond('#10b981','#10b981'),cross('#f59e0b'),circle(14),square(18)],c:0},
-{q:'Fiqurlar böyüyür. "?" seçin:',grid:{type:'row',cells:[circle(6,'none','#a855f7'),circle(12,'none','#a855f7'),circle(18,'none','#a855f7'),qmark()]},opts:[circle(24,'none','#a855f7'),circle(18,'none','#a855f7'),circle(30,'none','#f59e0b'),square(22,'none','#a855f7')],c:0},
-{q:'Rəng dəyişir. "?" seçin:',grid:{type:'row',cells:[square(20,'#3b82f6'),square(20,'#06b6d4'),square(20,'#10b981'),qmark()]},opts:[square(20,'#f59e0b'),square(20,'#3b82f6'),square(20,'none','#10b981'),circle(12,'#f59e0b')],c:0},
-{q:'Forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),circle(14,'#06b6d4'),qmark()]},opts:[circle(14,'#10b981'),square(18,'none','#06b6d4'),triangle('none','#3b82f6'),square(18,'none','#10b981')],c:1},
-{q:'Nöqtə sayı artır. "?" seçin:',grid:{type:'row',cells:[dots(2,'#f59e0b'),dots(4,'#f59e0b'),dots(6,'#f59e0b'),qmark()]},opts:[dots(7,'#f59e0b'),dots(8,'#f59e0b'),dots(9,'#f59e0b'),dots(6,'#f59e0b')],c:1},
-{q:'Dolu-boş ardıcıllığında "?" seçin:',grid:{type:'row',cells:[triangle('none','#3b82f6'),triangle('#3b82f6','#3b82f6'),diamond('none','#3b82f6'),qmark()]},opts:[diamond('#3b82f6','#3b82f6'),diamond('none','#06b6d4'),circle(14,'#3b82f6'),square(18,'none','#3b82f6')],c:0},
-{q:'Forma növü dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),triangle('none','#3b82f6'),diamond('none','#3b82f6'),qmark()]},opts:[pentagon('none','#3b82f6'),circle(14,'none','#3b82f6'),square(18,'#3b82f6'),hexagon('none','#3b82f6')],c:0},
-{q:'Ölçü kiçilir. "?" seçin:',grid:{type:'row',cells:[square(30,'none','#10b981'),square(22,'none','#10b981'),square(14,'none','#10b981'),qmark()]},opts:[square(8,'none','#10b981'),square(14,'none','#10b981'),square(6,'none','#3b82f6'),circle(8,'#10b981')],c:0},
-{q:'Rəng + forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),qmark()]},opts:[circle(14,'#f59e0b'),square(14,'#3b82f6'),triangle('none','#3b82f6'),circle(14,'#a855f7')],c:0},
-{q:'Fiqurlar alternativ dəyişir. "?" seçin:',grid:{type:'row',cells:[square(18,'none','#3b82f6'),circle(14,'#3b82f6'),square(18,'none','#06b6d4'),qmark()]},opts:[circle(14,'#06b6d4'),square(18,'#3b82f6'),circle(14,'none','#3b82f6'),diamond('none','#06b6d4')],c:0},
-{q:'Nöqtə mövqeyi dəyişir. "?" seçin:',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(3,'#3b82f6'),dots(1,'#06b6d4'),qmark()]},opts:[dots(3,'#06b6d4'),dots(1,'#10b981'),dots(3,'#10b981'),dots(2,'#06b6d4')],c:0}
-,
-{q:'Forma növü dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),triangle('none','#3b82f6'),diamond('none','#3b82f6'),qmark()]},opts:[pentagon('none','#3b82f6'),circle(14,'none','#3b82f6'),square(18,'#3b82f6'),hexagon('none','#3b82f6')],c:0},
-{q:'Ölçü kiçilir. "?" seçin:',grid:{type:'row',cells:[square(30,'none','#10b981'),square(22,'none','#10b981'),square(14,'none','#10b981'),qmark()]},opts:[square(8,'none','#10b981'),square(14,'none','#10b981'),square(6,'none','#3b82f6'),circle(8,'#10b981')],c:0},
-{q:'Rəng+forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),qmark()]},opts:[circle(14,'#f59e0b'),square(14,'#3b82f6'),triangle('none','#3b82f6'),circle(14,'#a855f7')],c:0},
-{q:'Fiqurlar alternativ dəyişir. "?" seçin:',grid:{type:'row',cells:[square(18,'none','#3b82f6'),circle(14,'#3b82f6'),square(18,'none','#06b6d4'),qmark()]},opts:[circle(14,'#06b6d4'),square(18,'#3b82f6'),circle(14,'none','#3b82f6'),diamond('none','#06b6d4')],c:0},
-{q:'Nöqtə mövqeyi dəyişir. "?" seçin:',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(3,'#3b82f6'),dots(1,'#06b6d4'),qmark()]},opts:[dots(3,'#06b6d4'),dots(1,'#10b981'),dots(3,'#10b981'),dots(2,'#06b6d4')],c:0}];
+{q:'Ardıcıllıqda "?" nə olmalıdır?',grid:{type:'row',cells:[circle(8,'#3b82f6'),circle(14,'#3b82f6'),circle(20,'#3b82f6'),qmark()],b:-1.1},opts:[circle(14,'#3b82f6'),circle(26,'#3b82f6'),circle(20,'#3b82f6'),triangle('#3b82f6')],c:1},
+{q:'Sıradakı fiqur hansı olmalıdır?',grid:{type:'row',cells:[square(14),square(22),square(30),qmark()],b:-1.0},opts:[square(38),square(30),circle(18),triangle()],c:0},
+{q:'Hansı fiqur sıraya uyğundur?',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),qmark()],b:-0.8},opts:[dots(5,'#3b82f6'),dots(4,'#3b82f6'),dots(3,'#3b82f6'),dots(6,'#3b82f6')],c:1},
+{q:'Nümunəyə uyğun "?" fiqurunu seçin:',grid:{type:'row',cells:[triangle('none','#06b6d4'),triangle('#06b6d4','#06b6d4'),circle(10,'none','#10b981'),qmark()],b:-1.2},opts:[circle(10,'#10b981','#10b981'),circle(10,'none','#06b6d4'),triangle('#10b981','#10b981'),square(16,'#10b981')],c:0},
+{q:'Ardıcıllıqda boş yer hansı fiqur olmalıdır?',grid:{type:'row',cells:[cross('#3b82f6'),diamond(),cross('#10b981'),qmark()],b:-1.4},opts:[diamond('#10b981','#10b981'),cross('#f59e0b'),circle(14),square(18)],c:0},
+{q:'Fiqurlar böyüyür. "?" seçin:',grid:{type:'row',cells:[circle(6,'none','#a855f7'),circle(12,'none','#a855f7'),circle(18,'none','#a855f7'),qmark()],b:-1.3},opts:[circle(24,'none','#a855f7'),circle(18,'none','#a855f7'),circle(30,'none','#f59e0b'),square(22,'none','#a855f7')],c:0},
+{q:'Rəng dəyişir. "?" seçin:',grid:{type:'row',cells:[square(20,'#3b82f6'),square(20,'#06b6d4'),square(20,'#10b981'),qmark()],b:-1.6},opts:[square(20,'#f59e0b'),square(20,'#3b82f6'),square(20,'none','#10b981'),circle(12,'#f59e0b')],c:0},
+{q:'Forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),circle(14,'#06b6d4'),qmark()],b:-1.0},opts:[circle(14,'#10b981'),square(18,'none','#06b6d4'),triangle('none','#3b82f6'),square(18,'none','#10b981')],c:1},
+{q:'Nöqtə sayı artır. "?" seçin:',grid:{type:'row',cells:[dots(2,'#f59e0b'),dots(4,'#f59e0b'),dots(6,'#f59e0b'),qmark()],b:-1.3},opts:[dots(7,'#f59e0b'),dots(8,'#f59e0b'),dots(9,'#f59e0b'),dots(6,'#f59e0b')],c:1},
+{q:'Dolu-boş ardıcıllığında "?" seçin:',grid:{type:'row',cells:[triangle('none','#3b82f6'),triangle('#3b82f6','#3b82f6'),diamond('none','#3b82f6'),qmark()],b:-1.3},opts:[diamond('#3b82f6','#3b82f6'),diamond('none','#06b6d4'),circle(14,'#3b82f6'),square(18,'none','#3b82f6')],c:0},
+{q:'Forma növü dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),triangle('none','#3b82f6'),diamond('none','#3b82f6'),qmark()],b:-1.2},opts:[pentagon('none','#3b82f6'),circle(14,'none','#3b82f6'),square(18,'#3b82f6'),hexagon('none','#3b82f6')],c:0},
+{q:'Ölçü kiçilir. "?" seçin:',grid:{type:'row',cells:[square(30,'none','#10b981'),square(22,'none','#10b981'),square(14,'none','#10b981'),qmark()],b:-0.9},opts:[square(8,'none','#10b981'),square(14,'none','#10b981'),square(6,'none','#3b82f6'),circle(8,'#10b981')],c:0},
+{q:'Rəng + forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),qmark()],b:-1.5},opts:[circle(14,'#f59e0b'),square(14,'#3b82f6'),triangle('none','#3b82f6'),circle(14,'#a855f7')],c:0},
+{q:'Fiqurlar alternativ dəyişir. "?" seçin:',grid:{type:'row',cells:[square(18,'none','#3b82f6'),circle(14,'#3b82f6'),square(18,'none','#06b6d4'),qmark()],b:-0.9},opts:[circle(14,'#06b6d4'),square(18,'#3b82f6'),circle(14,'none','#3b82f6'),diamond('none','#06b6d4')],c:0},
+{q:'Nöqtə mövqeyi dəyişir. "?" seçin:',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(3,'#3b82f6'),dots(1,'#06b6d4'),qmark()],b:-1.4},opts:[dots(3,'#06b6d4'),dots(1,'#10b981'),dots(3,'#10b981'),dots(2,'#06b6d4')],c:0},
+{q:'Rəng+forma ardıcıllığında "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),qmark()],b:-0.8},opts:[circle(14,'#f59e0b'),square(14,'#3b82f6'),triangle('none','#3b82f6'),circle(14,'#a855f7')],c:0}
+];
 
 const ABSTRACT_M=[
-{q:'3x3 matrisdə "?" hansı fiqur olmalıdır?',grid:{type:'3x3',cells:[circle(10,'none','#3b82f6'),circle(16,'none','#3b82f6'),circle(22,'none','#3b82f6'),square(16,'none','#06b6d4'),square(22,'none','#06b6d4'),square(28,'none','#06b6d4'),triangle('none','#10b981'),triangle('#10b981','#10b981'),qmark()]},opts:[triangle('#10b981','#10b981'),circle(10),square(12),diamond('#10b981')],c:0},
-{q:'Hər sətirdə rəng eyni. "?" hansı olmalıdır?',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),square(22,'none','#3b82f6'),triangle('none','#3b82f6'),circle(18,'none','#06b6d4'),square(22,'none','#06b6d4'),triangle('none','#06b6d4'),circle(18,'none','#10b981'),square(22,'none','#10b981'),qmark()]},opts:[triangle('none','#10b981'),circle(18,'none','#10b981'),diamond('none','#10b981'),triangle('none','#3b82f6')],c:0},
-{q:'Nöqtə sayı cütlüklər artır. "?" seçin:',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(3,'#3b82f6'),dots(5,'#3b82f6'),qmark()]},opts:[dots(6,'#3b82f6'),dots(7,'#3b82f6'),dots(8,'#3b82f6'),dots(9,'#3b82f6')],c:1},
-{q:'Hər sütunda fiqurlar böyüyür. "?" seçin:',grid:{type:'3x3',cells:[square(10),square(16),square(22),circle(10,'none','#06b6d4'),circle(16,'none','#06b6d4'),circle(22,'none','#06b6d4'),triangle('none','#f59e0b'),triangle('#f59e0b','#f59e0b'),qmark()]},opts:[square(28,'#f59e0b','#f59e0b'),triangle('#f59e0b','#f59e0b'),circle(22,'none','#f59e0b'),diamond('#f59e0b')],c:1},
-{q:'Alternativ dolu-boş dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(8,'#3b82f6'),diamond('none','#3b82f6'),circle(16,'#3b82f6'),qmark()]},opts:[circle(16,'#3b82f6'),diamond('#3b82f6','#3b82f6'),circle(8,'#3b82f6'),square(20,'#3b82f6')],c:1},
-{q:'Hər sətirdə forma: dairə → kvadrat → üçbucaq. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),triangle('none','#3b82f6'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),triangle('none','#06b6d4'),circle(14,'#f59e0b'),square(18,'none','#f59e0b'),qmark()]},opts:[triangle('none','#f59e0b'),triangle('#f59e0b','#f59e0b'),diamond('none','#f59e0b'),circle(14,'#f59e0b')],c:0},
-{q:'Rəng + ölçü birlikdə dəyişir. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),circle(14,'#06b6d4'),circle(20,'#10b981'),square(8,'none','#3b82f6'),square(14,'none','#06b6d4'),square(20,'none','#10b981'),triangle('none','#3b82f6'),triangle('none','#06b6d4'),qmark()]},opts:[triangle('none','#10b981'),triangle('#10b981','#10b981'),circle(20,'#10b981'),square(20,'#10b981')],c:0},
-{q:'Hər sütunda forma dəyişir. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),diamond('none','#3b82f6'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),diamond('none','#06b6d4'),circle(14,'#10b981'),square(18,'none','#10b981'),qmark()]},opts:[diamond('none','#10b981'),circle(14,'#10b981'),triangle('none','#10b981'),pentagon('none','#10b981')],c:0},
-{q:'Nöqtə + forma ardıcıllığı. "?" seçin:',grid:{type:'row',cells:[dots(2,'#3b82f6'),square(16,'none','#3b82f6'),dots(4,'#06b6d4'),qmark()]},opts:[square(16,'none','#06b6d4'),dots(6,'#10b981'),circle(14,'#06b6d4'),square(20,'#06b6d4')],c:0},
-{q:'Hər sətirdə ölçü artır. "?" seçin:',grid:{type:'3x3',cells:[triangle('none','#a855f7',2.5),triangle('none','#a855f7',5),triangle('#a855f7','#a855f7'),diamond('none','#3b82f6',2.5),diamond('none','#3b82f6',5),diamond('#3b82f6','#3b82f6'),circle(8,'none','#f59e0b'),circle(14,'none','#f59e0b'),qmark()]},opts:[circle(20,'#f59e0b','#f59e0b'),circle(20,'none','#f59e0b'),circle(8,'#f59e0b'),hexagon('#f59e0b')],c:0},
-{q:'Sıralanma qaydası. "?" seçin:',grid:{type:'row',cells:[circle(10,'#3b82f6'),dots(3,'#3b82f6'),square(14,'none','#3b82f6'),qmark()]},opts:[triangle('none','#3b82f6'),pentagon('none','#3b82f6'),diamond('none','#3b82f6'),hexagon('none','#3b82f6')],c:2},
-{q:'Diagonal qayda. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),triangle('none','#3b82f6'),square(18,'none','#06b6d4'),triangle('none','#06b6d4'),circle(14,'#06b6d4'),triangle('none','#10b981'),circle(14,'#10b981'),qmark()]},opts:[square(18,'none','#10b981'),triangle('none','#10b981'),circle(14,'none','#10b981'),diamond('none','#10b981')],c:0},
-{q:'İkili qayda: rəng + forma. "?" seçin:',grid:{type:'row',cells:[square(18,'#3b82f6'),circle(14,'#06b6d4'),triangle('#10b981','#10b981'),qmark()]},opts:[diamond('#a855f7','#a855f7'),pentagon('none','#a855f7'),hexagon('#a855f7'),dots(4,'#a855f7')],c:0},
-{q:'Matris tamamlama. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),dots(2,'#06b6d4'),dots(3,'#06b6d4'),dots(4,'#06b6d4'),dots(3,'#10b981'),dots(4,'#10b981'),qmark()]},opts:[dots(5,'#10b981'),dots(4,'#10b981'),dots(6,'#10b981'),dots(3,'#3b82f6')],c:0},
-{q:'Rəng dövri dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),circle(14,'#3b82f6'),circle(14,'#06b6d4'),qmark()]},opts:[circle(14,'#10b981'),circle(14,'#3b82f6'),circle(14,'#f59e0b'),circle(14,'#a855f7')],c:0}
-,
-{q:'Hər sütunda forma dəyişir. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),diamond('none','#3b82f6'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),diamond('none','#06b6d4'),circle(14,'#10b981'),square(18,'none','#10b981'),qmark()]},opts:[diamond('none','#10b981'),circle(14,'#10b981'),triangle('none','#10b981'),pentagon('none','#10b981')],c:0},
-{q:'Diagonal qayda. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),triangle('none','#3b82f6'),square(18,'none','#06b6d4'),triangle('none','#06b6d4'),circle(14,'#06b6d4'),triangle('none','#10b981'),circle(14,'#10b981'),qmark()]},opts:[square(18,'none','#10b981'),triangle('none','#10b981'),circle(14,'none','#10b981'),diamond('none','#10b981')],c:0},
-{q:'İkili qayda: rəng+forma. "?" seçin:',grid:{type:'row',cells:[square(18,'#3b82f6'),circle(14,'#06b6d4'),triangle('#10b981','#10b981'),qmark()]},opts:[diamond('#a855f7','#a855f7'),pentagon('none','#a855f7'),hexagon('#a855f7'),dots(4,'#a855f7')],c:0},
-{q:'Matris tamamlama. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),dots(2,'#06b6d4'),dots(3,'#06b6d4'),dots(4,'#06b6d4'),dots(3,'#10b981'),dots(4,'#10b981'),qmark()]},opts:[dots(5,'#10b981'),dots(4,'#10b981'),dots(6,'#10b981'),dots(3,'#3b82f6')],c:0},
-{q:'Hər sətirdə ölçü artır. "?" seçin:',grid:{type:'3x3',cells:[triangle('none','#a855f7',2.5),triangle('none','#a855f7',5),triangle('#a855f7','#a855f7'),diamond('none','#3b82f6',2.5),diamond('none','#3b82f6',5),diamond('#3b82f6','#3b82f6'),circle(8,'none','#f59e0b'),circle(14,'none','#f59e0b'),qmark()]},opts:[circle(20,'#f59e0b','#f59e0b'),circle(20,'none','#f59e0b'),circle(8,'#f59e0b'),hexagon('#f59e0b')],c:0}];
+{q:'3x3 matrisdə "?" hansı fiqur olmalıdır?',grid:{type:'3x3',cells:[circle(10,'none','#3b82f6'),circle(16,'none','#3b82f6'),circle(22,'none','#3b82f6'),square(16,'none','#06b6d4'),square(22,'none','#06b6d4'),square(28,'none','#06b6d4'),triangle('none','#10b981'),triangle('#10b981','#10b981'),qmark()],b:0.0},opts:[triangle('#10b981','#10b981'),circle(10),square(12),diamond('#10b981')],c:0},
+{q:'Hər sətirdə rəng eyni. "?" hansı olmalıdır?',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),square(22,'none','#3b82f6'),triangle('none','#3b82f6'),circle(18,'none','#06b6d4'),square(22,'none','#06b6d4'),triangle('none','#06b6d4'),circle(18,'none','#10b981'),square(22,'none','#10b981'),qmark()],b:-0.3},opts:[triangle('none','#10b981'),circle(18,'none','#10b981'),diamond('none','#10b981'),triangle('none','#3b82f6')],c:0},
+{q:'Nöqtə sayı cütlüklər artır. "?" seçin:',grid:{type:'row',cells:[dots(1,'#3b82f6'),dots(3,'#3b82f6'),dots(5,'#3b82f6'),qmark()],b:-0.3},opts:[dots(6,'#3b82f6'),dots(7,'#3b82f6'),dots(8,'#3b82f6'),dots(9,'#3b82f6')],c:1},
+{q:'Hər sütunda fiqurlar böyüyür. "?" seçin:',grid:{type:'3x3',cells:[square(10),square(16),square(22),circle(10,'none','#06b6d4'),circle(16,'none','#06b6d4'),circle(22,'none','#06b6d4'),triangle('none','#f59e0b'),triangle('#f59e0b','#f59e0b'),qmark()],b:0.4},opts:[square(28,'#f59e0b','#f59e0b'),triangle('#f59e0b','#f59e0b'),circle(22,'none','#f59e0b'),diamond('#f59e0b')],c:1},
+{q:'Alternativ dolu-boş dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(8,'#3b82f6'),diamond('none','#3b82f6'),circle(16,'#3b82f6'),qmark()],b:-0.3},opts:[circle(16,'#3b82f6'),diamond('#3b82f6','#3b82f6'),circle(8,'#3b82f6'),square(20,'#3b82f6')],c:1},
+{q:'Hər sətirdə forma: dairə → kvadrat → üçbucaq. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),triangle('none','#3b82f6'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),triangle('none','#06b6d4'),circle(14,'#f59e0b'),square(18,'none','#f59e0b'),qmark()],b:-0.3},opts:[triangle('none','#f59e0b'),triangle('#f59e0b','#f59e0b'),diamond('none','#f59e0b'),circle(14,'#f59e0b')],c:0},
+{q:'Rəng + ölçü birlikdə dəyişir. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),circle(14,'#06b6d4'),circle(20,'#10b981'),square(8,'none','#3b82f6'),square(14,'none','#06b6d4'),square(20,'none','#10b981'),triangle('none','#3b82f6'),triangle('none','#06b6d4'),qmark()],b:0.3},opts:[triangle('none','#10b981'),triangle('#10b981','#10b981'),circle(20,'#10b981'),square(20,'#10b981')],c:0},
+{q:'Hər sütunda forma dəyişir. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),diamond('none','#3b82f6'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),diamond('none','#06b6d4'),circle(14,'#10b981'),square(18,'none','#10b981'),qmark()],b:0.4},opts:[diamond('none','#10b981'),circle(14,'#10b981'),triangle('none','#10b981'),pentagon('none','#10b981')],c:0},
+{q:'Nöqtə + forma ardıcıllığı. "?" seçin:',grid:{type:'row',cells:[dots(2,'#3b82f6'),square(16,'none','#3b82f6'),dots(4,'#06b6d4'),qmark()],b:-0.4},opts:[square(16,'none','#06b6d4'),dots(6,'#10b981'),circle(14,'#06b6d4'),square(20,'#06b6d4')],c:0},
+{q:'Hər sətirdə ölçü artır. "?" seçin:',grid:{type:'3x3',cells:[triangle('none','#a855f7',2.5),triangle('none','#a855f7',5),triangle('#a855f7','#a855f7'),diamond('none','#3b82f6',2.5),diamond('none','#3b82f6',5),diamond('#3b82f6','#3b82f6'),circle(8,'none','#f59e0b'),circle(14,'none','#f59e0b'),qmark()],b:-0.1},opts:[circle(20,'#f59e0b','#f59e0b'),circle(20,'none','#f59e0b'),circle(8,'#f59e0b'),hexagon('#f59e0b')],c:0},
+{q:'Sıralanma qaydası. "?" seçin:',grid:{type:'row',cells:[circle(10,'#3b82f6'),dots(3,'#3b82f6'),square(14,'none','#3b82f6'),qmark()],b:0.1},opts:[triangle('none','#3b82f6'),pentagon('none','#3b82f6'),diamond('none','#3b82f6'),hexagon('none','#3b82f6')],c:2},
+{q:'Diagonal qayda. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'#3b82f6'),square(18,'none','#3b82f6'),triangle('none','#3b82f6'),square(18,'none','#06b6d4'),triangle('none','#06b6d4'),circle(14,'#06b6d4'),triangle('none','#10b981'),circle(14,'#10b981'),qmark()],b:-0.1},opts:[square(18,'none','#10b981'),triangle('none','#10b981'),circle(14,'none','#10b981'),diamond('none','#10b981')],c:0},
+{q:'İkili qayda: rəng + forma. "?" seçin:',grid:{type:'row',cells:[square(18,'#3b82f6'),circle(14,'#06b6d4'),triangle('#10b981','#10b981'),qmark()],b:0.2},opts:[diamond('#a855f7','#a855f7'),pentagon('none','#a855f7'),hexagon('#a855f7'),dots(4,'#a855f7')],c:0},
+{q:'Matris tamamlama. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),dots(2,'#06b6d4'),dots(3,'#06b6d4'),dots(4,'#06b6d4'),dots(3,'#10b981'),dots(4,'#10b981'),qmark()],b:0.3},opts:[dots(5,'#10b981'),dots(4,'#10b981'),dots(6,'#10b981'),dots(3,'#3b82f6')],c:0},
+{q:'Rəng dövri dəyişir. "?" seçin:',grid:{type:'row',cells:[circle(14,'#3b82f6'),circle(14,'#06b6d4'),circle(14,'#10b981'),circle(14,'#3b82f6'),circle(14,'#06b6d4'),qmark()],b:0.4},opts:[circle(14,'#10b981'),circle(14,'#3b82f6'),circle(14,'#f59e0b'),circle(14,'#a855f7')],c:0},
+{q:'İkili qayda: rəng+forma. "?" seçin:',grid:{type:'row',cells:[square(18,'#3b82f6'),circle(14,'#06b6d4'),triangle('#10b981','#10b981'),qmark()],b:-0.4},opts:[diamond('#a855f7','#a855f7'),pentagon('none','#a855f7'),hexagon('#a855f7'),dots(4,'#a855f7')],c:0}
+];
 
 const ABSTRACT_H=[
-{q:'Kompleks matrisdə "?" hansı fiqur olmalıdır?',grid:{type:'3x3',cells:[circle(10,'#3b82f6'),circle(14,'#3b82f6'),circle(18,'#3b82f6'),dots(1,'#06b6d4'),dots(2,'#06b6d4'),dots(3,'#06b6d4'),square(14,'none','#f59e0b'),square(20,'none','#f59e0b'),qmark()]},opts:[square(26,'none','#f59e0b'),square(20,'none','#3b82f6'),circle(20,'#f59e0b'),dots(3,'#f59e0b')],c:0},
-{q:'Transformasiya qaydası. "?" seçin:',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),square(22,'none','#3b82f6'),qmark(),diamond('none','#06b6d4'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),square(20,'none','#10b981'),diamond('none','#10b981'),circle(16,'#10b981')]},opts:[triangle('none','#3b82f6'),diamond('none','#3b82f6'),circle(14,'none','#3b82f6'),pentagon('none','#3b82f6')],c:1},
-{q:'Forma dönüşümü. "?" seçin:',grid:{type:'3x3',cells:[triangle('none','#3b82f6'),triangle('#3b82f6','#3b82f6'),diamond('#3b82f6'),circle(10,'none','#06b6d4'),circle(10,'#06b6d4','#06b6d4'),square(18,'#06b6d4'),square(14,'none','#f59e0b'),square(14,'#f59e0b','#f59e0b'),qmark()]},opts:[diamond('#f59e0b'),diamond('none','#f59e0b'),circle(14,'#f59e0b'),hexagon('#f59e0b')],c:0},
-{q:'Mürəkkəb ardıcıllıq. "?" seçin:',grid:{type:'row',cells:[circle(10,'#3b82f6'),dots(2,'#3b82f6'),square(14,'none','#3b82f6'),qmark()]},opts:[triangle('none','#3b82f6'),pentagon('none','#3b82f6'),diamond('none','#3b82f6'),hexagon('none','#3b82f6')],c:2},
-{q:'Ən mürəkkəb matris. "?" seçin:',grid:{type:'3x3',cells:[square(12,'#3b82f6'),circle(10,'none','#3b82f6'),triangle('none','#3b82f6'),triangle('#06b6d4'),square(12,'none','#06b6d4'),circle(10,'#06b6d4'),circle(10,'none','#10b981'),triangle('#10b981'),qmark()]},opts:[square(12,'none','#10b981'),circle(10,'none','#10b981'),diamond('none','#10b981'),square(12,'#10b981')],c:0},
-{q:'İkili transformasiya: rəng + doldurma. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'none','#3b82f6'),circle(14,'#3b82f6'),square(18,'none','#3b82f6'),diamond('none','#06b6d4'),diamond('#06b6d4'),circle(14,'none','#06b6d4'),triangle('none','#10b981'),triangle('#10b981'),qmark()]},opts:[square(18,'none','#10b981'),square(18,'#10b981'),diamond('none','#10b981'),pentagon('#10b981')],c:0},
-{q:'Üçlü qayda: forma + rəng + ölçü. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(14,'none','#06b6d4'),triangle('none','#10b981'),square(14,'none','#3b82f6'),triangle('none','#06b6d4'),circle(8,'#10b981'),triangle('none','#3b82f6'),circle(8,'#06b6d4'),qmark()]},opts:[square(14,'none','#10b981'),square(14,'#10b981'),circle(8,'none','#10b981'),diamond('none','#10b981')],c:0},
-{q:'Spiralvari ardıcıllıq. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),circle(14,'#3b82f6'),circle(20,'#3b82f6'),circle(20,'#06b6d4'),circle(20,'#10b981'),circle(14,'#10b981'),circle(8,'#10b981'),circle(8,'#f59e0b'),qmark()]},opts:[circle(14,'#f59e0b'),circle(20,'#f59e0b'),circle(8,'#a855f7'),circle(14,'#3b82f6')],c:0},
-{q:'Mürəkkəb rəng+forma rotasiyası. "?" seçin:',grid:{type:'3x3',cells:[triangle('#3b82f6'),circle(14,'none','#06b6d4'),square(18,'#10b981'),circle(14,'none','#3b82f6'),square(18,'#06b6d4'),triangle('#10b981'),square(18,'none','#3b82f6'),triangle('#06b6d4'),qmark()]},opts:[circle(14,'#10b981'),circle(14,'none','#10b981'),diamond('#10b981'),square(18,'none','#10b981')],c:1},
-{q:'4 qaydanın birləşməsi. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),circle(10,'#3b82f6'),dots(2,'#3b82f6'),dots(2,'#06b6d4'),circle(10,'#06b6d4'),dots(3,'#06b6d4'),dots(3,'#10b981'),circle(10,'#10b981'),qmark()]},opts:[dots(4,'#10b981'),dots(3,'#3b82f6'),circle(14,'#10b981'),square(14,'#10b981')],c:0},
-{q:'Diaqonal transformasiya. "?" seçin:',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),diamond('none','#3b82f6'),triangle('none','#3b82f6'),diamond('none','#06b6d4'),triangle('none','#06b6d4'),circle(18,'#06b6d4'),triangle('none','#10b981'),circle(18,'#10b981'),qmark()]},opts:[diamond('none','#10b981'),circle(14,'none','#10b981'),triangle('#10b981','#10b981'),square(18,'none','#10b981')],c:0},
-{q:'Çoxqatlı forma qayda. "?" seçin:',grid:{type:'3x3',cells:[pentagon('none','#3b82f6'),hexagon('none','#3b82f6'),pentagon('#3b82f6'),hexagon('none','#06b6d4'),pentagon('#06b6d4'),hexagon('none','#06b6d4'),pentagon('#10b981'),hexagon('none','#10b981'),qmark()]},opts:[pentagon('none','#10b981'),hexagon('#10b981'),circle(14,'#10b981'),diamond('none','#10b981')],c:1},
-{q:'İkiqat rəng seqmenti. "?" seçin:',grid:{type:'3x3',cells:[circle(10,'#3b82f6'),circle(16,'#06b6d4'),circle(22,'#10b981'),square(10,'none','#3b82f6'),square(16,'none','#06b6d4'),square(22,'none','#10b981'),triangle('none','#3b82f6'),triangle('none','#06b6d4'),qmark()]},opts:[triangle('none','#10b981'),triangle('#10b981','#10b981'),circle(22,'#10b981'),pentagon('none','#10b981')],c:0},
-{q:'Nöqtə × forma kombinasiyası. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),dots(3,'#06b6d4'),dots(4,'#06b6d4'),dots(5,'#06b6d4'),dots(5,'#10b981'),dots(6,'#10b981'),qmark()]},opts:[dots(7,'#10b981'),dots(6,'#3b82f6'),dots(8,'#10b981'),dots(5,'#a855f7')],c:0},
-{q:'En mürəkkəb 3x3 matris. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(12,'#06b6d4'),triangle('#10b981','#10b981'),square(12,'#3b82f6'),triangle('#06b6d4','#06b6d4'),circle(8,'#10b981'),triangle('#3b82f6','#3b82f6'),circle(8,'#06b6d4'),qmark()]},opts:[square(12,'#10b981'),square(12,'none','#10b981'),diamond('#10b981'),circle(12,'#10b981')],c:0}
-,
-{q:'Mürəkkəb rəng+forma rotasiyası. "?" seçin:',grid:{type:'3x3',cells:[triangle('#3b82f6'),circle(14,'none','#06b6d4'),square(18,'#10b981'),circle(14,'none','#3b82f6'),square(18,'#06b6d4'),triangle('#10b981'),square(18,'none','#3b82f6'),triangle('#06b6d4'),qmark()]},opts:[circle(14,'#10b981'),circle(14,'none','#10b981'),diamond('#10b981'),square(18,'none','#10b981')],c:1},
-{q:'4 qaydanın birləşməsi. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),circle(10,'#3b82f6'),dots(2,'#3b82f6'),dots(2,'#06b6d4'),circle(10,'#06b6d4'),dots(3,'#06b6d4'),dots(3,'#10b981'),circle(10,'#10b981'),qmark()]},opts:[dots(4,'#10b981'),dots(3,'#3b82f6'),circle(14,'#10b981'),square(14,'#10b981')],c:0},
-{q:'İkiqat rəng seqmenti. "?" seçin:',grid:{type:'3x3',cells:[circle(10,'#3b82f6'),circle(16,'#06b6d4'),circle(22,'#10b981'),square(10,'none','#3b82f6'),square(16,'none','#06b6d4'),square(22,'none','#10b981'),triangle('none','#3b82f6'),triangle('none','#06b6d4'),qmark()]},opts:[triangle('none','#10b981'),triangle('#10b981','#10b981'),circle(22,'#10b981'),pentagon('none','#10b981')],c:0},
-{q:'Ən mürəkkəb 3x3 matris. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(12,'#06b6d4'),triangle('#10b981','#10b981'),square(12,'#3b82f6'),triangle('#06b6d4','#06b6d4'),circle(8,'#10b981'),triangle('#3b82f6','#3b82f6'),circle(8,'#06b6d4'),qmark()]},opts:[square(12,'#10b981'),square(12,'none','#10b981'),diamond('#10b981'),circle(12,'#10b981')],c:0},
-{q:'Çoxqatlı forma+rəng qayda. "?" seçin:',grid:{type:'3x3',cells:[pentagon('none','#3b82f6'),hexagon('none','#06b6d4'),pentagon('#10b981'),hexagon('none','#3b82f6'),pentagon('#06b6d4'),hexagon('none','#10b981'),pentagon('none','#06b6d4'),hexagon('#10b981'),qmark()]},opts:[pentagon('none','#3b82f6'),hexagon('none','#06b6d4'),pentagon('#3b82f6'),pentagon('none','#10b981')],c:0}];
+{q:'Kompleks matrisdə "?" hansı fiqur olmalıdır?',grid:{type:'3x3',cells:[circle(10,'#3b82f6'),circle(14,'#3b82f6'),circle(18,'#3b82f6'),dots(1,'#06b6d4'),dots(2,'#06b6d4'),dots(3,'#06b6d4'),square(14,'none','#f59e0b'),square(20,'none','#f59e0b'),qmark()],b:1.5},opts:[square(26,'none','#f59e0b'),square(20,'none','#3b82f6'),circle(20,'#f59e0b'),dots(3,'#f59e0b')],c:0},
+{q:'Transformasiya qaydası. "?" seçin:',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),square(22,'none','#3b82f6'),qmark(),diamond('none','#06b6d4'),circle(14,'#06b6d4'),square(18,'none','#06b6d4'),square(20,'none','#10b981'),diamond('none','#10b981'),circle(16,'#10b981')],b:1.3},opts:[triangle('none','#3b82f6'),diamond('none','#3b82f6'),circle(14,'none','#3b82f6'),pentagon('none','#3b82f6')],c:1},
+{q:'Forma dönüşümü. "?" seçin:',grid:{type:'3x3',cells:[triangle('none','#3b82f6'),triangle('#3b82f6','#3b82f6'),diamond('#3b82f6'),circle(10,'none','#06b6d4'),circle(10,'#06b6d4','#06b6d4'),square(18,'#06b6d4'),square(14,'none','#f59e0b'),square(14,'#f59e0b','#f59e0b'),qmark()],b:1.6},opts:[diamond('#f59e0b'),diamond('none','#f59e0b'),circle(14,'#f59e0b'),hexagon('#f59e0b')],c:0},
+{q:'Mürəkkəb ardıcıllıq. "?" seçin:',grid:{type:'row',cells:[circle(10,'#3b82f6'),dots(2,'#3b82f6'),square(14,'none','#3b82f6'),qmark()],b:1.1},opts:[triangle('none','#3b82f6'),pentagon('none','#3b82f6'),diamond('none','#3b82f6'),hexagon('none','#3b82f6')],c:2},
+{q:'Ən mürəkkəb matris. "?" seçin:',grid:{type:'3x3',cells:[square(12,'#3b82f6'),circle(10,'none','#3b82f6'),triangle('none','#3b82f6'),triangle('#06b6d4'),square(12,'none','#06b6d4'),circle(10,'#06b6d4'),circle(10,'none','#10b981'),triangle('#10b981'),qmark()],b:0.8},opts:[square(12,'none','#10b981'),circle(10,'none','#10b981'),diamond('none','#10b981'),square(12,'#10b981')],c:0},
+{q:'İkili transformasiya: rəng + doldurma. "?" seçin:',grid:{type:'3x3',cells:[circle(14,'none','#3b82f6'),circle(14,'#3b82f6'),square(18,'none','#3b82f6'),diamond('none','#06b6d4'),diamond('#06b6d4'),circle(14,'none','#06b6d4'),triangle('none','#10b981'),triangle('#10b981'),qmark()],b:1.4},opts:[square(18,'none','#10b981'),square(18,'#10b981'),diamond('none','#10b981'),pentagon('#10b981')],c:0},
+{q:'Üçlü qayda: forma + rəng + ölçü. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(14,'none','#06b6d4'),triangle('none','#10b981'),square(14,'none','#3b82f6'),triangle('none','#06b6d4'),circle(8,'#10b981'),triangle('none','#3b82f6'),circle(8,'#06b6d4'),qmark()],b:1.7},opts:[square(14,'none','#10b981'),square(14,'#10b981'),circle(8,'none','#10b981'),diamond('none','#10b981')],c:0},
+{q:'Spiralvari ardıcıllıq. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),circle(14,'#3b82f6'),circle(20,'#3b82f6'),circle(20,'#06b6d4'),circle(20,'#10b981'),circle(14,'#10b981'),circle(8,'#10b981'),circle(8,'#f59e0b'),qmark()],b:1.3},opts:[circle(14,'#f59e0b'),circle(20,'#f59e0b'),circle(8,'#a855f7'),circle(14,'#3b82f6')],c:0},
+{q:'Mürəkkəb rəng+forma rotasiyası. "?" seçin:',grid:{type:'3x3',cells:[triangle('#3b82f6'),circle(14,'none','#06b6d4'),square(18,'#10b981'),circle(14,'none','#3b82f6'),square(18,'#06b6d4'),triangle('#10b981'),square(18,'none','#3b82f6'),triangle('#06b6d4'),qmark()],b:1.3},opts:[circle(14,'#10b981'),circle(14,'none','#10b981'),diamond('#10b981'),square(18,'none','#10b981')],c:1},
+{q:'4 qaydanın birləşməsi. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),circle(10,'#3b82f6'),dots(2,'#3b82f6'),dots(2,'#06b6d4'),circle(10,'#06b6d4'),dots(3,'#06b6d4'),dots(3,'#10b981'),circle(10,'#10b981'),qmark()],b:0.9},opts:[dots(4,'#10b981'),dots(3,'#3b82f6'),circle(14,'#10b981'),square(14,'#10b981')],c:0},
+{q:'Diaqonal transformasiya. "?" seçin:',grid:{type:'3x3',cells:[circle(18,'#3b82f6'),diamond('none','#3b82f6'),triangle('none','#3b82f6'),diamond('none','#06b6d4'),triangle('none','#06b6d4'),circle(18,'#06b6d4'),triangle('none','#10b981'),circle(18,'#10b981'),qmark()],b:1.3},opts:[diamond('none','#10b981'),circle(14,'none','#10b981'),triangle('#10b981','#10b981'),square(18,'none','#10b981')],c:0},
+{q:'Çoxqatlı forma qayda. "?" seçin:',grid:{type:'3x3',cells:[pentagon('none','#3b82f6'),hexagon('none','#3b82f6'),pentagon('#3b82f6'),hexagon('none','#06b6d4'),pentagon('#06b6d4'),hexagon('none','#06b6d4'),pentagon('#10b981'),hexagon('none','#10b981'),qmark()],b:1.5},opts:[pentagon('none','#10b981'),hexagon('#10b981'),circle(14,'#10b981'),diamond('none','#10b981')],c:1},
+{q:'İkiqat rəng seqmenti. "?" seçin:',grid:{type:'3x3',cells:[circle(10,'#3b82f6'),circle(16,'#06b6d4'),circle(22,'#10b981'),square(10,'none','#3b82f6'),square(16,'none','#06b6d4'),square(22,'none','#10b981'),triangle('none','#3b82f6'),triangle('none','#06b6d4'),qmark()],b:0.8},opts:[triangle('none','#10b981'),triangle('#10b981','#10b981'),circle(22,'#10b981'),pentagon('none','#10b981')],c:0},
+{q:'Nöqtə × forma kombinasiyası. "?" seçin:',grid:{type:'3x3',cells:[dots(1,'#3b82f6'),dots(2,'#3b82f6'),dots(3,'#3b82f6'),dots(3,'#06b6d4'),dots(4,'#06b6d4'),dots(5,'#06b6d4'),dots(5,'#10b981'),dots(6,'#10b981'),qmark()],b:1.3},opts:[dots(7,'#10b981'),dots(6,'#3b82f6'),dots(8,'#10b981'),dots(5,'#a855f7')],c:0},
+{q:'En mürəkkəb 3x3 matris. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(12,'#06b6d4'),triangle('#10b981','#10b981'),square(12,'#3b82f6'),triangle('#06b6d4','#06b6d4'),circle(8,'#10b981'),triangle('#3b82f6','#3b82f6'),circle(8,'#06b6d4'),qmark()],b:1.5},opts:[square(12,'#10b981'),square(12,'none','#10b981'),diamond('#10b981'),circle(12,'#10b981')],c:0},
+{q:'Ən mürəkkəb 3x3 matris. "?" seçin:',grid:{type:'3x3',cells:[circle(8,'#3b82f6'),square(12,'#06b6d4'),triangle('#10b981','#10b981'),square(12,'#3b82f6'),triangle('#06b6d4','#06b6d4'),circle(8,'#10b981'),triangle('#3b82f6','#3b82f6'),circle(8,'#06b6d4'),qmark()],b:1.3},opts:[square(12,'#10b981'),square(12,'none','#10b981'),diamond('#10b981'),circle(12,'#10b981')],c:0},
+{q:'Çoxqatlı forma+rəng qayda. "?" seçin:',grid:{type:'3x3',cells:[pentagon('none','#3b82f6'),hexagon('none','#06b6d4'),pentagon('#10b981'),hexagon('none','#3b82f6'),pentagon('#06b6d4'),hexagon('none','#10b981'),pentagon('none','#06b6d4'),hexagon('#10b981'),qmark()],b:1.4},opts:[pentagon('none','#3b82f6'),hexagon('none','#06b6d4'),pentagon('#3b82f6'),pentagon('none','#10b981')],c:0}
+];
 
 
 // CCSI
@@ -698,7 +677,7 @@ const CCSI_Q=[
 // ============================================================
 let candidateId=null,candidateData=null,assignedTests=[],currentTestIdx=0;
 let currentSections=[],currentSecIdx=0,currentQs=[],currentQIdx=0;
-let answers={},timerInterval=null,timeLeft=0,diffLevel=0,adaptUsed=[],adaptStreak=0,adaptWrongStreak=0;
+let answers={},timerInterval=null,timeLeft=0,diffLevel=0,adaptUsed=[],adaptStreak=0,adaptWrongStreak=0,theta=0.0;
 let testScores={},selectedAnswer=null,currentQ=null;
 
 const TEST_META={
@@ -772,7 +751,7 @@ function startCurrentSection(){
   const sec=currentSections[currentSecIdx];
   const tk=assignedTests[currentTestIdx];
   currentQs=getQuestions(tk,sec.key);
-  currentQIdx=0;diffLevel=0;adaptStreak=0;adaptWrongStreak=0;answers={};selectedAnswer=null;
+  currentQIdx=0;diffLevel=0;adaptStreak=0;adaptWrongStreak=0;theta=0.0;answers={};selectedAnswer=null;
 
   document.getElementById('hdr-badge').textContent=sec.label;
   document.getElementById('hdr-badge').className='test-badge-hdr '+sec.badge;
@@ -800,13 +779,12 @@ function getQuestions(tk,secKey){
 }
 
 function buildAdaptPool(e,m,h){
-  // Hər səviyyəni shuffle et - 20 sual pool yaradır
-  // 20 sualdan: 7 asan + 7 orta + 6 çətin (pool-da saxla, adaptiv seçəcək)
-  const eShuffled=shuffle([...e]).slice(0,7).map(q=>({...q,diff:0}));
-  const mShuffled=shuffle([...m]).slice(0,7).map(q=>({...q,diff:1}));
-  const hShuffled=shuffle([...h]).slice(0,6).map(q=>({...q,diff:2}));
-  // Hamısını bir pool-da saxla - getAdaptQ diff-ə görə seçəcək
-  return shuffle([...eShuffled,...mShuffled,...hShuffled]);
+  // Bütün sualları shuffle et, diff ilə işarələ
+  // getAdaptQ diff-ə görə seçəcək
+  const eS=shuffle([...e]).map(q=>({...q,diff:0}));
+  const mS=shuffle([...m]).map(q=>({...q,diff:1}));
+  const hS=shuffle([...h]).map(q=>({...q,diff:2}));
+  return [...eS,...mS,...hS];
 }
 
 function getAdaptQ(){
@@ -948,33 +926,27 @@ function nextQuestion(){
     id:currentQ.id||currentQIdx
   });
 
-  // Adaptiv mexanizm
+  // Adaptiv mexanizm + Rasch theta yeniləməsi
   if(tk==='adaptg'){
-    const qNum=currentQIdx+1; // bu sualdan sonrakı sual nömrəsi
-    if(qNum<=3){
-      // İlk 3 sual həmişə asan - cavab nə olursa olsun diff=0 qalır
-      diffLevel=0;
-      adaptStreak=0;
-      adaptWrongStreak=0;
+    // Rasch yeniləməsi - hər sual üçün theta-nı yenilə
+    const b=currentQ.b??0;
+    const p=1/(1+Math.exp(-(theta-b)));
+    if(isCorrect){
+      theta+=0.5*(1-p); // düzgün cavab → theta artır
     } else {
-      // 4-cü sualdan etibarən adaptiv
-      if(isCorrect){
-        adaptStreak++;
-        adaptWrongStreak=0;
-        // Ardıcıl 3 düzgün → bir səviyyə çətinləş
-        if(adaptStreak>=3){
-          diffLevel=Math.min(2,diffLevel+1);
-          adaptStreak=0;
-        }
-      } else {
-        adaptWrongStreak++;
-        adaptStreak=0;
-        // Ardıcıl 2 səhv → bir səviyyə asanlaş
-        if(adaptWrongStreak>=2){
-          diffLevel=Math.max(0,diffLevel-1);
-          adaptWrongStreak=0;
-        }
-      }
+      theta-=0.5*p; // səhv cavab → theta azalır
+    }
+    theta=Math.max(-3.5,Math.min(3.5,theta)); // sınır
+
+    // Adaptiv çətinlik səviyyəsi theta-ya görə
+    const qNum=currentQIdx+1;
+    if(qNum<=3){
+      diffLevel=0; // ilk 3 sual həmişə asan
+    } else {
+      // theta-ya görə növbəti sualın səviyyəsini seç
+      if(theta<-0.5) diffLevel=0;
+      else if(theta<0.5) diffLevel=1;
+      else diffLevel=2;
     }
   }
 
@@ -1010,25 +982,28 @@ async function saveTestResult(){
       });
       sectionScores[sec]=factorScores;
     }else{
-      // Çəkili xal: asan=1, orta=2, çətin=3
-      const weights={0:1,1:2,2:3};
-      let weightedCorrect=0,weightedTotal=0;
-      ans.forEach(a=>{
-        const w=weights[a.diff??1];
-        weightedTotal+=w;
-        if(a.isCorrect)weightedCorrect+=w;
-      });
-      // Sadə düzgün sayı da saxla ümumi xal üçün
+      // Rasch theta-dan xal hesabla
+      // theta (-3.5, +3.5) → stanine (1-9) → percentil → score (0-100)
+      const finalTheta=currentQ?theta:0; // son theta saxlanılıb
+      // Theta-dan faiz: normal paylanma CDF
+      // Sadələşdirilmiş: θ=0 → 50%, θ=1 → 84%, θ=-1 → 16%
+      const scoreFromTheta=Math.round(50+theta*17); // hər SD = 17 faiz
+      const score=Math.max(5,Math.min(99,scoreFromTheta));
       const correct=ans.filter(a=>a.isCorrect).length;
-      totalCorrect+=correct;totalQ+=ans.length;
-      const score=weightedTotal>0?Math.round((weightedCorrect/weightedTotal)*100):0;
-      sectionScores[sec]={score};
+      totalCorrect+=correct; totalQ+=ans.length;
+      sectionScores[sec]={score,correct,total:ans.length,theta:parseFloat(theta.toFixed(3))};
     }
   });
 
   // Hər seksiya xallarının ortalaması
-  const secScores=Object.values(sectionScores).filter(s=>typeof s.score==='number').map(s=>s.score);
-  const totalScore=secScores.length>0?Math.round(secScores.reduce((a,b)=>a+b,0)/secScores.length):0;
+  const secScores=Object.values(sectionScores)
+    .filter(s=>s && typeof s.score==='number')
+    .map(s=>s.score);
+  const totalScore=secScores.length>0
+    ? Math.round(secScores.reduce((a,b)=>a+b,0)/secScores.length)
+    : 0;
+  // Theta da saxla
+  const finalTheta=parseFloat(theta.toFixed(3));
   testScores[tk]={totalScore,sectionScores};
 
   try{
@@ -1036,6 +1011,7 @@ async function saveTestResult(){
       candidateId,candidateName:candidateData.name,
       companyId:candidateData.companyId,companyName:candidateData.companyName,
       testType:tk,totalScore,sectionScores,
+      thetaScore:finalTheta||0,
       completedAt:firebase.firestore.FieldValue.serverTimestamp()
     });
     await db.collection('candidates').doc(candidateId).update({
