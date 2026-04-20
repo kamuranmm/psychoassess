@@ -336,12 +336,37 @@ function build15FQ(idealData){
 
   const fRow=(k,idealData)=>{
     const f=FACTORS[k];const sc=fS[k]||5;const st=sten2s(sc);
-    let idealMin=undefined, idealMax=undefined;
+    let idealMid=undefined;
     if(idealData && idealData.factors && idealData.factors[k]) {
-      idealMin=idealData.factors[k].min;
-      idealMax=idealData.factors[k].max;
+      const iv=idealData.factors[k];
+      idealMid=Math.round((iv.min+iv.max)/2);
     }
-    return `<tr><td style="width:50px;text-align:center;"><span style="display:inline-block;background:#5b21b6;color:white;border-radius:5px;padding:3px 7px;font-size:11px;font-weight:700;">${f.lbl}</span></td><td><div class="s-name">${f.nm}</div><div class="s-desc">${f.l} ↔ ${f.r}</div></td><td>${stanineBar(st,idealMin,idealMax)}</td><td class="pct">${s2p(st)}</td></tr>`;
+    // Hər STEN üçün xana yarat
+    const cells=[1,2,3,4,5,6,7,8,9,10].map(i=>{
+      const isCandidate=i===st;
+      const isIdeal=i===idealMid;
+      let inner='';
+      if(isCandidate && isIdeal){
+        // Üst-üstə — qırmızı üstündə ağ halqa
+        inner=`<div style="width:16px;height:16px;border-radius:50%;background:#dc2626;border:2.5px solid white;box-shadow:0 0 0 2px #94a3b8;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>`;
+      } else if(isCandidate){
+        inner=`<div style="width:14px;height:14px;border-radius:50%;background:#dc2626;border:2px solid white;box-shadow:0 1px 4px rgba(220,38,38,0.5);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>`;
+      } else if(isIdeal){
+        inner=`<div style="width:14px;height:14px;border-radius:50%;background:white;border:2.5px solid #64748b;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);"></div>`;
+      }
+      return `<td style="padding:0;width:32px;height:32px;text-align:center;position:relative;border-right:1px solid #f1f5f9;">
+        <div style="position:absolute;top:50%;left:0;right:0;height:1.5px;background:${isCandidate?'#dc2626':isIdeal?'#94a3b8':'#e2e8f0'};z-index:0;"></div>
+        ${inner}
+      </td>`;
+    }).join('');
+    const pctVal=s2p(st);
+    return `<tr style="border-bottom:1px solid #f1f5f9;">
+      <td style="padding:8px 10px;text-align:center;"><span style="display:inline-block;background:#5b21b6;color:white;border-radius:5px;padding:2px 7px;font-size:11px;font-weight:700;">${f.lbl}</span></td>
+      <td style="padding:8px 10px;font-size:12px;color:var(--muted);">${f.l}</td>
+      ${cells}
+      <td style="padding:8px 10px;font-size:12px;color:var(--muted);">${f.r}</td>
+      <td style="padding:8px 10px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent);">${pctVal}</td>
+    </tr>`;
   };
 
   return `
@@ -355,13 +380,43 @@ function build15FQ(idealData){
   </div>
 
   <div class="section-card">
-    <div class="section-hdr" style="background:#5b21b6;">📊 KLASSİK PROFİL — 15FQ+</div>
+    <div class="section-hdr" style="background:#5b21b6;">📊 İDEAL PROFİL MÜQAYİSƏSİ — 15FQ+</div>
     <div class="section-body">
-      <p style="font-size:12px;color:var(--muted);margin-bottom:14px;">STEN şkalası: Orta=5.5, SD=2. İstinad qrupu: Professional İdarəedici (n=1186)</p>
-      <table class="stanine-tbl">
-        <thead><tr><th>Şkala</th><th>Faktor</th><th>1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9</th><th style="text-align:right">%ile</th></tr></thead>
-        <tbody>${Object.keys(FACTORS).map(k=>fRow(k)).join('')}</tbody>
-      </table>
+      \${idealData?\`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:14px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;">
+        <div>
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;">🎯 İdeal Profil: \${idealData.name}\${idealData.position?' · '+idealData.position:''}</div>
+          <div style="display:flex;gap:20px;">
+            <div style="display:flex;align-items:center;gap:6px;">
+              <svg width="28" height="14"><line x1="0" y1="7" x2="28" y2="7" stroke="#94a3b8" stroke-width="1.5"/><circle cx="14" cy="7" r="5" fill="white" stroke="#94a3b8" stroke-width="2"/></svg>
+              <span style="font-size:12px;color:var(--muted);">İdeal profil</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <svg width="28" height="14"><line x1="0" y1="7" x2="28" y2="7" stroke="#dc2626" stroke-width="1.5"/><circle cx="14" cy="7" r="5" fill="#dc2626" stroke="#dc2626" stroke-width="2"/></svg>
+              <span style="font-size:12px;color:var(--muted);">Namizid profili</span>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Profil Uyğunluğu (BSD)</div>
+          <div style="font-size:28px;font-weight:800;" id="bsd-score-display">—</div>
+        </div>
+      </div>
+      \`:\`<p style="font-size:12px;color:var(--muted);margin-bottom:14px;">STEN şkalası: Orta=5.5, SD=2. İstinad qrupu: Professional İdarəedici (n=1186)</p>\`}
+      <div style="overflow-x:auto;">
+        <table style="width:100%;border-collapse:collapse;min-width:600px;">
+          <thead>
+            <tr style="border-bottom:2px solid #e2e8f0;">
+              <th style="padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;">Şkala</th>
+              <th style="padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;min-width:120px;">Sol</th>
+              <th style="padding:8px 0;font-size:11px;font-weight:700;color:var(--muted);text-align:center;" colspan="10">1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10</th>
+              <th style="padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-align:left;min-width:120px;">Sağ</th>
+              <th style="padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-align:right;">%ile</th>
+            </tr>
+          </thead>
+          <tbody>\${Object.keys(FACTORS).map(k=>fRow(k,idealData)).join('')}</tbody>
+        </table>
+      </div>
     </div>
   </div>
 
@@ -412,16 +467,18 @@ function build15FQ(idealData){
       let num=0,den=0;
       factors.forEach(k=>{
         const iv=idealData.factors[k]; if(!iv) return;
-        const sc=fS[k]||5; const st=Math.max(1,Math.min(10,Math.round(sc)));
+        const sc=fS[k]||5; const st=sten2s(Math.max(1,Math.min(10,Math.round(sc))));
+        const idealMidVal=Math.round((iv.min+iv.max)/2);
         const w=weights[iv.weight]||2;
         if(st>=iv.min && st<=iv.max){ num+=w; }
         else{ const d=Math.min(Math.abs(st-iv.min),Math.abs(st-iv.max)); num+=w*Math.max(0,1-d/5); }
         den+=w;
       });
-      const bsd=den>0?Math.round((num/den)*100):0;
-      const bsdColor=bsd>=75?'var(--success)':bsd>=50?'var(--warning)':'var(--danger)';
+      const bsd=den>0?Math.round((num/den)*100)/100:0;
+      const bsdPct=Math.round(bsd*100);
+      const bsdColor=bsdPct>=75?'#059669':bsdPct>=50?'#d97706':'#dc2626';
       const el=document.getElementById('bsd-score-display');
-      if(el){ el.textContent=`Uyğunluq: ${bsd}%`; el.style.color=bsdColor; }
+      if(el){ el.innerHTML=`<span style="color:${bsdColor};">${bsdPct}%</span>`; }
     },200);
   }
 }
