@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PsychoAssess — İdeal Profil</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;
+  --accent:#0057b8;--accent2:#0ea5e9;--success:#059669;--warning:#d97706;
+  --danger:#dc2626;--text:#1e293b;--muted:#64748b;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.04);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* TOPBAR */
+.topbar{background:var(--accent);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-logo{font-size:18px;font-weight:800;color:white;}
+.topbar-right{display:flex;gap:10px;}
+.btn-top{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all 0.2s;}
+.btn-save{background:white;color:var(--accent);}
+.btn-save:hover{background:#dbeafe;}
+.btn-back{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);}
+
+/* SCREENS */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* SETUP SCREEN */
+.setup-wrap{max-width:860px;margin:0 auto;padding:32px 20px;}
+.page-title{font-size:26px;font-weight:800;margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
+
+.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow);}
+.card-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.card-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+
+.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+.field-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);background:var(--surface2);outline:none;transition:border 0.2s;}
+.field-input:focus{border-color:var(--accent);}
+.form-row{margin-bottom:16px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+
+/* FACTOR SLIDERS */
+.factor-grid{display:flex;flex-direction:column;gap:14px;}
+
+.factor-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;}
+.factor-row:hover{border-color:var(--accent);background:#eff6ff;}
+.factor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.factor-badge{background:var(--accent);color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.factor-name{font-size:14px;font-weight:700;color:var(--text);}
+.factor-poles{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;}
+.factor-left{color:var(--muted);}
+.factor-right{color:var(--muted);}
+
+/* RANGE SLIDER - ikili: min və max */
+.range-wrap{position:relative;height:36px;display:flex;align-items:center;}
+.range-track{position:absolute;left:0;right:0;height:8px;background:#e2e8f0;border-radius:4px;overflow:visible;}
+.range-fill{position:absolute;height:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;pointer-events:none;}
+.range-input{position:absolute;width:100%;height:8px;background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none;left:0;}
+.range-input::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid white;box-shadow:0 2px 6px rgba(0,87,184,0.4);cursor:pointer;pointer-events:all;transition:transform 0.15s;}
+.range-input::-webkit-slider-thumb:hover{transform:scale(1.15);}
+.range-input::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid white;box-shadow:0 2px 6px rgba(0,87,184,0.4);cursor:pointer;pointer-events:all;}
+.range-input.upper{z-index:1;}
+
+/* STEN göstəricisi */
+.sten-display{display:flex;gap:4px;margin-top:8px;}
+.sten-cell{flex:1;height:24px;border-radius:4px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#94a3b8;transition:all 0.2s;cursor:default;}
+.sten-cell.ideal{background:var(--accent);color:white;}
+.sten-cell.num{font-family:'JetBrains Mono',monospace;}
+
+/* Tooltip */
+.factor-tooltip{display:none;position:absolute;right:18px;top:50%;transform:translateY(-50%);background:#1e293b;color:white;border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.6;max-width:260px;z-index:10;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
+.factor-row:hover .factor-tooltip{display:block;}
+.factor-info{width:18px;height:18px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);cursor:help;flex-shrink:0;}
+
+/* WEIGHT */
+.weight-select{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;background:white;cursor:pointer;color:var(--text);}
+.weight-select.w-high{border-color:#10b981;color:#059669;background:#f0fdf4;}
+.weight-select.w-med{border-color:#f59e0b;color:#d97706;background:#fffbeb;}
+.weight-select.w-low{border-color:#94a3b8;color:#64748b;background:#f8fafc;}
+
+/* PREVIEW */
+.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:var(--shadow);}
+.preview-title{font-size:16px;font-weight:800;margin-bottom:16px;color:var(--accent);}
+.preview-table{width:100%;border-collapse:collapse;}
+.preview-table th{padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--border);text-align:left;}
+.preview-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle;}
+.preview-table tr:last-child td{border:none;}
+
+.ideal-bar{display:flex;gap:2px;}
+.ideal-bar-cell{width:20px;height:16px;border-radius:3px;background:#e2e8f0;}
+.ideal-bar-cell.on{background:var(--accent);}
+
+/* BSD koeffisienti */
+.bsd-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
+.bsd-label{font-size:13px;color:var(--accent);font-weight:600;}
+.bsd-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:var(--accent);}
+
+/* SAVE MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.active{display:flex;}
+.modal{background:white;border-radius:18px;padding:32px;max-width:440px;width:calc(100%-32px);position:relative;}
+.modal-title{font-size:20px;font-weight:800;margin-bottom:20px;}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--border);border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px;color:white;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,87,184,0.3);}
+
+/* PROFILES LIST */
+.profiles-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;max-height:320px;overflow-y:auto;}
+.profile-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
+.profile-item-name{font-weight:700;font-size:14px;}
+.profile-item-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.profile-btns{display:flex;gap:6px;}
+.btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;}
+.btn-edit{background:#eff6ff;color:var(--accent);}
+.btn-del{background:#fef2f2;color:var(--danger);}
+.btn-use{background:#f0fdf4;color:var(--success);}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:white;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;z-index:999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* İDEAL STEN AÇIQLAMASI */
+.sten-desc{font-size:12px;color:var(--accent);font-weight:600;margin-top:4px;min-height:16px;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">PsychoAssess — İdeal Profil</div>
+  <div class="topbar-right">
+    <button class="btn-top btn-back" onclick="history.back()">← Geri</button>
+    <button class="btn-top btn-save" onclick="openSaveModal()">💾 Profili Saxla</button>
+  </div>
+</div>
+
+<div class="screen active" id="screen-main">
+<div class="setup-wrap">
+  <div class="page-title">🎯 İdeal Profil Qur</div>
+  <div class="page-sub">HR olaraq hər 15FQ+ faktoru üçün ideal STEN aralığını seçin. Namizidlərin profili bu idealla müqayisə ediləcək.</div>
+
+  <!-- Profil məlumatları -->
+  <div class="setup-card">
+    <div class="card-title">📋 Profil Məlumatları</div>
+    <div class="form-grid">
+      <div class="form-row">
+        <div class="field-label">Profil adı</div>
+        <input type="text" class="field-input" id="profile-name" placeholder="məs. Müştəri Xidmətləri Nümayəndəsi">
+      </div>
+      <div class="form-row">
+        <div class="field-label">Vəzifə</div>
+        <input type="text" class="field-input" id="profile-pos" placeholder="məs. Call Center Agent">
+      </div>
+    </div>
+  </div>
+
+  <!-- 16 faktor -->
+  <div class="setup-card">
+    <div class="card-title">🧠 16 Şəxsiyyət Faktoru — İdeal STEN Aralığı</div>
+    <div class="card-desc">Hər faktor üçün ideal namizid aralığını seçin (STEN 1-10). Sürüşdürmə ilə min-max aralığı qeyd edin. Hər faktorun üzərinə keçdikdə izah görünür.</div>
+    <div class="factor-grid" id="factor-grid"></div>
+  </div>
+
+  <!-- Önizləmə -->
+  <div class="preview-card">
+    <div class="preview-title">📊 İdeal Profil Önizləməsi</div>
+    <div style="overflow-x:auto;">
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Şkala</th>
+            <th>Sol Qütb</th>
+            <th style="min-width:240px;">1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10</th>
+            <th>Sağ Qütb</th>
+            <th>Aralıq</th>
+            <th>Əhəmiyyət</th>
+          </tr>
+        </thead>
+        <tbody id="preview-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- SAXLA MODAL -->
+<div class="modal-overlay" id="modal-save">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-title">💾 Profili Saxla</div>
+    <div class="form-row">
+      <div class="field-label">Profil adı</div>
+      <input type="text" class="field-input" id="save-name" placeholder="İdeal Profil adı">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Şirkət (avtomatik)</div>
+      <input type="text" class="field-input" id="save-company" readonly style="background:#f1f5f9;color:var(--muted);">
+    </div>
+    <button class="btn-primary" onclick="saveProfile()" style="margin-top:8px;">✅ Saxla</button>
+  </div>
+</div>
+
+<!-- MÖVCUD PROFİLLƏR MODAL -->
+<div class="modal-overlay" id="modal-profiles">
+  <div class="modal" style="max-width:560px;">
+    <button class="modal-close" onclick="closeModal('modal-profiles')">✕</button>
+    <div class="modal-title">📂 Saxlanmış Profillər</div>
+    <div class="profiles-list" id="profiles-list">
+      <div style="text-align:center;padding:20px;color:var(--muted);">Yüklənir...</div>
+    </div>
+    <button class="btn-primary" onclick="closeModal('modal-profiles')" style="background:#64748b;">Bağla</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.min.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
+  authDomain:"hr-testing-48e31.firebaseapp.com",
+  projectId:"hr-testing-48e31",
+  storageBucket:"hr-testing-48e31.firebasestorage.app",
+  messagingSenderId:"905744094931",
+  appId:"1:905744094931:web:2e16300768f61b4fd76626"
+});
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let companyId = null, companyData = null;
+
+// ============================================================
+// 16 FAKTOR TƏRİFLƏRİ
+// ============================================================
+const FACTORS = [
+  {
+    key:'FA', label:'fA', name:'İstiqanlılıq',
+    left:'Soyuqqanlı · Məsafəli', right:'İstiqanlı · Empatik',
+    desc: {
+      low:'STEN 1-3: Formal, məsafəli, emosional bağlılıqdan qaçan. Müstəqil, işə fokuslanmış.',
+      mid:'STEN 4-7: Balanslaşdırılmış — həm professional, həm də mehriban.',
+      high:'STEN 8-10: Çox istiqanlı, empatik, insanlarla güclü bağ quran.'
+    },
+    stenDesc:[
+      '','Son dərəcə soyuqqanlı, insanlarla formal münasibət','Çox məsafəli, emosional bağlılıq az','Adətən formal davranır','Bir qədər çəkimli lakin işini görür','Balanslaşdırılmış — həm professional həm mehriban','İnsanlarla yaxşı ünsiyyət qurur','Mehriban, dəstəkləyici','Çox istiqanlı, empatik, insanları anlayan','Son dərəcə empatiik, hər kəsə qayğı göstərən'
+    ]
+  },
+  {
+    key:'B', label:'β', name:'İntellektans',
+    left:'Aşağı intellektans', right:'Yüksək intellektans',
+    desc:{
+      low:'STEN 1-3: Konkret düşüncə, sadə tapşırıqlar üçün uyğun.',
+      mid:'STEN 4-7: Orta analitik qabiliyyət, əksər iş vəzifələri üçün kifayət.',
+      high:'STEN 8-10: Yüksək analitik qabiliyyət, mürəkkəb problemlər həll edir.'
+    },
+    stenDesc:[
+      '','Çox sadə tapşırıqları yerinə yetirir','Məhdud analitik düşüncə','Konkret, sadə məntiqlə işləyir','Orta analitik qabiliyyət var','Adekvat intellektual bacarıq','Analitik düşüncəsi inkişaf etmişdir','Zirək, problemləri tez həll edir','Güclü analitik qabiliyyət','Son dərəcə intellektual, mürəkkəb məsələləri həll edir'
+    ]
+  },
+  {
+    key:'FC', label:'fC', name:'Emosional Sabitlik',
+    left:'Hisslərə tabe olan', right:'Emosional sabit',
+    desc:{
+      low:'STEN 1-3: Stress altında çətin qalır, emosional dalgalanmalar.',
+      mid:'STEN 4-7: Orta emosional sabitlik, əksər vəziyyətləri idarə edir.',
+      high:'STEN 8-10: Stress altında sakit, emosional baxımdan çox sabit.'
+    },
+    stenDesc:[
+      '','Çox emosional, stress altında çöküş yaşayır','Tez-tez narahat olur','Emosional dalgalanmaları var','Bəzən stressdən etkilənir','Normal emosional tarazlıq','Ümumiyyətlə sakit qalır','Stress altında effektiv işləyir','Emosional cəhətdən güclü','Son dərəcə sakit, heç nəy sarsılmır'
+    ]
+  },
+  {
+    key:'FE', label:'fE', name:'Dominantlıq',
+    left:'Uyğunlaşan · Mülayim', right:'Dominant · İddialı',
+    desc:{
+      low:'STEN 1-3: Çox uyğunlaşan, münaqişədən qaçır, başqalarına boyun əyir.',
+      mid:'STEN 4-7: Balanslaşdırılmış — lazım olanda öz fikrini bildirir.',
+      high:'STEN 8-10: Güclü lider, öz mövqeyini açıq bildirir, rəqabətcil.'
+    },
+    stenDesc:[
+      '','Həmişə boyun əyir, öz fikrini bildirmir','Çox uyğunlaşan','Münaqişədən qaçır','Bəzən öz fikrini bildirir','Balanslaşdırılmış — həm uyğun həm qətiyyətli','Lazım olanda öz mövqeyini tutur','Qərar verici, liderlik göstərir','Güclü dominant, öz fikrini həmişə bildirir','Son dərəcə dominant, rəqabətcil lider'
+    ]
+  },
+  {
+    key:'FF', label:'fF', name:'Canlılıq',
+    left:'Ciddi · Tutumlu', right:'Enerjili · Şən',
+    desc:{
+      low:'STEN 1-3: Ciddi, tutumlu, işə fokuslanmış, zarafatı sevmir.',
+      mid:'STEN 4-7: Balanslaşdırılmış — həm ciddi həm neşəli.',
+      high:'STEN 8-10: Çox enerjili, şən, insanları canlandırır.'
+    },
+    stenDesc:[
+      '','Son dərəcə ciddi, zarafat yoxdur','Çox tutumlu, sərt','Ciddi, işinə fokuslanmış','Bir qədər ciddi','Balanslaşdırılmış','Açıq, mehriban','Enerjili, insanları canlandırır','Çox şən, həvəsli','Son dərəcə enerjili, optimist'
+    ]
+  },
+  {
+    key:'FG', label:'fG', name:'Qaydaya riayət',
+    left:'Sərbəst · Öz istəyi', right:'Vicdanlı · Məsuliyyətli',
+    desc:{
+      low:'STEN 1-3: Qaydalara az hörmət edir, öz yoluyla gedir.',
+      mid:'STEN 4-7: Çevik — qaydalara riayət edir amma situasiyaya görə.',
+      high:'STEN 8-10: Güclü etik dəyərlər, detallara diqqət, məsuliyyətli.'
+    },
+    stenDesc:[
+      '','Qaydaları nəzərə almır','Çox az məsuliyyət hissi','Çevik, qaydalara az bağlı','Bəzən qaydalara riayət edir','Orta məsuliyyət hissi','Adətən vicdanlı davranır','Məsuliyyəti yüksək','Güclü etik, detallara diqqətli','Son dərəcə vicdanlı, qüsursuz intizam'
+    ]
+  },
+  {
+    key:'FH', label:'fH', name:'Sosial Cəsarət',
+    left:'Çəkingən · Utancaq', right:'Sosial cəsur · Açıq',
+    desc:{
+      low:'STEN 1-3: Utancaq, yeni tanışlıqdan çəkinir, kütlə qarşısında narahat.',
+      mid:'STEN 4-7: Situasiyaya görə sosial — bəzən açıq bəzən çəkimli.',
+      high:'STEN 8-10: Sosial cəsur, yeni insanlarla asanlıqla ünsiyyət qurur.'
+    },
+    stenDesc:[
+      '','Son dərəcə utancaq, sosial fobiya var','Çox çəkingən','İnsanlar qarşısında narahat','Bir qədər çəkimli','Situasiyaya görə sosial','Ümumiyyətlə rahat','Sosial, yeni tanışlıqları xoşlayır','Çox sosial cəsur','Son dərəcə açıq, hamısı ilə asanlıqla danışır'
+    ]
+  },
+  {
+    key:'FI', label:'fI', name:'Həssaslıq',
+    left:'Praktik · Əməli', right:'Həssas · Estetik',
+    desc:{
+      low:'STEN 1-3: Praktik, əməli, qərarlarını faktlara əsaslandırır.',
+      mid:'STEN 4-7: Həm hisslərə həm məntiqə əsaslanır.',
+      high:'STEN 8-10: Güclü estetik həssaslıq, hissiyyata əsaslanır.'
+    },
+    stenDesc:[
+      '','Çox əməli, hisslər qərarına təsir etmir','Son dərəcə praktik','Məntiqə əsaslanan','Adətən faktlara baxır','Balanslaşdırılmış','Bəzən hisslərini nəzərə alır','Həssas, insanlara yaxın','Güclü empatiya','Son dərəcə həssas, estetik'
+    ]
+  },
+  {
+    key:'FL', label:'fL', name:'Güvən',
+    left:'Güvənən · Tolerant', right:'Şübhəci · Tənqidi',
+    desc:{
+      low:'STEN 1-3: İnsanlara asanlıqla güvənir, səmimi.',
+      mid:'STEN 4-7: Balanslaşdırılmış — güvənir amma diqqətlidir.',
+      high:'STEN 8-10: Şübhəci, insanların gizlin motivlərini axtarır.'
+    },
+    stenDesc:[
+      '','Hamıya körüklə güvənir','Çox sadəlövh','İnsanlara asanlıqla güvənir','Ümumiyyətlə güvənir','Balanslaşdırılmış','Bir qədər ehtiyatlı','Şübhəci, dəqiq yoxlayır','Çox şübhəci','Son dərəcə tənqidi, heç kimə tam güvənmir'
+    ]
+  },
+  {
+    key:'FM', label:'fM', name:'Abstrakt düşüncə',
+    left:'Konkret · Realist', right:'Abstrakt · Xəyalpərəst',
+    desc:{
+      low:'STEN 1-3: Konkret, realist, əlindəki işə fokuslanır.',
+      mid:'STEN 4-7: Həm praktik həm nəzəri düşünür.',
+      high:'STEN 8-10: Abstrakt, yaradıcı, böyük mənzərəni görür.'
+    },
+    stenDesc:[
+      '','Yalnız əlinskəkini görür','Son dərəcə konkret','Praktik, realist','Adətən konkret','Balanslaşdırılmış','Bəzən abstrakt düşünür','Yaradıcı, böyük mənzərəni görür','Güclü abstrakt düşüncə','Son dərəcə xəyalpərəst, visioner'
+    ]
+  },
+  {
+    key:'FN', label:'fN', name:'Məxfilik · Diplomatiya',
+    left:'Birbaşa · Açıq', right:'Diplomatik · Zirək',
+    desc:{
+      low:'STEN 1-3: Birbaşa, açıq, ağlından keçəni deyir.',
+      mid:'STEN 4-7: Balanslaşdırılmış — dürüst amma diplomatik.',
+      high:'STEN 8-10: Çox diplomatik, söz seçiminə diqqət edir.'
+    },
+    stenDesc:[
+      '','Heç bir filter yoxdur — hər şeyi deyir','Çox birbaşa','Açıq, filtersiz','Adətən birbaşa','Balanslaşdırılmış','Bir qədər diplomatik','Diplomatik, söz seçimi yaxşı','Çox zirək, hər şeyi ölçür','Son dərəcə diplomatik, gizli niyyətli'
+    ]
+  },
+  {
+    key:'FO', label:'fO', name:'Özgüvən',
+    left:'Güvənli · Arxayın', right:'Narahat · Şübhəli',
+    desc:{
+      low:'STEN 1-3: Yüksək özgüvən, özü barədə narahat deyil.',
+      mid:'STEN 4-7: Orta özgüvən, bəzən özünü şübhə edir.',
+      high:'STEN 8-10: Özünə çox az güvənir, həmişə narahat.'
+    },
+    stenDesc:[
+      '','Son dərəcə əmindir — heç nədən şübhə etmir','Güclü özgüvən','Özünə güvənir','Adətən əmindir','Orta özgüvən','Bəzən şübhə edir','Özünə tənqidi baxır','Çox az özgüvən','Son dərəcə narahat, daim özünü şübhə edir'
+    ]
+  },
+  {
+    key:'FQ1', label:'fQ₁', name:'Yeniliyə açıqlıq',
+    left:'Ənənəvi · Mühafizəkar', right:'Radikal · Eksperimental',
+    desc:{
+      low:'STEN 1-3: Ənənəvi, mühafizəkar, dəyişiklikdən qaçır.',
+      mid:'STEN 4-7: Balanslaşdırılmış — yenilikçi amma ənənəyə hörmətli.',
+      high:'STEN 8-10: Radikal, dəyişikliyi sevir, yeni ideyaları qəbul edir.'
+    },
+    stenDesc:[
+      '','Dəyişikliyə kəskin müqavimət','Son dərəcə mühafizəkar','Ənənəvi','Adətən köhnə üsulları üstün tutur','Balanslaşdırılmış','Yeniliklərə açıqdır','Dəyişikliyi sevir','Radikal, innovativ','Son dərəcə eksperimental'
+    ]
+  },
+  {
+    key:'FQ2', label:'fQ₂', name:'Müstəqillik',
+    left:'Qrupa bağlı · Sosial', right:'Müstəqil · Özbaşına',
+    desc:{
+      low:'STEN 1-3: Komanda şəraitini sevir, qrup dəstəyinə ehtiyac duyur.',
+      mid:'STEN 4-7: Həm müstəqil həm komandada işləyir.',
+      high:'STEN 8-10: Müstəqil, tək işləməyi üstün tutur.'
+    },
+    stenDesc:[
+      '','Tək qalmaqdan qorxur','Qrupa çox bağlı','Komandanı üstün tutur','Adətən qrupda işləyir','Balanslaşdırılmış','Həm tək həm qrupda işləyir','Müstəqil işləməyi üstün tutur','Çox müstəqil','Son dərəcə özbaşına, tək işləyir'
+    ]
+  },
+  {
+    key:'FQ3', label:'fQ₃', name:'Özünü idarə',
+    left:'Nizamsız · Öz istəyi', right:'Özünü idarə edən · Dəqiq',
+    desc:{
+      low:'STEN 1-3: Nizamsız, plansız, impulsiv davranır.',
+      mid:'STEN 4-7: Orta özünü idarəetmə bacarığı.',
+      high:'STEN 8-10: Güclü özünü idarəetmə, planlı, məqsədyönlü.'
+    },
+    stenDesc:[
+      '','Heç bir planı yoxdur, tamamilə impulsiv','Çox nizamsız','Plansız davranır','Bəzən özünü idarə edə bilir','Orta özünü idarəetmə','Adətən planlı','Planlı, məqsədyönlü','Güclü özünü idarəetmə','Son dərəcə dəqiq, mükəmməlçi'
+    ]
+  },
+  {
+    key:'FQ4', label:'fQ₄', name:'Gərginlik',
+    left:'Sakit · Rahat', right:'Gərgin · Tələsik',
+    desc:{
+      low:'STEN 1-3: Çox sakit, rahat, heç nəy tələsmir.',
+      mid:'STEN 4-7: Orta gərginlik səviyyəsi, idarə olunur.',
+      high:'STEN 8-10: Gərgin, tələsik, həmişə narahat.'
+    },
+    stenDesc:[
+      '','Son dərəcə rahat, heç nə üçün narahat olmur','Çox sakit','Ümumiyyətlə rahat','Az gərginlik yaşayır','Orta gərginlik','Bəzən narahat olur','Tez-tez gərgin','Çox tələsik, həmişə narahat','Son dərəcə gərgin, yorucu enerji'
+    ]
+  }
+];
+
+// İdeal profil dəyərləri — min və max STEN
+let idealProfile = {};
+FACTORS.forEach(f => {
+  idealProfile[f.key] = {min:4, max:7, weight:'medium'};
+});
+
+// ============================================================
+// FAKTOR SLIDER RENDER
+// ============================================================
+function renderFactors() {
+  const grid = document.getElementById('factor-grid');
+  grid.innerHTML = '';
+
+  FACTORS.forEach(f => {
+    const val = idealProfile[f.key];
+    const div = document.createElement('div');
+    div.className = 'factor-row';
+    div.id = `row-${f.key}`;
+
+    div.innerHTML = `
+      <div class="factor-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="factor-badge">${f.label}</span>
+          <span class="factor-name">${f.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select class="weight-select w-${val.weight==='high'?'high':val.weight==='low'?'low':'med'}"
+            id="weight-${f.key}" onchange="updateWeight('${f.key}',this)">
+            <option value="high" ${val.weight==='high'?'selected':''}>⭐ Çox vacib</option>
+            <option value="medium" ${val.weight==='medium'?'selected':''}>• Vacib</option>
+            <option value="low" ${val.weight==='low'?'selected':''}>◦ Az vacib</option>
+          </select>
+          <div style="font-size:12px;color:var(--accent);font-weight:700;font-family:'JetBrains Mono',monospace;min-width:60px;text-align:right;">
+            STEN: <span id="val-${f.key}">${val.min}–${val.max}</span>
+          </div>
+        </div>
+      </div>
+      <div class="factor-poles">
+        <span class="factor-left">← ${f.left}</span>
+        <span class="factor-right">${f.right} →</span>
+      </div>
+      <div class="range-wrap">
+        <div class="range-track">
+          <div class="range-fill" id="fill-${f.key}"></div>
+        </div>
+        <input type="range" class="range-input" id="min-${f.key}"
+          min="1" max="10" value="${val.min}"
+          oninput="updateRange('${f.key}','min',this.value)">
+        <input type="range" class="range-input upper" id="max-${f.key}"
+          min="1" max="10" value="${val.max}"
+          oninput="updateRange('${f.key}','max',this.value)">
+      </div>
+      <div class="sten-display" id="sten-${f.key}"></div>
+      <div class="sten-desc" id="desc-${f.key}"></div>
+    `;
+    grid.appendChild(div);
+
+    updateFill(f.key);
+    renderStenCells(f.key);
+    updateDesc(f.key);
+  });
+}
+
+function updateRange(key, type, val) {
+  val = parseInt(val);
+  const minEl = document.getElementById(`min-${key}`);
+  const maxEl = document.getElementById(`max-${key}`);
+
+  if(type === 'min') {
+    if(val > idealProfile[key].max) {
+      val = idealProfile[key].max;
+      minEl.value = val;
+    }
+    idealProfile[key].min = val;
+  } else {
+    if(val < idealProfile[key].min) {
+      val = idealProfile[key].min;
+      maxEl.value = val;
+    }
+    idealProfile[key].max = val;
+  }
+
+  document.getElementById(`val-${key}`).textContent =
+    `${idealProfile[key].min}–${idealProfile[key].max}`;
+  updateFill(key);
+  renderStenCells(key);
+  updateDesc(key);
+  renderPreview();
+}
+
+function updateFill(key) {
+  const fill = document.getElementById(`fill-${key}`);
+  const min = idealProfile[key].min;
+  const max = idealProfile[key].max;
+  const left = ((min-1)/9)*100;
+  const right = ((max-1)/9)*100;
+  fill.style.left = left+'%';
+  fill.style.width = (right-left)+'%';
+}
+
+function renderStenCells(key) {
+  const el = document.getElementById(`sten-${key}`);
+  const min = idealProfile[key].min;
+  const max = idealProfile[key].max;
+  el.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(i =>
+    `<div class="sten-cell num ${i>=min&&i<=max?'ideal':''}">${i}</div>`
+  ).join('');
+}
+
+function updateDesc(key) {
+  const f = FACTORS.find(x=>x.key===key);
+  if(!f) return;
+  const el = document.getElementById(`desc-${key}`);
+  const min = idealProfile[key].min;
+  const max = idealProfile[key].max;
+  const mid = Math.round((min+max)/2);
+  let d = '';
+  if(mid<=3) d = f.desc.low;
+  else if(mid<=7) d = f.desc.mid;
+  else d = f.desc.high;
+  el.textContent = d;
+}
+
+function updateWeight(key, sel) {
+  idealProfile[key].weight = sel.value;
+  sel.className = `weight-select w-${sel.value==='high'?'high':sel.value==='low'?'low':'med'}`;
+  renderPreview();
+}
+
+// ============================================================
+// PREVIEW TABLE
+// ============================================================
+function renderPreview() {
+  const tbody = document.getElementById('preview-tbody');
+  tbody.innerHTML = FACTORS.map(f => {
+    const val = idealProfile[f.key];
+    const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
+      `<div class="ideal-bar-cell ${i>=val.min&&i<=val.max?'on':''}"></div>`
+    ).join('');
+    const weightLabel = val.weight==='high'?'⭐ Çox vacib':val.weight==='low'?'◦ Az vacib':'• Vacib';
+    const weightColor = val.weight==='high'?'var(--success)':val.weight==='low'?'var(--muted)':'var(--warning)';
+    return `<tr>
+      <td><span style="background:var(--accent);color:white;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;">${f.label}</span> ${f.name}</td>
+      <td style="font-size:11px;color:var(--muted);">${f.left}</td>
+      <td><div class="ideal-bar">${cells}</div></td>
+      <td style="font-size:11px;color:var(--muted);">${f.right}</td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);">${val.min}–${val.max}</span></td>
+      <td><span style="font-size:12px;font-weight:600;color:${weightColor};">${weightLabel}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// SAXLA / YÜKLƏ
+// ============================================================
+function openSaveModal() {
+  const name = document.getElementById('profile-name').value.trim();
+  document.getElementById('save-name').value = name || 'İdeal Profil';
+  document.getElementById('save-company').value = companyData?.name || '—';
+  document.getElementById('modal-save').classList.add('active');
+}
+
+function closeModal(id='modal-save') {
+  document.getElementById(id).classList.remove('active');
+}
+
+async function saveProfile() {
+  const name = document.getElementById('save-name').value.trim();
+  const pos = document.getElementById('profile-pos').value.trim();
+  if(!name) { showToast('Profil adı daxil edin','error'); return; }
+  if(!companyId) { showToast('Giriş tələb olunur','error'); return; }
+
+  try {
+    await db.collection('idealProfiles').add({
+      name, position: pos,
+      companyId, companyName: companyData?.name || '',
+      factors: idealProfile,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal();
+    showToast(`"${name}" profili saxlandı ✓`, 'success');
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+async function loadProfiles() {
+  if(!companyId) return;
+  document.getElementById('modal-profiles').classList.add('active');
+  const list = document.getElementById('profiles-list');
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Yüklənir...</div>';
+
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    if(snap.empty) {
+      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Hələ saxlanmış profil yoxdur</div>';
+      return;
+    }
+    list.innerHTML = snap.docs.map(d => {
+      const data = d.data();
+      return `<div class="profile-item">
+        <div>
+          <div class="profile-item-name">${data.name}</div>
+          <div class="profile-item-meta">${data.position||'—'}</div>
+        </div>
+        <div class="profile-btns">
+          <button class="btn-sm btn-use" onclick="loadProfile('${d.id}')">📂 Yüklə</button>
+          <button class="btn-sm btn-del" onclick="deleteProfile('${d.id}','${data.name}')">🗑️</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>';
+  }
+}
+
+async function loadProfile(id) {
+  try {
+    const doc = await db.collection('idealProfiles').doc(id).get();
+    const data = doc.data();
+    idealProfile = data.factors;
+    document.getElementById('profile-name').value = data.name;
+    document.getElementById('profile-pos').value = data.position || '';
+
+    // Slider-ları yenilə
+    FACTORS.forEach(f => {
+      const val = idealProfile[f.key];
+      if(!val) return;
+      document.getElementById(`min-${f.key}`).value = val.min;
+      document.getElementById(`max-${f.key}`).value = val.max;
+      document.getElementById(`val-${f.key}`).textContent = `${val.min}–${val.max}`;
+      const wSel = document.getElementById(`weight-${f.key}`);
+      wSel.value = val.weight||'medium';
+      wSel.className = `weight-select w-${val.weight==='high'?'high':val.weight==='low'?'low':'med'}`;
+      updateFill(f.key);
+      renderStenCells(f.key);
+      updateDesc(f.key);
+    });
+    renderPreview();
+    closeModal('modal-profiles');
+    showToast(`"${data.name}" yükləndi ✓`, 'success');
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+async function deleteProfile(id, name) {
+  if(!confirm(`"${name}" profilini silmək istəyirsiniz?`)) return;
+  try {
+    await db.collection('idealProfiles').doc(id).delete();
+    showToast(`${name} silindi`, 'success');
+    loadProfiles();
+  } catch(e) { showToast('Xəta', 'error'); }
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+auth.onAuthStateChanged(async user => {
+  if(!user) { window.location.href='company-admin.html'; return; }
+  try {
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if(!adminDoc.exists) { window.location.href='company-admin.html'; return; }
+    const adminData = adminDoc.data();
+    companyId = adminData.companyId;
+    const compDoc = await db.collection('companies').doc(companyId).get();
+    companyData = compDoc.data();
+  } catch(e) { console.error(e); }
+});
+
+// ============================================================
+// TOPBAR - profillər düyməsi əlavə et
+// ============================================================
+document.querySelector('.topbar-right').insertAdjacentHTML('afterbegin',
+  '<button class="btn-top btn-back" onclick="loadProfiles()" style="background:rgba(255,255,255,0.2);color:white;">📂 Profillər</button>'
+);
+
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error'?'#dc2626':'#1e293b';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderFactors();
+renderPreview();
+</script>
+</body>
+</html>
