@@ -1977,6 +1977,71 @@ async function deleteProjCandidate(id) {
   } catch(e) { showToast('Xəta: '+e.message, 'error'); }
 }
 
+
+// ============================================================
+// BSD - Barrett Shaped Distance koeffisienti
+// Namizid profili ilə ideal profil arasındakı oxşarlıq
+// 0 = heç bir oxşarlıq, 1 = mükəmməl uyğunluq
+// ============================================================
+async function calcBSD(candidateId, profileId) {
+  try {
+    // İdeal profil
+    const idealDoc = await db.collection('idealProfiles').doc(profileId).get();
+    if(!idealDoc.exists) return null;
+    const ideal = idealDoc.data().factors;
+
+    // Namizid 15FQ nəticəsi
+    const snap = await db.collection('testResults')
+      .where('candidateId','==',candidateId)
+      .where('testType','==','16fq').get();
+    if(snap.empty) return null;
+
+    const result = snap.docs[0].data();
+    const personality = result.sectionScores?.personality || {};
+
+    const factors = ['FA','B','FC','FE','FF','FG','FH','FI','FL','FM','FN','FO','FQ1','FQ2','FQ3','FQ4'];
+    const weights = {'high':3,'medium':2,'low':1};
+
+    let numerator = 0, denominator = 0;
+
+    factors.forEach(f => {
+      const idealVal = ideal[f];
+      if(!idealVal) return;
+
+      const pd = personality[f];
+      let candidateSten = 5; // default orta
+      if(pd && pd.total > 0) {
+        const raw = Math.round((pd.agree/pd.total)*10);
+        candidateSten = Math.max(1,Math.min(10,raw));
+      }
+
+      const w = weights[idealVal.weight] || 2;
+      const idealMid = (idealVal.min + idealVal.max) / 2;
+
+      // BSD hesablaması
+      if(candidateSten >= idealVal.min && candidateSten <= idealVal.max) {
+        // Aralıq içindədir — tam uyğun
+        numerator += w;
+      } else {
+        // Kənardan nə qədər uzaq
+        const dist = Math.min(Math.abs(candidateSten - idealVal.min), Math.abs(candidateSten - idealVal.max));
+        const match = Math.max(0, 1 - dist/5);
+        numerator += w * match;
+      }
+      denominator += w;
+    });
+
+    return denominator > 0 ? Math.round((numerator/denominator)*100)/100 : 0;
+  } catch(e) {
+    console.error('BSD xəta:', e);
+    return null;
+  }
+}
+
+function openIdealProfile() {
+  window.open('ideal-profile.html', '_blank');
+}
+
 function scoreToSten(score) {
   if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
   if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
@@ -2124,8 +2189,9 @@ window.copyToClipboard = copyToClipboard;
 window.deleteProject = deleteProject;
 window.deleteCandidate = deleteCandidate;
 window.deleteProjCandidate = deleteProjCandidate;
+window.openIdealProfile = openIdealProfile;
+window.calcBSD = calcBSD;
 
 </script>
 </body>
 </html>
-
