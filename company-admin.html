@@ -885,7 +885,7 @@
             <div class="page-title" id="ideal-builder-title" style="margin-bottom:0;">Yeni İdeal Profil</div>
             <div class="page-sub" style="margin-bottom:0;">16 faktor üçün ideal STEN aralığını seçin</div>
           </div>
-          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;" onclick="saveIdealProfile()">💾 Saxla</button>
+          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);" onclick="saveAndCreateLink()">🔗 Link Yarat</button>
         </div>
 
         <div class="card" style="margin-bottom:16px;">
@@ -2326,57 +2326,9 @@ async function loadIdealProfiles() {
   } catch(e) { el.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>'; }
 }
 
-// İdeal profil üçün test linki yarat
+// İdeal profil üçün test linki yarat — siyahıdan
 async function createIdealTestLink(idealProfileId, profileName) {
-  // Namizid adı və email al
-  const name = prompt('Namizid adı:');
-  if(!name || !name.trim()) return;
-  const email = prompt('Namizid e-poçtu:');
-  if(!email || !email.trim()) return;
-
-  try {
-    const ref = await db.collection('candidates').add({
-      name: name.trim(),
-      email: email.trim(),
-      companyId,
-      companyName: companyData.name,
-      idealProfileId,
-      assignedTests: ['16fq'],
-      completedTests: [],
-      active: true,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    const link = `${window.location.origin}/test?c=${ref.id}`;
-    navigator.clipboard.writeText(link).catch(()=>{});
-    // Modal ilə göstər
-    showLinkModal(link, name.trim(), profileName);
-  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
-}
-
-function showLinkModal(link, name, profileName) {
-  // Mövcud modal varsa istifadə et, yoxdursa yarat
-  let modal = document.getElementById('modal-ideal-link');
-  if(!modal) {
-    modal = document.createElement('div');
-    modal.id = 'modal-ideal-link';
-    modal.className = 'modal-overlay';
-    modal.innerHTML = `<div class="modal" style="max-width:480px;">
-      <div class="modal-close" onclick="closeModal('modal-ideal-link')">✕</div>
-      <div class="modal-title">🔗 Test Linki Hazırdır</div>
-      <div id="ideal-link-content"></div>
-    </div>`;
-    document.body.appendChild(modal);
-  }
-  document.getElementById('ideal-link-content').innerHTML = `
-    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:16px;">
-      <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:4px;">✅ Link kopyalandı!</div>
-      <div style="font-size:12px;color:var(--muted);">${name} üçün · ${profileName}</div>
-    </div>
-    <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-bottom:16px;word-break:break-all;font-family:'JetBrains Mono',monospace;font-size:12px;">${link}</div>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Namizid bu linki açanda yalnız <b>15FQ+ şəxsiyyət testi</b> keçəcək. Test bitdikdə nəticə ideal profilinizlə müqayisə ediləcək.</p>
-    <button class="btn-primary" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Linki yenidən kopyala</button>
-  `;
-  modal.classList.add('active');
+  openLinkCreateModal(idealProfileId, profileName);
 }
 
 // Yeni ideal profil yarat
@@ -2496,16 +2448,130 @@ async function saveIdealProfile() {
       factors: currentIdealProfile,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
-    if(editingIdealId) {
-      await db.collection('idealProfiles').doc(editingIdealId).update(data);
-      showToast(`"${name}" yeniləndi ✓`,'success');
+    let profileId = editingIdealId;
+    if(profileId) {
+      await db.collection('idealProfiles').doc(profileId).update(data);
     } else {
       data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection('idealProfiles').add(data);
-      showToast(`"${name}" saxlandı ✓`,'success');
+      const ref = await db.collection('idealProfiles').add(data);
+      profileId = ref.id;
+      editingIdealId = profileId;
     }
-    showPage('ideal');
-  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+    return profileId;
+  } catch(e) { showToast('Xəta: '+e.message,'error'); return null; }
+}
+
+// Profili saxla + namizid məlumatı al + link yarat
+async function saveAndCreateLink() {
+  const name = document.getElementById('ip-name').value.trim();
+  const pos = document.getElementById('ip-pos').value.trim();
+  if(!name) { showToast('Profil adı daxil edin','error'); return; }
+
+  // Əvvəlcə profili saxla
+  const profileId = await saveIdealProfile();
+  if(!profileId) return;
+
+  // Namizid məlumatı al
+  openLinkCreateModal(profileId, name);
+}
+
+// Link yaratma modal-ı
+function openLinkCreateModal(profileId, profileName) {
+  let modal = document.getElementById('modal-link-create');
+  if(!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-link-create';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `<div class="modal" style="max-width:460px;">
+      <div class="modal-close" onclick="closeModal('modal-link-create')">✕</div>
+      <div class="modal-title">🔗 Test Linki Yarat</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Namizid bu linki açanda <b>15FQ+ şəxsiyyət testi</b> keçəcək. Test bitdikdə nəticə seçdiyiniz ideal profillə müqayisə ediləcək.</p>
+      <div class="form-row">
+        <div class="field-label">Namizid adı Soyadı</div>
+        <input type="text" class="field-input" id="lc-name" placeholder="Əli Həsənov">
+      </div>
+      <div class="form-row">
+        <div class="field-label">E-poçt</div>
+        <input type="email" class="field-input" id="lc-email" placeholder="eli@email.com">
+      </div>
+      <div class="form-row">
+        <div class="field-label">Vəzifə (optional)</div>
+        <input type="text" class="field-input" id="lc-pos" placeholder="Satış mütəxəssisi">
+      </div>
+      <div id="lc-result" style="display:none;"></div>
+      <button class="btn-primary" id="lc-btn" onclick="generateTestLink()">🔗 Link Yarat</button>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+  // Profile ID saxla
+  modal.dataset.profileId = profileId;
+  modal.dataset.profileName = profileName;
+  // Reset
+  document.getElementById('lc-name').value = '';
+  document.getElementById('lc-email').value = '';
+  document.getElementById('lc-pos').value = '';
+  document.getElementById('lc-result').style.display = 'none';
+  document.getElementById('lc-btn').style.display = 'block';
+  modal.classList.add('active');
+}
+
+async function generateTestLink() {
+  const modal = document.getElementById('modal-link-create');
+  const candName = document.getElementById('lc-name').value.trim();
+  const candEmail = document.getElementById('lc-email').value.trim();
+  const candPos = document.getElementById('lc-pos').value.trim();
+  const profileId = modal.dataset.profileId;
+  const profileName = modal.dataset.profileName;
+
+  if(!candName) { showToast('Ad daxil edin','error'); return; }
+  if(!candEmail) { showToast('E-poçt daxil edin','error'); return; }
+
+  document.getElementById('lc-btn').textContent = 'Yaranır...';
+  document.getElementById('lc-btn').disabled = true;
+
+  try {
+    const ref = await db.collection('candidates').add({
+      name: candName,
+      email: candEmail,
+      position: candPos,
+      companyId,
+      companyName: companyData.name,
+      idealProfileId: profileId,
+      assignedTests: ['16fq'],
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    navigator.clipboard.writeText(link).catch(()=>{});
+
+    document.getElementById('lc-btn').style.display = 'none';
+    document.getElementById('lc-result').style.display = 'block';
+    document.getElementById('lc-result').innerHTML = `
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px;">✅ Link hazırdır və kopyalandı!</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${candName} · ${profileName}</div>
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:10px;">${link}</div>
+        <button class="btn-sm btn-report" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Yenidən kopyala</button>
+      </div>
+      <button class="btn-primary" onclick="resetLinkModal()" style="background:#64748b;">+ Yeni link yarat</button>
+    `;
+  } catch(e) {
+    showToast('Xəta: '+e.message,'error');
+    document.getElementById('lc-btn').textContent = '🔗 Link Yarat';
+    document.getElementById('lc-btn').disabled = false;
+  }
+}
+
+function resetLinkModal() {
+  document.getElementById('lc-name').value = '';
+  document.getElementById('lc-email').value = '';
+  document.getElementById('lc-pos').value = '';
+  document.getElementById('lc-result').style.display = 'none';
+  document.getElementById('lc-btn').textContent = '🔗 Link Yarat';
+  document.getElementById('lc-btn').disabled = false;
+  document.getElementById('lc-btn').style.display = 'block';
 }
 
 async function deleteIdealProfile(id, name) {
@@ -2673,6 +2739,9 @@ window.saveIdealProfile = saveIdealProfile;
 window.updateIPRange = updateIPRange;
 window.updateIPWeight = updateIPWeight;
 window.createIdealTestLink = createIdealTestLink;
+window.saveAndCreateLink = saveAndCreateLink;
+window.generateTestLink = generateTestLink;
+window.resetLinkModal = resetLinkModal;
 window.showLinkModal = showLinkModal;
 window.calcBSD = calcBSD;
 
