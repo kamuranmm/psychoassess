@@ -891,6 +891,7 @@
                 <th>Abstract</th>
                 <th>Ümumi</th>
                 <th>Sten (1-10)</th>
+                <th>Profil Uyğunluğu</th>
                 <th>Qiymət</th>
                 <th>Link</th>
               </tr>
@@ -1048,6 +1049,16 @@
         <option value="ccsi">🟠 CCSI Situasiya Mühakiməsi</option>
         <option value="all">🔷 Hamısı (Adapt-G + 16FQ + CCSI)</option>
       </select>
+    </div>
+    <div class="form-row">
+      <div class="field-label">İdeal Profil (15FQ+ üçün)</div>
+      <select class="field-input" id="proj-ideal-profile">
+        <option value="">— Seçilməyib —</option>
+      </select>
+      <div style="margin-top:6px;display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;color:var(--muted);">Yeni ideal profil yaratmaq üçün:</span>
+        <button type="button" onclick="openIdealProfileBuilder()" style="padding:5px 12px;border-radius:7px;border:none;background:#eff6ff;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">+ Yarat</button>
+      </div>
     </div>
     <div class="form-row">
       <div class="field-label">Qeyd (optional)</div>
@@ -1607,10 +1618,20 @@ async function loadProjects() {
   } catch(e) { list.innerHTML = '<div style="color:red;padding:20px;">Xəta baş verdi</div>'; console.error(e); }
 }
 
-function openAddProject() {
+async function openAddProject() {
   document.getElementById('proj-name').value = '';
   document.getElementById('proj-position').value = '';
   document.getElementById('proj-note').value = '';
+  // İdeal profilləri yüklə
+  const sel = document.getElementById('proj-ideal-profile');
+  sel.innerHTML = '<option value="">— Seçilməyib —</option>';
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    snap.forEach(d => {
+      const data = d.data();
+      sel.innerHTML += `<option value="${d.id}">${data.name}${data.position?' — '+data.position:''}</option>`;
+    });
+  } catch(e) {}
   openModal('modal-project');
 }
 
@@ -1620,9 +1641,11 @@ async function createProject() {
   const testType = document.getElementById('proj-test').value;
   const note = document.getElementById('proj-note').value.trim();
   if (!name) { showToast('Layihə adı mütləqdir','error'); return; }
+  const idealProfileId = document.getElementById('proj-ideal-profile').value;
   try {
     const ref = await db.collection('projects').add({
       name, position, testType, note,
+      idealProfileId: idealProfileId || null,
       companyId,
       companyName: companyData.name,
       candidateCount: 0,
@@ -1659,12 +1682,22 @@ async function loadProjectCandidates() {
     const snap = await db.collection('candidates').where('projectId','==',currentProjectId).get();
     currentProjectCandidates = snap.docs.map(d=>({id:d.id,...d.data()}));
 
-    // Nəticələri yüklə
+    // Nəticələri yüklə (adaptg)
     const resultSnaps = await Promise.all(
       currentProjectCandidates.map(c =>
         db.collection('testResults').where('candidateId','==',c.id).where('testType','==','adaptg').get()
       )
     );
+    // 16FQ nəticələrini yüklə (BSD üçün)
+    const fqSnaps = await Promise.all(
+      currentProjectCandidates.map(c =>
+        db.collection('testResults').where('candidateId','==',c.id).where('testType','==','16fq').get()
+      )
+    );
+    const fqResultsMap = {};
+    currentProjectCandidates.forEach((c,i) => {
+      if(!fqSnaps[i].empty) fqResultsMap[c.id] = fqSnaps[i].docs[0].data();
+    });
 
     // Hər namizidə xal əlavə et
     currentProjectCandidates = currentProjectCandidates.map((c,i) => {
@@ -1685,6 +1718,42 @@ async function loadProjectCandidates() {
 
     // Xala görə sırala
     currentProjectCandidates.sort((a,b) => b.totalScore - a.totalScore);
+
+    // İdeal profil varsa BSD hesabla
+    if(currentProjectData.idealProfileId && currentProjectUnlocked===currentProjectId) {
+      try {
+        const idealDoc = await db.collection('idealProfiles').doc(currentProjectData.idealProfileId).get();
+        if(idealDoc.exists) {
+          const ideal = idealDoc.data().factors;
+          const factors = ['FA','B','FC','FE','FF','FG','FH','FI','FL','FM','FN','FO','FQ1','FQ2','FQ3','FQ4'];
+          const weights = {'high':3,'medium':2,'low':1};
+          currentProjectCandidates.forEach(c => {
+            if(!c.hasResult) return;
+            // 16FQ nəticəsini tap
+            const fqRes = fqResultsMap[c.id];
+            if(!fqRes) return;
+            const personality = fqRes.sectionScores?.personality || {};
+            let numerator=0, denominator=0;
+            factors.forEach(f => {
+              const idealVal = ideal[f];
+              if(!idealVal) return;
+              const pd = personality[f];
+              let sten = 5;
+              if(pd && pd.total>0) sten = Math.max(1,Math.min(10,Math.round((pd.agree/pd.total)*10)));
+              const w = weights[idealVal.weight]||2;
+              if(sten>=idealVal.min && sten<=idealVal.max) {
+                numerator += w;
+              } else {
+                const dist = Math.min(Math.abs(sten-idealVal.min), Math.abs(sten-idealVal.max));
+                numerator += w * Math.max(0, 1-dist/5);
+              }
+              denominator += w;
+            });
+            c.bsdScore = denominator>0 ? Math.round((numerator/denominator)*100)/100 : null;
+          });
+        }
+      } catch(e) { console.error('BSD xəta:',e); }
+    }
 
     const total = currentProjectCandidates.length;
     const done = currentProjectCandidates.filter(c=>c.hasResult).length;
@@ -1730,7 +1799,7 @@ async function loadProjectCandidates() {
         html += `<tr>
           <td><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted);">${rank}</span></td>
           <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
-          <td colspan="5" style="color:var(--muted);font-size:12px;font-style:italic;">Test hələ keçilməyib</td>
+          <td colspan="6" style="color:var(--muted);font-size:12px;font-style:italic;">Test hələ keçilməyib</td>
           <td><span style="font-size:12px;color:var(--muted);">⏳ Gözləyir</span></td>
           <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
         </tr>`;
@@ -1741,6 +1810,7 @@ async function loadProjectCandidates() {
         html += `<tr style="background:#fffbeb;">
           <td><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted);">${rank}</span></td>
           <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
           <td style="color:var(--muted);font-size:13px;">🔒 —</td>
@@ -1767,6 +1837,23 @@ async function loadProjectCandidates() {
         <div style="display:flex;gap:2px;">${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div style="width:8px;height:8px;border-radius:2px;background:${i<=sten?(sten>=5?'#059669':'#dc2626'):'#e2e6f0'};"></div>`).join('')}</div>
       </div>`;
       const rankColor = rank===1?'#d97706':rank===2?'#6b7280':rank===3?'#92400e':'var(--muted)';
+      // BSD skoru
+      const bsdScore = c.bsdScore;
+      let bsdHtml = '<span style="font-size:12px;color:var(--muted);">—</span>';
+      if(bsdScore !== undefined && bsdScore !== null) {
+        const bsdPct = Math.round(bsdScore*100);
+        const bsdColor = bsdPct>=75?'var(--success)':bsdPct>=50?'var(--warning)':'var(--danger)';
+        const bsdLabel = bsdPct>=75?'Yüksək':bsdPct>=50?'Orta':'Aşağı';
+        bsdHtml = `<div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:60px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="width:${bsdPct}%;height:100%;background:${bsdColor};border-radius:3px;"></div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${bsdColor};">${bsdPct}%</span>
+          <span style="font-size:11px;color:${bsdColor};">${bsdLabel}</span>
+        </div>`;
+      } else if(currentProjectData.idealProfileId && c.hasResult) {
+        bsdHtml = '<span style="font-size:11px;color:var(--muted);">Hesablanır...</span>';
+      }
 
       html += `<tr style="background:${rank<=3?'#fafafa':''};">
         <td><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${rankColor};">${rank}</span></td>
@@ -1776,6 +1863,7 @@ async function loadProjectCandidates() {
         <td style="font-weight:700;color:#f59e0b;">${abstract}%</td>
         <td style="font-weight:800;font-size:16px;color:var(--accent);">${totalPct}%</td>
         <td>${stenBar}</td>
+        <td>${bsdHtml}</td>
         <td>${qiymət}</td>
         <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
       </tr>`;
@@ -2042,6 +2130,25 @@ function openIdealProfile() {
   window.open('ideal-profile.html', '_blank');
 }
 
+function openIdealProfileBuilder() {
+  // Yeni tabda ideal profil səhifəsini aç
+  window.open('ideal-profile.html', '_blank');
+}
+
+// Admin panel-ə qayıtdıqda ideal profil seçicini yenilə
+async function refreshIdealProfiles() {
+  const sel = document.getElementById('proj-ideal-profile');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— Seçilməyib —</option>';
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    snap.forEach(d => {
+      const data = d.data();
+      sel.innerHTML += `<option value="${d.id}">${data.name}${data.position?' — '+data.position:''}</option>`;
+    });
+  } catch(e) {}
+}
+
 function scoreToSten(score) {
   if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
   if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
@@ -2190,6 +2297,7 @@ window.deleteProject = deleteProject;
 window.deleteCandidate = deleteCandidate;
 window.deleteProjCandidate = deleteProjCandidate;
 window.openIdealProfile = openIdealProfile;
+window.openIdealProfileBuilder = openIdealProfileBuilder;
 window.calcBSD = calcBSD;
 
 </script>
