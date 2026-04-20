@@ -132,6 +132,7 @@ body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="topbar-logo">PsychoAssess — İdeal Profil</div>
   <div class="topbar-right">
     <button class="btn-top btn-back" onclick="history.back()">← Geri</button>
+    <button class="btn-top btn-back btn-profiles" onclick="loadProfiles()" style="background:rgba(255,255,255,0.2);">📂 Profillər</button>
     <button class="btn-top btn-save" onclick="openSaveModal()">💾 Profili Saxla</button>
   </div>
 </div>
@@ -694,8 +695,21 @@ auth.onAuthStateChanged(async user => {
     companyId = adminData.companyId;
     const compDoc = await db.collection('companies').doc(companyId).get();
     companyData = compDoc.data();
+    // Saxlanmış profilləri yüklə
+    await loadSavedProfiles();
   } catch(e) { console.error(e); }
 });
+
+// Saxlanmış profilləri topbar-a əlavə et
+async function loadSavedProfiles() {
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    const count = snap.size;
+    // Profillər düyməsini yenilə
+    const btn = document.querySelector('.topbar-right .btn-profiles');
+    if(btn) btn.textContent = `📂 Profillər (${count})`;
+  } catch(e) {}
+}
 
 // ============================================================
 // TOPBAR - profillər düyməsi əlavə et
