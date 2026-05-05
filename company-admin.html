@@ -658,8 +658,12 @@
     <div class="field-label">E-poçt</div>
     <input type="email" class="field-input" id="loginEmail" placeholder="admin@sirket.az">
     <div class="field-label">Şifrə</div>
-    <input type="password" class="field-input" id="loginPassword" placeholder="••••••••">
-    <button class="btn-primary" onclick="doLogin()">Daxil ol</button>
+    <input type="password" class="field-input" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-primary" onclick="doLogin()" style="margin-top:4px;">Daxil ol</button>
+    <div style="text-align:center;margin-top:12px;">
+      <span onclick="doForgotPassword()" style="font-size:13px;color:#0057b8;cursor:pointer;text-decoration:underline;font-weight:600;">Şifrəni unutdum?</span>
+    </div>
+    <div id="resetMsg" style="display:none;margin-top:10px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:13px;color:#059669;font-weight:600;text-align:center;"></div>
   </div>
 </div>
 
@@ -1306,6 +1310,23 @@ async function doLogin() {
     await auth.signInWithEmailAndPassword(email, pass);
   } catch(e) {
     showLoginError('E-poçt və ya şifrə səhvdir.');
+  }
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) {
+    showLoginError('Zəhmət olmasa əvvəlcə e-poçt ünvanını daxil edin.');
+    return;
+  }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    document.getElementById('loginError').textContent = '';
+    const msg = document.getElementById('resetMsg');
+    msg.textContent = '✓ Şifrə sıfırlama linki ' + email + ' ünvanına göndərildi. E-poçtunuzu yoxlayın.';
+    msg.style.display = 'block';
+  } catch(e) {
+    showLoginError('Bu e-poçt tapılmadı və ya xəta baş verdi.');
   }
 }
 
