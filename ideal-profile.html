@@ -3,734 +3,2815 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PsychoAssess — İdeal Profil</title>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<title>PsychoAssess — Şirkət Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.min.js"></script>
 <style>
-:root{
-  --bg:#f0f4f8;--surface:#fff;--surface2:#f8fafc;--border:#e2e8f0;
-  --accent:#0057b8;--accent2:#0ea5e9;--success:#059669;--warning:#d97706;
-  --danger:#dc2626;--text:#1e293b;--muted:#64748b;
-  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.04);
-}
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  :root {
+    --bg: #f4f6fb;
+    --surface: #ffffff;
+    --surface2: #f0f2f8;
+    --border: #e2e6f0;
+    --accent: #4f46e5;
+    --accent2: #7c3aed;
+    --accent3: #059669;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --danger: #dc2626;
+    --warning: #d97706;
+    --success: #059669;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  }
 
-/* TOPBAR */
-.topbar{background:var(--accent);padding:0 28px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.topbar-logo{font-size:18px;font-weight:800;color:white;}
-.topbar-right{display:flex;gap:10px;}
-.btn-top{padding:8px 18px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;transition:all 0.2s;}
-.btn-save{background:white;color:var(--accent);}
-.btn-save:hover{background:#dbeafe;}
-.btn-back{background:rgba(255,255,255,0.15);color:white;border:1px solid rgba(255,255,255,0.3);}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-/* SCREENS */
-.screen{display:none;}
-.screen.active{display:block;}
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-/* SETUP SCREEN */
-.setup-wrap{max-width:860px;margin:0 auto;padding:32px 20px;}
-.page-title{font-size:26px;font-weight:800;margin-bottom:4px;}
-.page-sub{font-size:14px;color:var(--muted);margin-bottom:28px;}
+  /* LOGIN */
+  #loginScreen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
 
-.setup-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:28px;margin-bottom:20px;box-shadow:var(--shadow);}
-.card-title{font-size:15px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
-.card-desc{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;}
+  .login-box {
+    background: white;
+    border-radius: 24px;
+    padding: 48px;
+    width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
 
-.field-label{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-.field-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:14px;color:var(--text);background:var(--surface2);outline:none;transition:border 0.2s;}
-.field-input:focus{border-color:var(--accent);}
-.form-row{margin-bottom:16px;}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .login-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
 
-/* FACTOR SLIDERS */
-.factor-grid{display:flex;flex-direction:column;gap:14px;}
+  .login-sub {
+    color: var(--muted);
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
 
-.factor-row{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:16px 18px;position:relative;}
-.factor-row:hover{border-color:var(--accent);background:#eff6ff;}
-.factor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.factor-badge{background:var(--accent);color:white;border-radius:6px;padding:3px 10px;font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;}
-.factor-name{font-size:14px;font-weight:700;color:var(--text);}
-.factor-poles{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px;}
-.factor-left{color:var(--muted);}
-.factor-right{color:var(--muted);}
+  .field-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 7px;
+  }
 
-/* RANGE SLIDER - ikili: min və max */
-.range-wrap{position:relative;height:36px;display:flex;align-items:center;}
-.range-track{position:absolute;left:0;right:0;height:8px;background:#e2e8f0;border-radius:4px;overflow:visible;}
-.range-fill{position:absolute;height:8px;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;pointer-events:none;}
-.range-input{position:absolute;width:100%;height:8px;background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none;left:0;}
-.range-input::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid white;box-shadow:0 2px 6px rgba(0,87,184,0.4);cursor:pointer;pointer-events:all;transition:transform 0.15s;}
-.range-input::-webkit-slider-thumb:hover{transform:scale(1.15);}
-.range-input::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--accent);border:3px solid white;box-shadow:0 2px 6px rgba(0,87,184,0.4);cursor:pointer;pointer-events:all;}
-.range-input.upper{z-index:1;}
+  .field-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    margin-bottom: 18px;
+  }
 
-/* STEN göstəricisi */
-.sten-display{display:flex;gap:4px;margin-top:8px;}
-.sten-cell{flex:1;height:24px;border-radius:4px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#94a3b8;transition:all 0.2s;cursor:default;}
-.sten-cell.ideal{background:var(--accent);color:white;}
-.sten-cell.num{font-family:'JetBrains Mono',monospace;}
+  .field-input:focus { border-color: var(--accent); background: white; }
 
-/* Tooltip */
-.factor-tooltip{display:none;position:absolute;right:18px;top:50%;transform:translateY(-50%);background:#1e293b;color:white;border-radius:10px;padding:10px 14px;font-size:12px;line-height:1.6;max-width:260px;z-index:10;box-shadow:0 8px 24px rgba(0,0,0,0.2);}
-.factor-row:hover .factor-tooltip{display:block;}
-.factor-info{width:18px;height:18px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);cursor:help;flex-shrink:0;}
+  .btn-primary {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    color: white;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-/* WEIGHT */
-.weight-select{padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;background:white;cursor:pointer;color:var(--text);}
-.weight-select.w-high{border-color:#10b981;color:#059669;background:#f0fdf4;}
-.weight-select.w-med{border-color:#f59e0b;color:#d97706;background:#fffbeb;}
-.weight-select.w-low{border-color:#94a3b8;color:#64748b;background:#f8fafc;}
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
 
-/* PREVIEW */
-.preview-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:var(--shadow);}
-.preview-title{font-size:16px;font-weight:800;margin-bottom:16px;color:var(--accent);}
-.preview-table{width:100%;border-collapse:collapse;}
-.preview-table th{padding:8px 10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;border-bottom:2px solid var(--border);text-align:left;}
-.preview-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;font-size:13px;vertical-align:middle;}
-.preview-table tr:last-child td{border:none;}
+  .error-msg {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--danger);
+    font-size: 13px;
+    margin-bottom: 16px;
+    display: none;
+  }
 
-.ideal-bar{display:flex;gap:2px;}
-.ideal-bar-cell{width:20px;height:16px;border-radius:3px;background:#e2e8f0;}
-.ideal-bar-cell.on{background:var(--accent);}
+  /* TOPBAR */
+  #dashboard { display: none; }
 
-/* BSD koeffisienti */
-.bsd-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-top:16px;}
-.bsd-label{font-size:13px;color:var(--accent);font-weight:600;}
-.bsd-val{font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:800;color:var(--accent);}
+  .topbar {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 62px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow);
+  }
 
-/* SAVE MODAL */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center;}
-.modal-overlay.active{display:flex;}
-.modal{background:white;border-radius:18px;padding:32px;max-width:440px;width:calc(100%-32px);position:relative;}
-.modal-title{font-size:20px;font-weight:800;margin-bottom:20px;}
-.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;background:var(--border);border:none;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;}
-.btn-primary{width:100%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:12px;padding:14px;color:white;font-family:'Outfit',sans-serif;font-size:15px;font-weight:700;cursor:pointer;}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(0,87,184,0.3);}
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
 
-/* PROFILES LIST */
-.profiles-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;max-height:320px;overflow-y:auto;}
-.profile-item{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;}
-.profile-item-name{font-weight:700;font-size:14px;}
-.profile-item-meta{font-size:12px;color:var(--muted);margin-top:2px;}
-.profile-btns{display:flex;gap:6px;}
-.btn-sm{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:'Outfit',sans-serif;}
-.btn-edit{background:#eff6ff;color:var(--accent);}
-.btn-del{background:#fef2f2;color:var(--danger);}
-.btn-use{background:#f0fdf4;color:var(--success);}
+  .topbar-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+  }
 
-.toast{position:fixed;bottom:24px;right:24px;background:#1e293b;color:white;border-radius:10px;padding:12px 20px;font-size:14px;font-weight:600;z-index:999;opacity:0;transform:translateY(8px);transition:all 0.3s;pointer-events:none;}
-.toast.show{opacity:1;transform:translateY(0);}
+  .topbar-company {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+  }
 
-/* İDEAL STEN AÇIQLAMASI */
-.sten-desc{font-size:12px;color:var(--accent);font-weight:600;margin-top:4px;min-height:16px;}
+  .credit-pill {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--warning);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .credit-pill.low {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: var(--danger);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+
+  .btn-logout {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: var(--danger);
+    font-size: 13px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { background: #fee2e2; }
+
+  /* LAYOUT */
+  .main-layout { display: flex; min-height: calc(100vh - 62px); }
+
+  .sidebar {
+    width: 210px;
+    background: white;
+    border-right: 1px solid var(--border);
+    padding: 20px 12px;
+    flex-shrink: 0;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 3px;
+  }
+
+  .nav-item:hover { background: var(--surface2); color: var(--text); }
+  .nav-item.active { background: #eef2ff; color: var(--accent); font-weight: 600; }
+
+  .content { flex: 1; padding: 28px; overflow-y: auto; }
+
+  .page { display: none; }
+  .page.active { display: block; }
+
+  .page-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+
+  .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+
+  /* STATS */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: var(--shadow);
+  }
+
+  .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: var(--accent); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  /* TABLE */
+  .card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .card-header {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .card-title { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead { background: #f8fafc; }
+
+  th {
+    padding: 12px 20px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 14px;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: #f8fafc; }
+
+  .candidate-name { font-weight: 600; color: var(--text); }
+  .candidate-email { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .badge-pending { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; }
+  .badge-done { background: #f0fdf4; color: var(--success); border: 1px solid #bbf7d0; }
+  .badge-partial { background: #eef2ff; color: var(--accent); border: 1px solid #c7d2fe; }
+
+  .test-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+
+  .test-pill {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .pill-done { background: #f0fdf4; color: var(--success); }
+  .pill-pending { background: #f1f5f9; color: var(--muted); }
+
+  .action-btns { display: flex; gap: 6px; flex-wrap: wrap; }
+
+  .btn-sm {
+    padding: 6px 11px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+
+  .btn-link { background: #eef2ff; border-color: #c7d2fe; color: var(--accent); }
+  .btn-link:hover { background: #e0e7ff; }
+  .btn-report { background: #f0fdf4; border-color: #bbf7d0; color: var(--success); }
+  .btn-report:hover { background: #dcfce7; }
+  .btn-excel { background: #fffbeb; border-color: #fde68a; color: var(--warning); }
+  .btn-excel:hover { background: #fef3c7; }
+  .btn-danger { background: #fef2f2; border-color: #fecaca; color: var(--danger); }
+  .btn-danger:hover { background: #fee2e2; }
+
+  /* İDEAL PROFİL SLIDER UI */
+  .ip-factor-row {
+    background: #f8fafc; border: 1.5px solid #e2e8f0;
+    border-radius: 12px; padding: 16px 18px; margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .ip-factor-row:hover { border-color: var(--accent); background: #eff6ff; }
+  .ip-factor-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .ip-badge { background:var(--accent); color:white; border-radius:6px; padding:3px 10px; font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace; }
+  .ip-poles { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .ip-range-wrap { position:relative; height:34px; display:flex; align-items:center; margin-bottom:6px; }
+  .ip-track { position:absolute; left:0; right:0; height:8px; background:#e2e8f0; border-radius:4px; }
+  .ip-fill { position:absolute; height:8px; background:linear-gradient(90deg,#4f46e5,#7c3aed); border-radius:4px; pointer-events:none; }
+  .ip-range-input { position:absolute; width:100%; height:8px; background:transparent; -webkit-appearance:none; appearance:none; pointer-events:none; }
+  .ip-range-input::-webkit-slider-thumb { -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:var(--accent); border:3px solid white; box-shadow:0 2px 8px rgba(79,70,229,0.4); cursor:pointer; pointer-events:all; }
+  .ip-range-input.upper { z-index:1; }
+  .ip-sten-cells { display:flex; gap:3px; margin-bottom:6px; }
+  .ip-cell { flex:1; height:22px; border-radius:4px; background:#e2e8f0; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#94a3b8; font-family:'JetBrains Mono',monospace; transition:all 0.2s; }
+  .ip-cell.on { background:var(--accent); color:white; }
+  .ip-desc-text { font-size:11px; color:var(--accent); font-weight:600; min-height:15px; }
+  .ip-weight-sel { padding:5px 10px; border:1.5px solid #e2e8f0; border-radius:7px; font-size:12px; font-weight:600; cursor:pointer; background:white; }
+  .ip-weight-sel.high { border-color:#10b981; color:#059669; background:#f0fdf4; }
+  .ip-weight-sel.med { border-color:#f59e0b; color:#d97706; background:#fffbeb; }
+  .ip-weight-sel.low { border-color:#94a3b8; color:#64748b; background:#f8fafc; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 32px;
+    width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    margin-bottom: 22px;
+    color: var(--text);
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 18px; right: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 30px; height: 30px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  .modal-close:hover { background: var(--border); }
+
+  .form-row { margin-bottom: 16px; }
+
+  /* TEST SEÇIM */
+  .test-select-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .test-select-item {
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .test-select-item:hover { border-color: var(--accent); background: #f8f9ff; }
+  .test-select-item.selected { border-color: var(--accent); background: #eef2ff; }
+
+  .test-select-name { font-weight: 600; font-size: 14px; }
+  .test-select-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .test-select-credit { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--warning); }
+
+  .checkbox-custom {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .test-select-item.selected .checkbox-custom {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+    font-size: 12px;
+  }
+
+  /* LINK BOX */
+  .link-box {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .link-url {
+    font-size: 13px;
+    color: var(--accent);
+    word-break: break-all;
+    flex: 1;
+  }
+
+  .btn-copy {
+    background: var(--accent);
+    border: none;
+    border-radius: 7px;
+    padding: 7px 14px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  /* CREDIT WARNING */
+  .credit-warning {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .credit-warning-icon { font-size: 32px; margin-bottom: 8px; }
+  .credit-warning-title { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--danger); margin-bottom: 4px; }
+  .credit-warning-text { font-size: 13px; color: var(--muted); }
+
+  /* LOADING */
+  .loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: var(--muted);
+  }
+
+  .spinner {
+    width: 22px; height: 22px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 10px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--muted);
+  }
+
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 14px;
+    z-index: 9999;
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  }
+
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid var(--success); }
+  .toast.error { border-left: 4px solid var(--danger); }
+
+  /* REPORT MODAL */
+  .report-info {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .report-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .report-row:last-child { border-bottom: none; }
+  .report-row-label { color: var(--muted); }
+  .report-row-value { font-weight: 600; }
+
+  .credit-cost {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 10px;
+    padding: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .credit-cost-label { font-size: 13px; color: var(--muted); }
+  .credit-cost-value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: var(--warning); }
+
+  select.field-input { appearance: none; cursor: pointer; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: 10px;
+    padding: 4px;
+    margin-bottom: 20px;
+    width: fit-content;
+  }
+
+  .tab-btn {
+    padding: 8px 18px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .tab-btn.active { background: white; color: var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  /* PROJECT STYLES */
+  .project-card { background:white; border:1px solid var(--border); border-radius:14px; padding:22px; margin-bottom:14px; box-shadow:var(--shadow); }
+  .project-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+  .project-title { font-family:"Syne",sans-serif; font-size:17px; font-weight:700; }
+  .project-meta { font-size:12px; color:var(--muted); margin-top:3px; }
+  .project-stats { display:flex; gap:16px; margin-bottom:14px; }
+  .project-stat { background:var(--surface2); border-radius:8px; padding:8px 14px; font-size:13px; }
+  .project-stat-val { font-weight:700; color:var(--accent); font-size:16px; }
+  .project-stat-label { color:var(--muted); font-size:11px; }
+  .project-actions { display:flex; gap:8px; flex-wrap:wrap; }
+  .sten-indicator { display:inline-flex; align-items:center; gap:3px; }
+  .sten-box { width:20px; height:20px; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; }
+  .sten-box.strong { background:#dcfce7; color:#166534; }
+  .sten-box.weak { background:#fee2e2; color:#991b1b; }
+  .sten-box.inactive { background:#f1f5f9; color:#94a3b8; }
+
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-logo">PsychoAssess — İdeal Profil</div>
-  <div class="topbar-right">
-    <button class="btn-top btn-back" onclick="history.back()">← Geri</button>
-    <button class="btn-top btn-back btn-profiles" onclick="loadProfiles()" style="background:rgba(255,255,255,0.2);">📂 Profillər</button>
-    <button class="btn-top btn-save" onclick="openSaveModal()">💾 Profili Saxla</button>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">PsychoAssess</div>
+    <div class="login-sub">ŞİRKƏT ADMİN PANELİ</div>
+    <div class="error-msg" id="loginError"></div>
+    <div class="field-label">E-poçt</div>
+    <input type="email" class="field-input" id="loginEmail" placeholder="admin@sirket.az">
+    <div class="field-label">Şifrə</div>
+    <input type="password" class="field-input" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-primary" onclick="doLogin()" style="margin-top:4px;">Daxil ol</button>
+    <div style="text-align:center;margin-top:12px;">
+      <span onclick="doForgotPassword()" style="font-size:13px;color:#0057b8;cursor:pointer;text-decoration:underline;font-weight:600;">Şifrəni unutdum?</span>
+    </div>
+    <div id="resetMsg" style="display:none;margin-top:10px;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;font-size:13px;color:#059669;font-weight:600;text-align:center;"></div>
   </div>
 </div>
 
-<div class="screen active" id="screen-main">
-<div class="setup-wrap">
-  <div class="page-title">🎯 İdeal Profil Qur</div>
-  <div class="page-sub">HR olaraq hər 15FQ+ faktoru üçün ideal STEN aralığını seçin. Namizidlərin profili bu idealla müqayisə ediləcək.</div>
-
-  <!-- Profil məlumatları -->
-  <div class="setup-card">
-    <div class="card-title">📋 Profil Məlumatları</div>
-    <div class="form-grid">
-      <div class="form-row">
-        <div class="field-label">Profil adı</div>
-        <input type="text" class="field-input" id="profile-name" placeholder="məs. Müştəri Xidmətləri Nümayəndəsi">
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">PsychoAssess</div>
+      <div class="topbar-company" id="companyName">Şirkət</div>
+    </div>
+    <div class="topbar-right">
+      <div class="credit-pill" id="creditPill">
+        💳 <span id="creditCount">—</span> kredit
       </div>
-      <div class="form-row">
-        <div class="field-label">Vəzifə</div>
-        <input type="text" class="field-input" id="profile-pos" placeholder="məs. Call Center Agent">
+      <button class="btn-logout" onclick="doLogout()">Çıxış</button>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <div class="sidebar">
+      <div class="nav-item active" onclick="showPage('overview')" id="nav-overview">
+        <span>📊</span> İcmal
+      </div>
+      <div class="nav-item" onclick="showPage('projects')" id="nav-projects"><span>📁</span> Layihələr</div><div class="nav-item" onclick="showPage('candidates')" id="nav-candidates">
+        <span>👥</span> Namizidlər
+      </div>
+      <div class="nav-item" onclick="showPage('results')" id="nav-results">
+        <span>📋</span> Nəticələr
+      </div>
+      <div class="nav-item" onclick="showPage('credits')" id="nav-credits">
+        <span>💳</span> Kreditlər
+      </div>
+      <div class="nav-item" onclick="showPage('ideal')" id="nav-ideal">
+        <span>🎯</span> İdeal Profillər
       </div>
     </div>
-  </div>
 
-  <!-- 16 faktor -->
-  <div class="setup-card">
-    <div class="card-title">🧠 16 Şəxsiyyət Faktoru — İdeal STEN Aralığı</div>
-    <div class="card-desc">Hər faktor üçün ideal namizid aralığını seçin (STEN 1-10). Sürüşdürmə ilə min-max aralığı qeyd edin. Hər faktorun üzərinə keçdikdə izah görünür.</div>
-    <div class="factor-grid" id="factor-grid"></div>
-  </div>
+    <div class="content">
 
-  <!-- Önizləmə -->
-  <div class="preview-card">
-    <div class="preview-title">📊 İdeal Profil Önizləməsi</div>
-    <div style="overflow-x:auto;">
-      <table class="preview-table">
-        <thead>
-          <tr>
-            <th>Şkala</th>
-            <th>Sol Qütb</th>
-            <th style="min-width:240px;">1 · 2 · 3 · 4 · 5 · 6 · 7 · 8 · 9 · 10</th>
-            <th>Sağ Qütb</th>
-            <th>Aralıq</th>
-            <th>Əhəmiyyət</th>
-          </tr>
-        </thead>
-        <tbody id="preview-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-</div>
+      <!-- OVERVIEW -->
+      <div class="page active" id="page-overview">
+        <div class="page-title">İcmal</div>
+        <div class="page-sub">Şirkətinizin test vəziyyəti</div>
 
-<!-- SAXLA MODAL -->
-<div class="modal-overlay" id="modal-save">
-  <div class="modal">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-    <div class="modal-title">💾 Profili Saxla</div>
-    <div class="form-row">
-      <div class="field-label">Profil adı</div>
-      <input type="text" class="field-input" id="save-name" placeholder="İdeal Profil adı">
-    </div>
-    <div class="form-row">
-      <div class="field-label">Şirkət (avtomatik)</div>
-      <input type="text" class="field-input" id="save-company" readonly style="background:#f1f5f9;color:var(--muted);">
-    </div>
-    <button class="btn-primary" onclick="saveProfile()" style="margin-top:8px;">✅ Saxla</button>
-  </div>
-</div>
-
-<!-- MÖVCUD PROFİLLƏR MODAL -->
-<div class="modal-overlay" id="modal-profiles">
-  <div class="modal" style="max-width:560px;">
-    <button class="modal-close" onclick="closeModal('modal-profiles')">✕</button>
-    <div class="modal-title">📂 Saxlanmış Profillər</div>
-    <div class="profiles-list" id="profiles-list">
-      <div style="text-align:center;padding:20px;color:var(--muted);">Yüklənir...</div>
-    </div>
-    <button class="btn-primary" onclick="closeModal('modal-profiles')" style="background:#64748b;">Bağla</button>
-  </div>
-</div>
-
-<div class="toast" id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-app-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-auth-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/firebase@10.7.1/firebase-firestore-compat.min.js"></script>
-<script>
-firebase.initializeApp({
-  apiKey:"AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
-  authDomain:"hr-testing-48e31.firebaseapp.com",
-  projectId:"hr-testing-48e31",
-  storageBucket:"hr-testing-48e31.firebasestorage.app",
-  messagingSenderId:"905744094931",
-  appId:"1:905744094931:web:2e16300768f61b4fd76626"
-});
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-let companyId = null, companyData = null;
-
-// ============================================================
-// 16 FAKTOR TƏRİFLƏRİ
-// ============================================================
-const FACTORS = [
-  {
-    key:'FA', label:'fA', name:'İstiqanlılıq',
-    left:'Soyuqqanlı · Məsafəli', right:'İstiqanlı · Empatik',
-    desc: {
-      low:'STEN 1-3: Formal, məsafəli, emosional bağlılıqdan qaçan. Müstəqil, işə fokuslanmış.',
-      mid:'STEN 4-7: Balanslaşdırılmış — həm professional, həm də mehriban.',
-      high:'STEN 8-10: Çox istiqanlı, empatik, insanlarla güclü bağ quran.'
-    },
-    stenDesc:[
-      '','Son dərəcə soyuqqanlı, insanlarla formal münasibət','Çox məsafəli, emosional bağlılıq az','Adətən formal davranır','Bir qədər çəkimli lakin işini görür','Balanslaşdırılmış — həm professional həm mehriban','İnsanlarla yaxşı ünsiyyət qurur','Mehriban, dəstəkləyici','Çox istiqanlı, empatik, insanları anlayan','Son dərəcə empatiik, hər kəsə qayğı göstərən'
-    ]
-  },
-  {
-    key:'B', label:'β', name:'İntellektans',
-    left:'Aşağı intellektans', right:'Yüksək intellektans',
-    desc:{
-      low:'STEN 1-3: Konkret düşüncə, sadə tapşırıqlar üçün uyğun.',
-      mid:'STEN 4-7: Orta analitik qabiliyyət, əksər iş vəzifələri üçün kifayət.',
-      high:'STEN 8-10: Yüksək analitik qabiliyyət, mürəkkəb problemlər həll edir.'
-    },
-    stenDesc:[
-      '','Çox sadə tapşırıqları yerinə yetirir','Məhdud analitik düşüncə','Konkret, sadə məntiqlə işləyir','Orta analitik qabiliyyət var','Adekvat intellektual bacarıq','Analitik düşüncəsi inkişaf etmişdir','Zirək, problemləri tez həll edir','Güclü analitik qabiliyyət','Son dərəcə intellektual, mürəkkəb məsələləri həll edir'
-    ]
-  },
-  {
-    key:'FC', label:'fC', name:'Emosional Sabitlik',
-    left:'Hisslərə tabe olan', right:'Emosional sabit',
-    desc:{
-      low:'STEN 1-3: Stress altında çətin qalır, emosional dalgalanmalar.',
-      mid:'STEN 4-7: Orta emosional sabitlik, əksər vəziyyətləri idarə edir.',
-      high:'STEN 8-10: Stress altında sakit, emosional baxımdan çox sabit.'
-    },
-    stenDesc:[
-      '','Çox emosional, stress altında çöküş yaşayır','Tez-tez narahat olur','Emosional dalgalanmaları var','Bəzən stressdən etkilənir','Normal emosional tarazlıq','Ümumiyyətlə sakit qalır','Stress altında effektiv işləyir','Emosional cəhətdən güclü','Son dərəcə sakit, heç nəy sarsılmır'
-    ]
-  },
-  {
-    key:'FE', label:'fE', name:'Dominantlıq',
-    left:'Uyğunlaşan · Mülayim', right:'Dominant · İddialı',
-    desc:{
-      low:'STEN 1-3: Çox uyğunlaşan, münaqişədən qaçır, başqalarına boyun əyir.',
-      mid:'STEN 4-7: Balanslaşdırılmış — lazım olanda öz fikrini bildirir.',
-      high:'STEN 8-10: Güclü lider, öz mövqeyini açıq bildirir, rəqabətcil.'
-    },
-    stenDesc:[
-      '','Həmişə boyun əyir, öz fikrini bildirmir','Çox uyğunlaşan','Münaqişədən qaçır','Bəzən öz fikrini bildirir','Balanslaşdırılmış — həm uyğun həm qətiyyətli','Lazım olanda öz mövqeyini tutur','Qərar verici, liderlik göstərir','Güclü dominant, öz fikrini həmişə bildirir','Son dərəcə dominant, rəqabətcil lider'
-    ]
-  },
-  {
-    key:'FF', label:'fF', name:'Canlılıq',
-    left:'Ciddi · Tutumlu', right:'Enerjili · Şən',
-    desc:{
-      low:'STEN 1-3: Ciddi, tutumlu, işə fokuslanmış, zarafatı sevmir.',
-      mid:'STEN 4-7: Balanslaşdırılmış — həm ciddi həm neşəli.',
-      high:'STEN 8-10: Çox enerjili, şən, insanları canlandırır.'
-    },
-    stenDesc:[
-      '','Son dərəcə ciddi, zarafat yoxdur','Çox tutumlu, sərt','Ciddi, işinə fokuslanmış','Bir qədər ciddi','Balanslaşdırılmış','Açıq, mehriban','Enerjili, insanları canlandırır','Çox şən, həvəsli','Son dərəcə enerjili, optimist'
-    ]
-  },
-  {
-    key:'FG', label:'fG', name:'Qaydaya riayət',
-    left:'Sərbəst · Öz istəyi', right:'Vicdanlı · Məsuliyyətli',
-    desc:{
-      low:'STEN 1-3: Qaydalara az hörmət edir, öz yoluyla gedir.',
-      mid:'STEN 4-7: Çevik — qaydalara riayət edir amma situasiyaya görə.',
-      high:'STEN 8-10: Güclü etik dəyərlər, detallara diqqət, məsuliyyətli.'
-    },
-    stenDesc:[
-      '','Qaydaları nəzərə almır','Çox az məsuliyyət hissi','Çevik, qaydalara az bağlı','Bəzən qaydalara riayət edir','Orta məsuliyyət hissi','Adətən vicdanlı davranır','Məsuliyyəti yüksək','Güclü etik, detallara diqqətli','Son dərəcə vicdanlı, qüsursuz intizam'
-    ]
-  },
-  {
-    key:'FH', label:'fH', name:'Sosial Cəsarət',
-    left:'Çəkingən · Utancaq', right:'Sosial cəsur · Açıq',
-    desc:{
-      low:'STEN 1-3: Utancaq, yeni tanışlıqdan çəkinir, kütlə qarşısında narahat.',
-      mid:'STEN 4-7: Situasiyaya görə sosial — bəzən açıq bəzən çəkimli.',
-      high:'STEN 8-10: Sosial cəsur, yeni insanlarla asanlıqla ünsiyyət qurur.'
-    },
-    stenDesc:[
-      '','Son dərəcə utancaq, sosial fobiya var','Çox çəkingən','İnsanlar qarşısında narahat','Bir qədər çəkimli','Situasiyaya görə sosial','Ümumiyyətlə rahat','Sosial, yeni tanışlıqları xoşlayır','Çox sosial cəsur','Son dərəcə açıq, hamısı ilə asanlıqla danışır'
-    ]
-  },
-  {
-    key:'FI', label:'fI', name:'Həssaslıq',
-    left:'Praktik · Əməli', right:'Həssas · Estetik',
-    desc:{
-      low:'STEN 1-3: Praktik, əməli, qərarlarını faktlara əsaslandırır.',
-      mid:'STEN 4-7: Həm hisslərə həm məntiqə əsaslanır.',
-      high:'STEN 8-10: Güclü estetik həssaslıq, hissiyyata əsaslanır.'
-    },
-    stenDesc:[
-      '','Çox əməli, hisslər qərarına təsir etmir','Son dərəcə praktik','Məntiqə əsaslanan','Adətən faktlara baxır','Balanslaşdırılmış','Bəzən hisslərini nəzərə alır','Həssas, insanlara yaxın','Güclü empatiya','Son dərəcə həssas, estetik'
-    ]
-  },
-  {
-    key:'FL', label:'fL', name:'Güvən',
-    left:'Güvənən · Tolerant', right:'Şübhəci · Tənqidi',
-    desc:{
-      low:'STEN 1-3: İnsanlara asanlıqla güvənir, səmimi.',
-      mid:'STEN 4-7: Balanslaşdırılmış — güvənir amma diqqətlidir.',
-      high:'STEN 8-10: Şübhəci, insanların gizlin motivlərini axtarır.'
-    },
-    stenDesc:[
-      '','Hamıya körüklə güvənir','Çox sadəlövh','İnsanlara asanlıqla güvənir','Ümumiyyətlə güvənir','Balanslaşdırılmış','Bir qədər ehtiyatlı','Şübhəci, dəqiq yoxlayır','Çox şübhəci','Son dərəcə tənqidi, heç kimə tam güvənmir'
-    ]
-  },
-  {
-    key:'FM', label:'fM', name:'Abstrakt düşüncə',
-    left:'Konkret · Realist', right:'Abstrakt · Xəyalpərəst',
-    desc:{
-      low:'STEN 1-3: Konkret, realist, əlindəki işə fokuslanır.',
-      mid:'STEN 4-7: Həm praktik həm nəzəri düşünür.',
-      high:'STEN 8-10: Abstrakt, yaradıcı, böyük mənzərəni görür.'
-    },
-    stenDesc:[
-      '','Yalnız əlinskəkini görür','Son dərəcə konkret','Praktik, realist','Adətən konkret','Balanslaşdırılmış','Bəzən abstrakt düşünür','Yaradıcı, böyük mənzərəni görür','Güclü abstrakt düşüncə','Son dərəcə xəyalpərəst, visioner'
-    ]
-  },
-  {
-    key:'FN', label:'fN', name:'Məxfilik · Diplomatiya',
-    left:'Birbaşa · Açıq', right:'Diplomatik · Zirək',
-    desc:{
-      low:'STEN 1-3: Birbaşa, açıq, ağlından keçəni deyir.',
-      mid:'STEN 4-7: Balanslaşdırılmış — dürüst amma diplomatik.',
-      high:'STEN 8-10: Çox diplomatik, söz seçiminə diqqət edir.'
-    },
-    stenDesc:[
-      '','Heç bir filter yoxdur — hər şeyi deyir','Çox birbaşa','Açıq, filtersiz','Adətən birbaşa','Balanslaşdırılmış','Bir qədər diplomatik','Diplomatik, söz seçimi yaxşı','Çox zirək, hər şeyi ölçür','Son dərəcə diplomatik, gizli niyyətli'
-    ]
-  },
-  {
-    key:'FO', label:'fO', name:'Özgüvən',
-    left:'Güvənli · Arxayın', right:'Narahat · Şübhəli',
-    desc:{
-      low:'STEN 1-3: Yüksək özgüvən, özü barədə narahat deyil.',
-      mid:'STEN 4-7: Orta özgüvən, bəzən özünü şübhə edir.',
-      high:'STEN 8-10: Özünə çox az güvənir, həmişə narahat.'
-    },
-    stenDesc:[
-      '','Son dərəcə əmindir — heç nədən şübhə etmir','Güclü özgüvən','Özünə güvənir','Adətən əmindir','Orta özgüvən','Bəzən şübhə edir','Özünə tənqidi baxır','Çox az özgüvən','Son dərəcə narahat, daim özünü şübhə edir'
-    ]
-  },
-  {
-    key:'FQ1', label:'fQ₁', name:'Yeniliyə açıqlıq',
-    left:'Ənənəvi · Mühafizəkar', right:'Radikal · Eksperimental',
-    desc:{
-      low:'STEN 1-3: Ənənəvi, mühafizəkar, dəyişiklikdən qaçır.',
-      mid:'STEN 4-7: Balanslaşdırılmış — yenilikçi amma ənənəyə hörmətli.',
-      high:'STEN 8-10: Radikal, dəyişikliyi sevir, yeni ideyaları qəbul edir.'
-    },
-    stenDesc:[
-      '','Dəyişikliyə kəskin müqavimət','Son dərəcə mühafizəkar','Ənənəvi','Adətən köhnə üsulları üstün tutur','Balanslaşdırılmış','Yeniliklərə açıqdır','Dəyişikliyi sevir','Radikal, innovativ','Son dərəcə eksperimental'
-    ]
-  },
-  {
-    key:'FQ2', label:'fQ₂', name:'Müstəqillik',
-    left:'Qrupa bağlı · Sosial', right:'Müstəqil · Özbaşına',
-    desc:{
-      low:'STEN 1-3: Komanda şəraitini sevir, qrup dəstəyinə ehtiyac duyur.',
-      mid:'STEN 4-7: Həm müstəqil həm komandada işləyir.',
-      high:'STEN 8-10: Müstəqil, tək işləməyi üstün tutur.'
-    },
-    stenDesc:[
-      '','Tək qalmaqdan qorxur','Qrupa çox bağlı','Komandanı üstün tutur','Adətən qrupda işləyir','Balanslaşdırılmış','Həm tək həm qrupda işləyir','Müstəqil işləməyi üstün tutur','Çox müstəqil','Son dərəcə özbaşına, tək işləyir'
-    ]
-  },
-  {
-    key:'FQ3', label:'fQ₃', name:'Özünü idarə',
-    left:'Nizamsız · Öz istəyi', right:'Özünü idarə edən · Dəqiq',
-    desc:{
-      low:'STEN 1-3: Nizamsız, plansız, impulsiv davranır.',
-      mid:'STEN 4-7: Orta özünü idarəetmə bacarığı.',
-      high:'STEN 8-10: Güclü özünü idarəetmə, planlı, məqsədyönlü.'
-    },
-    stenDesc:[
-      '','Heç bir planı yoxdur, tamamilə impulsiv','Çox nizamsız','Plansız davranır','Bəzən özünü idarə edə bilir','Orta özünü idarəetmə','Adətən planlı','Planlı, məqsədyönlü','Güclü özünü idarəetmə','Son dərəcə dəqiq, mükəmməlçi'
-    ]
-  },
-  {
-    key:'FQ4', label:'fQ₄', name:'Gərginlik',
-    left:'Sakit · Rahat', right:'Gərgin · Tələsik',
-    desc:{
-      low:'STEN 1-3: Çox sakit, rahat, heç nəy tələsmir.',
-      mid:'STEN 4-7: Orta gərginlik səviyyəsi, idarə olunur.',
-      high:'STEN 8-10: Gərgin, tələsik, həmişə narahat.'
-    },
-    stenDesc:[
-      '','Son dərəcə rahat, heç nə üçün narahat olmur','Çox sakit','Ümumiyyətlə rahat','Az gərginlik yaşayır','Orta gərginlik','Bəzən narahat olur','Tez-tez gərgin','Çox tələsik, həmişə narahat','Son dərəcə gərgin, yorucu enerji'
-    ]
-  }
-];
-
-// İdeal profil dəyərləri — min və max STEN
-let idealProfile = {};
-FACTORS.forEach(f => {
-  idealProfile[f.key] = {min:4, max:7, weight:'medium'};
-});
-
-// ============================================================
-// FAKTOR SLIDER RENDER
-// ============================================================
-function renderFactors() {
-  const grid = document.getElementById('factor-grid');
-  grid.innerHTML = '';
-
-  FACTORS.forEach(f => {
-    const val = idealProfile[f.key];
-    const div = document.createElement('div');
-    div.className = 'factor-row';
-    div.id = `row-${f.key}`;
-
-    div.innerHTML = `
-      <div class="factor-header">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <span class="factor-badge">${f.label}</span>
-          <span class="factor-name">${f.name}</span>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Namizidlər</div>
+            <div class="stat-value" id="stat-cands">—</div>
+            <div class="stat-sub">Əlavə edilmiş</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tamamlanan</div>
+            <div class="stat-value" id="stat-done" style="color:var(--success)">—</div>
+            <div class="stat-sub">Test bitirmişlər</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Gözləyən</div>
+            <div class="stat-value" id="stat-pending" style="color:var(--warning)">—</div>
+            <div class="stat-sub">Hələ keçməyiblər</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Kredit</div>
+            <div class="stat-value" id="stat-credit" style="color:var(--warning)">—</div>
+            <div class="stat-sub">Qalan kredit</div>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <select class="weight-select w-${val.weight==='high'?'high':val.weight==='low'?'low':'med'}"
-            id="weight-${f.key}" onchange="updateWeight('${f.key}',this)">
-            <option value="high" ${val.weight==='high'?'selected':''}>⭐ Çox vacib</option>
-            <option value="medium" ${val.weight==='medium'?'selected':''}>• Vacib</option>
-            <option value="low" ${val.weight==='low'?'selected':''}>◦ Az vacib</option>
-          </select>
-          <div style="font-size:12px;color:var(--accent);font-weight:700;font-family:'JetBrains Mono',monospace;min-width:60px;text-align:right;">
-            STEN: <span id="val-${f.key}">${val.min}–${val.max}</span>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Son namizidlər</div>
+            <button class="btn-sm btn-link" onclick="showPage('candidates')">Hamısını gör →</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Testlər</th>
+                <th>Status</th>
+                <th>Tarix</th>
+              </tr>
+            </thead>
+            <tbody id="recent-tbody">
+              <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CANDIDATES -->
+      <div class="page" id="page-candidates">
+        <div class="page-title">Namizidlər</div>
+        <div class="page-sub">Test linki göndərin, nəticələri izləyin</div>
+
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openAddCandidate()">+ Namizid əlavə et</button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Testlər</th>
+                <th>Status</th>
+                <th>Link</th>
+                <th>Hesabatlar</th>
+              </tr>
+            </thead>
+            <tbody id="candidates-tbody">
+              <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- RESULTS -->
+      <div class="page" id="page-results">
+        <div class="page-title">Nəticələr</div>
+        <div class="page-sub">Tamamlanmış testlərin nəticələri</div>
+
+        <div class="tab-bar">
+          <button class="tab-btn active" onclick="filterResults('all',this)">Hamısı</button>
+          <button class="tab-btn" onclick="filterResults('adaptg',this)">Adapt-G</button>
+          <button class="tab-btn" onclick="filterResults('16fq',this)">16FQ</button>
+          <button class="tab-btn" onclick="filterResults('ccsi',this)">CCSI</button>
+        </div>
+
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Namizid</th>
+                <th>Test növü</th>
+                <th>Xal</th>
+                <th>Tarix</th>
+                <th>Hesabat</th>
+              </tr>
+            </thead>
+            <tbody id="results-tbody">
+              <tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CREDITS -->
+      <div class="page" id="page-credits">
+        <div class="page-title">Kredit İdarəetməsi</div>
+        <div class="page-sub">Kredit balansınız və istifadə tarixçəsi</div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+          <div class="stat-card" style="border-left:4px solid var(--warning);">
+            <div class="stat-label">Cari Kredit</div>
+            <div class="stat-value" style="color:var(--warning);font-size:40px;" id="credit-big">—</div>
+            <div class="stat-sub">Qalan kredit sayı</div>
+          </div>
+          <div class="stat-card" style="border-left:4px solid var(--accent);">
+            <div class="stat-label">Kredit Qiymətləri</div>
+            <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Adapt-G PDF</span><span style="font-weight:700;color:var(--warning)">5 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Adapt-G Excel</span><span style="font-weight:700;color:var(--warning)">3 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>16FQ PDF</span><span style="font-weight:700;color:var(--warning)">5 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>CCSI PDF</span><span style="font-weight:700;color:var(--warning)">3 kredit</span>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;">
+                <span>Konsolidə</span><span style="font-weight:700;color:var(--warning)">8 kredit</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="credit-warning" id="low-credit-warning" style="display:none;">
+          <div class="credit-warning-icon">⚠️</div>
+          <div class="credit-warning-title">Kredit azalıb!</div>
+          <div class="credit-warning-text">Kredit yenilənməsi üçün bizimlə əlaqə saxlayın.</div>
+          <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:12px;background:var(--danger);color:white;padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">📧 Müraciət et</a>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">Kredit Tarixçəsi</div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Növ</th>
+                <th>Məbləğ</th>
+                <th>Səbəb</th>
+                <th>Tarix</th>
+              </tr>
+            </thead>
+            <tbody id="credit-logs-tbody">
+              <tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- İDEAL PROFİLLƏR PAGE -->
+      <div class="page" id="page-ideal">
+        <div class="page-title">🎯 İdeal Profillər</div>
+        <div class="page-sub">Hər vəzifə üçün ideal namizid profili qurun. Namizidlərin 15FQ+ nəticəsi bu profillə müqayisə ediləcək.</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openCreateIdealProfile()">+ Yeni İdeal Profil</button>
+        </div>
+        <div id="ideal-profiles-list">
+          <div class="loading"><div class="spinner"></div>Yüklənir...</div>
+        </div>
+      </div>
+
+      <!-- İDEAL PROFİL BUILDER PAGE -->
+      <div class="page" id="page-ideal-builder">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button onclick="showPage('ideal')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Geri</button>
+          <div>
+            <div class="page-title" id="ideal-builder-title" style="margin-bottom:0;">Yeni İdeal Profil</div>
+            <div class="page-sub" style="margin-bottom:0;">16 faktor üçün ideal STEN aralığını seçin</div>
+          </div>
+          <button class="btn-primary" style="width:auto;padding:9px 20px;font-size:13px;margin-left:auto;background:linear-gradient(135deg,#059669,#10b981);" onclick="saveAndCreateLink()">🎯 İdeal Profil Testi Yarat</button>
+        </div>
+
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-header"><div class="card-title">Profil Məlumatları</div></div>
+          <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <div class="field-label" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Profil adı</div>
+              <input type="text" class="field-input" id="ip-name" placeholder="məs. Müştəri Xidmətləri Nümayəndəsi">
+            </div>
+            <div>
+              <div class="field-label" style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">Vəzifə</div>
+              <input type="text" class="field-input" id="ip-pos" placeholder="məs. Call Center Agent">
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><div class="card-title">16 Faktor — İdeal STEN Aralığı</div></div>
+          <div style="padding:20px;">
+            <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Hər faktor üçün <b>minimum</b> və <b>maksimum</b> STEN dəyərini seçin. Namizidlərin cavabları bu aralıqla müqayisə ediləcək.</p>
+            <div id="ip-factors-grid"></div>
           </div>
         </div>
       </div>
-      <div class="factor-poles">
-        <span class="factor-left">← ${f.left}</span>
-        <span class="factor-right">${f.right} →</span>
-      </div>
-      <div class="range-wrap">
-        <div class="range-track">
-          <div class="range-fill" id="fill-${f.key}"></div>
-        </div>
-        <input type="range" class="range-input" id="min-${f.key}"
-          min="1" max="10" value="${val.min}"
-          oninput="updateRange('${f.key}','min',this.value)">
-        <input type="range" class="range-input upper" id="max-${f.key}"
-          min="1" max="10" value="${val.max}"
-          oninput="updateRange('${f.key}','max',this.value)">
-      </div>
-      <div class="sten-display" id="sten-${f.key}"></div>
-      <div class="sten-desc" id="desc-${f.key}"></div>
-    `;
-    grid.appendChild(div);
 
-    updateFill(f.key);
-    renderStenCells(f.key);
-    updateDesc(f.key);
-  });
+      <!-- PROJECTS PAGE -->
+      <div class="page" id="page-projects">
+        <div class="page-title">Layihələr</div>
+        <div class="page-sub">Vəzifə üzrə namizid qrupları yaradın və müqayisəli analiz edin</div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+          <button class="btn-primary" style="width:auto;padding:11px 22px;font-size:14px;" onclick="openAddProject()">+ Yeni layihə</button>
+        </div>
+        <div id="projects-list">
+          <div class="loading"><div class="spinner"></div>Yüklənir...</div>
+        </div>
+      </div>
+
+      <!-- PROJECT DETAIL PAGE -->
+      <div class="page" id="page-project-detail">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <button onclick="showPage('projects')" style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 14px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;">← Geri</button>
+          <div>
+            <div class="page-title" id="detail-project-name" style="margin-bottom:0;">—</div>
+            <div class="page-sub" id="detail-project-meta" style="margin-bottom:0;">—</div>
+          </div>
+        </div>
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr);">
+          <div class="stat-card">
+            <div class="stat-label">Namizidlər</div>
+            <div class="stat-value" id="detail-total">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Tamamlanan</div>
+            <div class="stat-value" style="color:var(--success)" id="detail-done">—</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Gözləyən</div>
+            <div class="stat-value" style="color:var(--warning)" id="detail-pending">—</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+          <div class="section-title" style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;">Namizidlər</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn-sm btn-link" onclick="openAddToProject()">+ Namizid əlavə et</button>
+            <button class="btn-sm btn-toggle" id="btn-unlock-results" onclick="unlockProjectResults()">🔓 Nəticələri aç</button>
+            <button class="btn-sm btn-excel" id="btn-group-excel" onclick="exportGroupExcel()">📊 Qrup Excel</button>
+          </div>
+        </div>
+        <div class="card">
+          <table>
+            <thead>
+              <tr>
+                <th>Sıra</th>
+                <th>Namizid</th>
+                <th>Verbal</th>
+                <th>Numerical</th>
+                <th>Abstract</th>
+                <th>Ümumi</th>
+                <th>Sten (1-10)</th>
+                <th>Profil Uyğunluğu</th>
+                <th>Qiymət</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="project-candidates-tbody">
+              <tr><td colspan="9"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Namizid əlavə et -->
+<div class="modal-overlay" id="modal-candidate">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-candidate')">✕</div>
+    <div class="modal-title">Namizid əlavə et</div>
+
+    <div class="form-row">
+      <div class="field-label">Ad Soyad</div>
+      <input type="text" class="field-input" id="cand-name" placeholder="Əli Həsənov">
+    </div>
+    <div class="form-row">
+      <div class="field-label">E-poçt</div>
+      <input type="email" class="field-input" id="cand-email" placeholder="eli@email.com">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Vəzifə / Qeyd</div>
+      <input type="text" class="field-input" id="cand-position" placeholder="Məs: Satış mütəxəssisi">
+    </div>
+
+    <div class="divider"></div>
+    <div class="field-label" style="margin-bottom:12px;">Test seçin</div>
+
+    <div class="test-select-grid">
+      <div class="test-select-item" onclick="toggleTest(this,'adaptg')" data-test="adaptg">
+        <div>
+          <div class="test-select-name">🔵 Adapt-G</div>
+          <div class="test-select-desc">Verbal + Numerical + Abstract Reasoning</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">5 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+      <div class="test-select-item" onclick="toggleTest(this,'16fq')" data-test="16fq">
+        <div>
+          <div class="test-select-name">🟡 16FQ</div>
+          <div class="test-select-desc">Şəxsiyyət İnventarı — 96 sual</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">5 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+      <div class="test-select-item" onclick="toggleTest(this,'ccsi')" data-test="ccsi">
+        <div>
+          <div class="test-select-name">🟠 CCSI</div>
+          <div class="test-select-desc">Situasiya Mühakiməsi — 24 sual</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="test-select-credit">3 kr</div>
+          <div class="checkbox-custom"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:var(--muted);">Hesabat krediti (sonra):</span>
+      <span style="font-family:'Syne',sans-serif;font-weight:700;color:var(--warning);" id="selected-cost">0 kredit</span>
+    </div>
+
+    <button class="btn-primary" onclick="createCandidate()">Link yarat və göndər</button>
+  </div>
+</div>
+
+<!-- MODAL: Link göstər -->
+<div class="modal-overlay" id="modal-link">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-link')">✕</div>
+    <div class="modal-title">✅ Test linki hazırdır</div>
+    <p style="font-size:14px;color:var(--muted);margin-bottom:16px;">Bu linki namizidə göndərin. O, linki açıb testi keçəcək.</p>
+
+    <div class="link-box">
+      <div class="link-url" id="test-link-url">—</div>
+      <button class="btn-copy" onclick="copyLink()">📋 Kopyala</button>
+    </div>
+
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;font-size:13px;color:var(--success);">
+      💡 Linki WhatsApp, e-poçt və ya istənilən kanalda göndərə bilərsiniz.
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Hesabat yüklə -->
+<div class="modal-overlay" id="modal-report">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-report')">✕</div>
+    <div class="modal-title">📊 Hesabat yüklə</div>
+
+    <div class="report-info" id="report-candidate-info"></div>
+
+    <div class="field-label" style="margin-bottom:10px;">Hesabat növü seçin</div>
+    <select class="field-input" id="report-type" onchange="updateReportCost()">
+      <option value="">— Seçin —</option>
+      <option value="adaptg-pdf" data-cost="5">Adapt-G PDF Hesabat (5 kredit)</option>
+      <option value="adaptg-excel" data-cost="3">Adapt-G Excel Skala (3 kredit)</option>
+      <option value="16fq-pdf" data-cost="5">16FQ PDF Hesabat (5 kredit)</option>
+      <option value="ccsi-pdf" data-cost="3">CCSI PDF Hesabat (3 kredit)</option>
+      <option value="consolidated" data-cost="8">Konsolidə Hesabat (8 kredit)</option>
+    </select>
+
+    <div class="credit-cost" id="report-cost-box" style="display:none;">
+      <div>
+        <div class="credit-cost-label">Bu hesabat üçün kredit</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px;">Qalan: <span id="report-remaining">—</span></div>
+      </div>
+      <div class="credit-cost-value" id="report-cost-val">—</div>
+    </div>
+
+    <div id="no-credit-msg" style="display:none;" class="credit-warning">
+      <div class="credit-warning-icon">😔</div>
+      <div class="credit-warning-title">Kredit yetərli deyil</div>
+      <div class="credit-warning-text">Zəhmət olmasa super adminlə əlaqə saxlayın.</div>
+      <a href="mailto:admin@psychoassess.az" style="display:inline-block;margin-top:10px;background:var(--danger);color:white;padding:7px 18px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;">Müraciət et</a>
+    </div>
+
+    <button class="btn-primary" onclick="downloadReport()" id="btn-download-report" style="display:none;margin-top:8px;">📥 Hesabatı yüklə</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+
+<!-- MODAL: Layihə yarat -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-project')">✕</div>
+    <div class="modal-title">Yeni Layihə</div>
+    <div class="form-row">
+      <div class="field-label">Layihə adı</div>
+      <input type="text" class="field-input" id="proj-name" placeholder="Məs: Satış Mütəxəssisi — Aprel 2026">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Vəzifə</div>
+      <input type="text" class="field-input" id="proj-position" placeholder="Məs: Satış mütəxəssisi">
+    </div>
+    <div class="form-row">
+      <div class="field-label">Test növü</div>
+      <select class="field-input" id="proj-test">
+        <option value="adaptg">🔵 Adapt-G (Verbal + Numerical + Abstract)</option>
+        <option value="16fq">🟡 16FQ Şəxsiyyət İnventarı</option>
+        <option value="ccsi">🟠 CCSI Situasiya Mühakiməsi</option>
+        <option value="all">🔷 Hamısı (Adapt-G + 16FQ + CCSI)</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <div class="field-label">İdeal Profil (15FQ+ üçün)</div>
+      <select class="field-input" id="proj-ideal-profile">
+        <option value="">— Seçilməyib —</option>
+      </select>
+      <div style="margin-top:6px;display:flex;gap:8px;align-items:center;">
+        <span style="font-size:12px;color:var(--muted);">Yeni ideal profil yaratmaq üçün:</span>
+        <button type="button" onclick="openIdealProfileBuilder()" style="padding:5px 12px;border-radius:7px;border:none;background:#eff6ff;color:var(--accent);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;">+ Yarat</button>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="field-label">Qeyd (optional)</div>
+      <input type="text" class="field-input" id="proj-note" placeholder="Əlavə məlumat">
+    </div>
+    <button class="btn-primary" onclick="createProject()">Layihə yarat</button>
+  </div>
+</div>
+
+<!-- MODAL: Layihəyə namizid əlavə et -->
+<div class="modal-overlay" id="modal-add-to-project">
+  <div class="modal" style="width:540px;">
+    <div class="modal-close" onclick="closeModal('modal-add-to-project')">✕</div>
+    <div class="modal-title">Layihəyə Namizid Əlavə Et</div>
+
+    <!-- Tab seçim -->
+    <div style="display:flex;gap:4px;background:var(--surface2);border-radius:10px;padding:4px;margin-bottom:20px;">
+      <button id="tab-new-cand" onclick="switchAddTab('new')" style="flex:1;padding:9px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:white;color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.08);">✏️ Yeni namizid</button>
+      <button id="tab-exist-cand" onclick="switchAddTab('exist')" style="flex:1;padding:9px;border-radius:7px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);">👥 Mövcud namizid</button>
+    </div>
+
+    <!-- YENİ NAMİZİD -->
+    <div id="panel-new-cand">
+      <div class="form-row">
+        <div class="field-label">Ad Soyad</div>
+        <input type="text" class="field-input" id="proj-cand-name" placeholder="Əli Həsənov">
+      </div>
+      <div class="form-row">
+        <div class="field-label">E-poçt</div>
+        <input type="email" class="field-input" id="proj-cand-email" placeholder="eli@email.com">
+      </div>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;margin-bottom:16px;font-size:13px;color:var(--success);">
+        💡 Test növü layihədən avtomatik götürüləcək
+      </div>
+      <button class="btn-primary" onclick="addCandidateToProject()">Əlavə et və link yarat</button>
+    </div>
+
+    <!-- MÖVCUD NAMİZİD -->
+    <div id="panel-exist-cand" style="display:none;">
+      <div style="margin-bottom:12px;">
+        <input type="text" class="field-input" id="exist-search" placeholder="Ad və ya email ilə axtar..." oninput="filterExistingCandidates()" style="margin-bottom:0;">
+      </div>
+      <div id="exist-cand-list" style="max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+        <div style="text-align:center;padding:20px;color:var(--muted);">Yüklənir...</div>
+      </div>
+      <button class="btn-primary" id="btn-add-exist" onclick="addExistingToProject()" disabled style="opacity:0.4;">Seçilmişi əlavə et</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Qrup Excel kredit -->
+<div class="modal-overlay" id="modal-group-credit">
+  <div class="modal">
+    <div class="modal-close" onclick="closeModal('modal-group-credit')">✕</div>
+    <div class="modal-title">🔓 Nəticələri Aç + Excel</div>
+    <div class="credit-info" style="background:#f8fafc;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">Hesablama:</div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;">
+        <span>Namizid sayı:</span><span id="gc-count" style="font-weight:700;">—</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;">
+        <span>Hər namizid (1 kredit):</span><span style="font-weight:700;color:var(--warning);">×1 kredit</span>
+      </div>
+      <div style="height:1px;background:var(--border);margin:10px 0;"></div>
+      <div style="display:flex;justify-content:space-between;font-size:16px;">
+        <span style="font-weight:700;">Ümumi:</span>
+        <span id="gc-total" style="font-weight:800;color:var(--warning);font-family:'Syne',sans-serif;font-size:20px;">—</span>
+      </div>
+    </div>
+    <div id="gc-no-credit" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:14px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:24px;margin-bottom:8px;">😔</div>
+      <div style="font-weight:700;color:var(--danger);margin-bottom:4px;">Kredit yetərli deyil</div>
+      <a href="mailto:admin@psychoassess.az" style="color:var(--danger);font-size:13px;">Adminlə əlaqə saxlayın</a>
+    </div>
+    <button class="btn-primary" id="gc-confirm-btn" onclick="confirmGroupExcel()" style="background:var(--success);">🔓 Kredit ödə, nəticələri aç və Excel yüklə</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCzKYmlgra7suscsrLkED_PWmsJeyzQC04",
+  authDomain: "hr-testing-48e31.firebaseapp.com",
+  databaseURL: "https://hr-testing-48e31-default-rtdb.firebaseio.com",
+  projectId: "hr-testing-48e31",
+  storageBucket: "hr-testing-48e31.firebasestorage.app",
+  messagingSenderId: "905744094931",
+  appId: "1:905744094931:web:2e16300768f61b4fd76626",
+  measurementId: "G-X2NV26TR01"
+};
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+// STATE
+let companyData = null;
+let companyId = null;
+let selectedTests = [];
+let currentCandidateId = null;
+let allResults = [];
+
+// CREDIT COSTS
+const COSTS = {
+  'adaptg-pdf': 5,
+  'adaptg-excel': 3,
+  '16fq-pdf': 5,
+  'ccsi-pdf': 3,
+  'consolidated': 8
+};
+
+// AUTH
+auth.onAuthStateChanged(async user => {
+  if (user) {
+    const adminDoc = await db.collection('admins').doc(user.uid).get();
+    if (adminDoc.exists && adminDoc.data().role === 'company') {
+      companyId = adminDoc.data().companyId;
+      const coDoc = await db.collection('companies').doc(companyId).get();
+      companyData = coDoc.data();
+
+      if (!companyData.active) {
+        auth.signOut();
+        showLoginError('Hesabınız deaktiv edilib. Adminlə əlaqə saxlayın.');
+        return;
+      }
+
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('companyName').textContent = companyData.name;
+      updateCreditDisplay(companyData.credits || 0);
+      loadAll();
+
+      // Real-time kredit izlə
+      db.collection('companies').doc(companyId).onSnapshot(snap => {
+        const credits = snap.data().credits || 0;
+        companyData.credits = credits;
+        updateCreditDisplay(credits);
+      });
+
+    } else {
+      auth.signOut();
+      showLoginError('Bu hesab şirkət admin deyil.');
+    }
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+});
+
+function updateCreditDisplay(credits) {
+  document.getElementById('creditCount').textContent = credits;
+  document.getElementById('stat-credit').textContent = credits;
+  if (document.getElementById('credit-big')) {
+    document.getElementById('credit-big').textContent = credits;
+  }
+  const pill = document.getElementById('creditPill');
+  if (credits < 10) {
+    pill.classList.add('low');
+    if (document.getElementById('low-credit-warning')) {
+      document.getElementById('low-credit-warning').style.display = 'block';
+    }
+  } else {
+    pill.classList.remove('low');
+  }
 }
 
-function updateRange(key, type, val) {
-  val = parseInt(val);
-  const minEl = document.getElementById(`min-${key}`);
-  const maxEl = document.getElementById(`max-${key}`);
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPassword').value;
+  try {
+    await auth.signInWithEmailAndPassword(email, pass);
+  } catch(e) {
+    showLoginError('E-poçt və ya şifrə səhvdir.');
+  }
+}
 
-  if(type === 'min') {
-    if(val > idealProfile[key].max) {
-      val = idealProfile[key].max;
-      minEl.value = val;
+async function doForgotPassword() {
+  const email = document.getElementById('loginEmail').value.trim();
+  if (!email) {
+    showLoginError('Zəhmət olmasa əvvəlcə e-poçt ünvanını daxil edin.');
+    return;
+  }
+  try {
+    await auth.sendPasswordResetEmail(email);
+    document.getElementById('loginError').textContent = '';
+    const msg = document.getElementById('resetMsg');
+    msg.textContent = '✓ Şifrə sıfırlama linki ' + email + ' ünvanına göndərildi. E-poçtunuzu yoxlayın.';
+    msg.style.display = 'block';
+  } catch(e) {
+    showLoginError('Bu e-poçt tapılmadı və ya xəta baş verdi.');
+  }
+}
+
+function doLogout() { auth.signOut(); }
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+// NAVİGASİYA
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const navEl = document.getElementById('nav-' + page); if(navEl) navEl.classList.add('active'); if(page==='project-detail'){const pn=document.getElementById('nav-projects');if(pn)pn.classList.add('active');}
+  if (page === 'candidates') loadCandidates();
+  if (page === 'projects') loadProjects();
+  if (page === 'results') loadResults();
+  if (page === 'credits') loadCreditLogs();
+  if (page === 'ideal') loadIdealProfiles();
+  if(page==='ideal-builder'){const pn=document.getElementById('nav-ideal');if(pn)pn.classList.add('active');}
+}
+
+function loadAll() {
+  loadOverview();
+  loadCandidates();
+}
+
+// OVERVIEW
+async function loadOverview() {
+  try {
+    const snap = await db.collection('candidates').where('companyId','==',companyId).get();
+    const total = snap.size;
+    let done = 0, pending = 0;
+    let recentHTML = '';
+
+    const sorted = snap.docs.sort((a,b) => (b.data().createdAt?.seconds||0) - (a.data().createdAt?.seconds||0));
+
+    snap.forEach(d => {
+      const data = d.data();
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      if (completed.length >= tests.length && tests.length > 0) done++;
+      else pending++;
+    });
+
+    document.getElementById('stat-cands').textContent = total;
+    document.getElementById('stat-done').textContent = done;
+    document.getElementById('stat-pending').textContent = pending;
+
+    sorted.slice(0,5).forEach(d => {
+      const data = d.data();
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+      const isDone = completed.length >= tests.length && tests.length > 0;
+      recentHTML += `<tr>
+        <td><div class="candidate-name">${data.name}</div><div class="candidate-email">${data.email}</div></td>
+        <td><div class="test-pills">${tests.map(t => `<span class="test-pill ${completed.includes(t)?'pill-done':'pill-pending'}">${t.toUpperCase()}</span>`).join('')}</div></td>
+        <td><span class="badge ${isDone?'badge-done':completed.length>0?'badge-partial':'badge-pending'}">${isDone?'✓ Bitdi':completed.length>0?'Davam edir':'Gözləyir'}</span></td>
+        <td style="color:var(--muted);font-size:13px;">${date}</td>
+      </tr>`;
+    });
+
+    document.getElementById('recent-tbody').innerHTML = recentHTML || '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">👥</div>Namizid yoxdur</div></td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+// CANDİDATES
+async function loadCandidates() {
+  const tbody = document.getElementById('candidates-tbody');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('candidates').where('companyId','==',companyId).get();
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">👥</div>Hələ namizid yoxdur. + Namizid əlavə et düyməsindən başlayın.</div></td></tr>';
+      return;
     }
-    idealProfile[key].min = val;
-  } else {
-    if(val < idealProfile[key].min) {
-      val = idealProfile[key].min;
-      maxEl.value = val;
-    }
-    idealProfile[key].max = val;
+
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const id = d.id;
+      const tests = data.assignedTests || [];
+      const completed = data.completedTests || [];
+      const isDone = completed.length >= tests.length && tests.length > 0;
+      const testLink = `${window.location.origin}/test?c=${id}`;
+
+      html += `<tr data-id="${id}">
+        <td>
+          <div class="candidate-name">${data.name}</div>
+          <div class="candidate-email">${data.email}</div>
+          ${data.position ? `<div class="candidate-email">${data.position}</div>` : ''}
+        </td>
+        <td><div class="test-pills">${tests.map(t => `<span class="test-pill ${completed.includes(t)?'pill-done':'pill-pending'}">${t.toUpperCase()}</span>`).join('')}</div></td>
+        <td><span class="badge ${isDone?'badge-done':completed.length>0?'badge-partial':'badge-pending'}">${isDone?'✓ Bitdi':completed.length>0?'Davam edir':'Gözləyir'}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="btn-sm btn-link" onclick="showLink('${id}')">🔗 Link</button>
+            <button class="btn-sm btn-danger" onclick="deleteCandidate('${id}')">🗑️</button>
+          </div>
+        </td>
+        <td>
+          <div class="action-btns">
+            ${isDone ? `<button class="btn-sm btn-report" onclick="openReport('${id}','${data.name}')">📊 PDF</button>
+            ${tests.includes('adaptg') ? `<button class="btn-sm btn-excel" onclick="openReport('${id}','${data.name}','adaptg-excel')">📈 Excel</button>` : ''}` : '<span style="font-size:12px;color:var(--muted);">Test gözləyir</span>'}
+          </div>
+        </td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="5" style="color:red;text-align:center;padding:20px;">Xəta baş verdi</td></tr>'; }
+}
+
+// RESULTS
+async function loadResults() {
+  const tbody = document.getElementById('results-tbody');
+  tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('testResults').where('companyId','==',companyId).get();
+    allResults = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.completedAt?.seconds||0) - (a.completedAt?.seconds||0));
+    renderResults(allResults);
+  } catch(e) { console.error(e); }
+}
+
+function renderResults(results) {
+  const tbody = document.getElementById('results-tbody');
+  if (!results.length) {
+    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-icon">📋</div>Hələ nəticə yoxdur</div></td></tr>';
+    return;
   }
 
-  document.getElementById(`val-${key}`).textContent =
-    `${idealProfile[key].min}–${idealProfile[key].max}`;
-  updateFill(key);
-  renderStenCells(key);
-  updateDesc(key);
-  renderPreview();
-}
-
-function updateFill(key) {
-  const fill = document.getElementById(`fill-${key}`);
-  const min = idealProfile[key].min;
-  const max = idealProfile[key].max;
-  const left = ((min-1)/9)*100;
-  const right = ((max-1)/9)*100;
-  fill.style.left = left+'%';
-  fill.style.width = (right-left)+'%';
-}
-
-function renderStenCells(key) {
-  const el = document.getElementById(`sten-${key}`);
-  const min = idealProfile[key].min;
-  const max = idealProfile[key].max;
-  el.innerHTML = [1,2,3,4,5,6,7,8,9,10].map(i =>
-    `<div class="sten-cell num ${i>=min&&i<=max?'ideal':''}">${i}</div>`
-  ).join('');
-}
-
-function updateDesc(key) {
-  const f = FACTORS.find(x=>x.key===key);
-  if(!f) return;
-  const el = document.getElementById(`desc-${key}`);
-  const min = idealProfile[key].min;
-  const max = idealProfile[key].max;
-  const mid = Math.round((min+max)/2);
-  let d = '';
-  if(mid<=3) d = f.desc.low;
-  else if(mid<=7) d = f.desc.mid;
-  else d = f.desc.high;
-  el.textContent = d;
-}
-
-function updateWeight(key, sel) {
-  idealProfile[key].weight = sel.value;
-  sel.className = `weight-select w-${sel.value==='high'?'high':sel.value==='low'?'low':'med'}`;
-  renderPreview();
-}
-
-// ============================================================
-// PREVIEW TABLE
-// ============================================================
-function renderPreview() {
-  const tbody = document.getElementById('preview-tbody');
-  tbody.innerHTML = FACTORS.map(f => {
-    const val = idealProfile[f.key];
-    const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
-      `<div class="ideal-bar-cell ${i>=val.min&&i<=val.max?'on':''}"></div>`
-    ).join('');
-    const weightLabel = val.weight==='high'?'⭐ Çox vacib':val.weight==='low'?'◦ Az vacib':'• Vacib';
-    const weightColor = val.weight==='high'?'var(--success)':val.weight==='low'?'var(--muted)':'var(--warning)';
-    return `<tr>
-      <td><span style="background:var(--accent);color:white;border-radius:5px;padding:2px 8px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;">${f.label}</span> ${f.name}</td>
-      <td style="font-size:11px;color:var(--muted);">${f.left}</td>
-      <td><div class="ideal-bar">${cells}</div></td>
-      <td style="font-size:11px;color:var(--muted);">${f.right}</td>
-      <td><span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);">${val.min}–${val.max}</span></td>
-      <td><span style="font-size:12px;font-weight:600;color:${weightColor};">${weightLabel}</span></td>
+  const testNames = { adaptg: 'Adapt-G', '16fq': '16FQ', ccsi: 'CCSI' };
+  let html = '';
+  results.forEach(r => {
+    const date = r.completedAt ? new Date(r.completedAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+    const score = r.totalScore !== undefined ? `${r.totalScore}%` : '—';
+    html += `<tr>
+      <td><div class="candidate-name">${r.candidateName || '—'}</div></td>
+      <td><span class="badge badge-partial">${testNames[r.testType] || r.testType}</span></td>
+      <td style="font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);">${score}</td>
+      <td style="color:var(--muted);font-size:13px;">${date}</td>
+      <td><button class="btn-sm btn-report" onclick="openReport('${r.candidateId}','${r.candidateName}')">📊 Hesabat</button></td>
     </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+function filterResults(type, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (type === 'all') renderResults(allResults);
+  else renderResults(allResults.filter(r => r.testType === type));
+}
+
+// CREDIT LOGS
+async function loadCreditLogs() {
+  const tbody = document.getElementById('credit-logs-tbody');
+  tbody.innerHTML = '<tr><td colspan="4"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+
+  try {
+    const snap = await db.collection('creditLogs').where('companyId','==',companyId).limit(50).get();
+    let html = '';
+    snap.forEach(d => {
+      const data = d.data();
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleString('az-AZ') : '—';
+      const isAdd = data.type === 'add';
+      html += `<tr>
+        <td><span style="font-size:11px;font-weight:700;padding:3px 8px;border-radius:4px;background:${isAdd?'#f0fdf4':'#fef2f2'};color:${isAdd?'var(--success)':'var(--danger)'};">${isAdd?'+ Əlavə':'− İstifadə'}</span></td>
+        <td style="font-family:'Syne',sans-serif;font-weight:700;color:${isAdd?'var(--success)':'var(--danger)'};">${isAdd?'+':'−'}${data.amount}</td>
+        <td style="color:var(--muted);font-size:13px;">${data.note || '—'}</td>
+        <td style="color:var(--muted);font-size:12px;">${date}</td>
+      </tr>`;
+    });
+    tbody.innerHTML = html || '<tr><td colspan="4"><div class="empty-state"><div class="empty-icon">📋</div>Əməliyyat yoxdur</div></td></tr>';
+  } catch(e) { console.error(e); }
+}
+
+// ADD CANDIDATE
+function openAddCandidate() {
+  selectedTests = [];
+  document.getElementById('cand-name').value = '';
+  document.getElementById('cand-email').value = '';
+  document.getElementById('cand-position').value = '';
+  document.querySelectorAll('.test-select-item').forEach(el => el.classList.remove('selected'));
+  document.querySelectorAll('.checkbox-custom').forEach(el => el.textContent = '');
+  document.getElementById('selected-cost').textContent = '0 kredit';
+  openModal('modal-candidate');
+}
+
+function toggleTest(el, test) {
+  el.classList.toggle('selected');
+  const cb = el.querySelector('.checkbox-custom');
+  if (el.classList.contains('selected')) {
+    cb.textContent = '✓';
+    if (!selectedTests.includes(test)) selectedTests.push(test);
+  } else {
+    cb.textContent = '';
+    selectedTests = selectedTests.filter(t => t !== test);
+  }
+  // Hesabat krediti (report vaxtı çəkiləcək, indi göstərək)
+  const reportCosts = { adaptg: 5, '16fq': 5, ccsi: 3 };
+  const total = selectedTests.reduce((s, t) => s + (reportCosts[t] || 0), 0);
+  document.getElementById('selected-cost').textContent = total + ' kredit';
+}
+
+async function createCandidate() {
+  const name = document.getElementById('cand-name').value.trim();
+  const email = document.getElementById('cand-email').value.trim();
+  const position = document.getElementById('cand-position').value.trim();
+
+  if (!name || !email) { showToast('Ad və e-poçt mütləqdir', 'error'); return; }
+  if (selectedTests.length === 0) { showToast('Ən azı 1 test seçin', 'error'); return; }
+
+  try {
+    const ref = await db.collection('candidates').add({
+      name, email, position,
+      companyId,
+      companyName: companyData.name,
+      assignedTests: selectedTests,
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-candidate');
+    document.getElementById('test-link-url').textContent = `${window.location.origin}/test?c=${ref.id}`;
+    openModal('modal-link');
+    showToast(`${name} əlavə edildi ✓`, 'success');
+    loadCandidates();
+    loadOverview();
+  } catch(e) {
+    showToast('Xəta: ' + e.message, 'error');
+  }
+}
+
+function showLink(candidateId) {
+  const link = `${window.location.origin}/test?c=${candidateId}`;
+  document.getElementById('test-link-url').textContent = link;
+  openModal('modal-link');
+}
+
+function copyLink() {
+  const url = document.getElementById('test-link-url').textContent;
+  navigator.clipboard.writeText(url).then(() => showToast('Link kopyalandı ✓', 'success'));
+}
+
+// REPORT
+function openReport(candidateId, candidateName, preType = '') {
+  currentCandidateId = candidateId;
+  document.getElementById('report-candidate-info').innerHTML = `
+    <div class="report-row"><span class="report-row-label">Namizid</span><span class="report-row-value">${candidateName}</span></div>
+    <div class="report-row"><span class="report-row-label">Cari kredit</span><span class="report-row-value" style="color:var(--warning);">${companyData.credits || 0} kredit</span></div>
+  `;
+  document.getElementById('report-type').value = preType;
+  document.getElementById('report-cost-box').style.display = 'none';
+  document.getElementById('no-credit-msg').style.display = 'none';
+  document.getElementById('btn-download-report').style.display = 'none';
+  if (preType) updateReportCost();
+  openModal('modal-report');
+}
+
+function updateReportCost() {
+  const sel = document.getElementById('report-type');
+  const val = sel.value;
+  if (!val) {
+    document.getElementById('report-cost-box').style.display = 'none';
+    document.getElementById('btn-download-report').style.display = 'none';
+    return;
+  }
+
+  const cost = COSTS[val] || 0;
+  const remaining = (companyData.credits || 0) - cost;
+
+  document.getElementById('report-cost-val').textContent = cost + ' kredit';
+  document.getElementById('report-remaining').textContent = remaining >= 0 ? remaining + ' qalacaq' : 'Çatmır!';
+  document.getElementById('report-cost-box').style.display = 'flex';
+
+  if (remaining < 0) {
+    document.getElementById('no-credit-msg').style.display = 'block';
+    document.getElementById('btn-download-report').style.display = 'none';
+  } else {
+    document.getElementById('no-credit-msg').style.display = 'none';
+    document.getElementById('btn-download-report').style.display = 'block';
+  }
+}
+
+async function downloadReport() {
+  const type = document.getElementById('report-type').value;
+  const cost = COSTS[type];
+
+  if ((companyData.credits || 0) < cost) {
+    showToast('Kredit yetərli deyil', 'error');
+    return;
+  }
+
+  try {
+    // Kreditten çıx
+    await db.collection('companies').doc(companyId).update({
+      credits: firebase.firestore.FieldValue.increment(-cost)
+    });
+
+    // Log yaz
+    await db.collection('creditLogs').add({
+      companyId,
+      companyName: companyData.name,
+      type: 'use',
+      amount: cost,
+      note: `Hesabat: ${type} — Namizid: ${currentCandidateId}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    closeModal('modal-report');
+    showToast(`${cost} kredit istifadə edildi. Hesabat hazırlanır...`, 'success');
+
+    // Hesabat səhifəsinə yönləndir
+    setTimeout(() => {
+      window.open(`report.html?c=${currentCandidateId}&type=${type}`, '_blank');
+    }, 800);
+
+  } catch(e) {
+    showToast('Xəta baş verdi', 'error');
+  }
+}
+
+// MODAL
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if(e.target===m) m.classList.remove('open'); });
+});
+
+// TOAST
+
+// ==================== PROJECTS ====================
+let currentProjectId = null;
+let currentProjectData = null;
+let currentProjectCandidates = [];
+
+async function loadProjects() {
+  const list = document.getElementById('projects-list');
+  list.innerHTML = '<div class="loading"><div class="spinner"></div>Yüklənir...</div>';
+  try {
+    const snap = await db.collection('projects').where('companyId','==',companyId).get();
+    if (snap.empty) {
+      list.innerHTML = '<div class="empty-state"><div class="empty-icon">📁</div><div>Hələ layihə yoxdur. "Yeni layihə" düyməsindən başlayın.</div></div>';
+      return;
+    }
+    const docs = snap.docs.sort((a,b)=>(b.data().createdAt?.seconds||0)-(a.data().createdAt?.seconds||0));
+    list.innerHTML = docs.map(d => {
+      const data = d.data();
+      const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 16FQ', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[data.testType]||data.testType;
+      const date = data.createdAt ? new Date(data.createdAt.seconds*1000).toLocaleDateString('az-AZ') : '—';
+      return `
+        <div class="project-card">
+          <div class="project-header">
+            <div>
+              <div class="project-title">${data.name}</div>
+              <div class="project-meta">${data.position||''} · ${testLabel} · ${date}</div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button class="btn-sm btn-link" onclick="openProjectDetail('${d.id}')">📂 Açıq</button>
+              <button class="btn-sm btn-danger" onclick="deleteProject('${d.id}','${data.name}')">🗑</button>
+            </div>
+          </div>
+          <div class="project-stats">
+            <div class="project-stat">
+              <div class="project-stat-val">${data.candidateCount||0}</div>
+              <div class="project-stat-label">Namizid</div>
+            </div>
+            <div class="project-stat">
+              <div class="project-stat-val" style="color:var(--success)">${data.completedCount||0}</div>
+              <div class="project-stat-label">Tamamlanan</div>
+            </div>
+            <div class="project-stat">
+              <div class="project-stat-val" style="color:var(--warning)">${(data.candidateCount||0)-(data.completedCount||0)}</div>
+              <div class="project-stat-label">Gözləyən</div>
+            </div>
+          </div>
+          ${data.note ? `<div style="font-size:13px;color:var(--muted);">📝 ${data.note}</div>` : ''}
+        </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = '<div style="color:red;padding:20px;">Xəta baş verdi</div>'; console.error(e); }
+}
+
+async function openAddProject() {
+  document.getElementById('proj-name').value = '';
+  document.getElementById('proj-position').value = '';
+  document.getElementById('proj-note').value = '';
+  // İdeal profilləri yüklə
+  const sel = document.getElementById('proj-ideal-profile');
+  sel.innerHTML = '<option value="">— Seçilməyib —</option>';
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    snap.forEach(d => {
+      const data = d.data();
+      sel.innerHTML += `<option value="${d.id}">${data.name}${data.position?' — '+data.position:''}</option>`;
+    });
+  } catch(e) {}
+  openModal('modal-project');
+}
+
+async function createProject() {
+  const name = document.getElementById('proj-name').value.trim();
+  const position = document.getElementById('proj-position').value.trim();
+  const testType = document.getElementById('proj-test').value;
+  const note = document.getElementById('proj-note').value.trim();
+  if (!name) { showToast('Layihə adı mütləqdir','error'); return; }
+  const idealProfileId = document.getElementById('proj-ideal-profile').value;
+  try {
+    const ref = await db.collection('projects').add({
+      name, position, testType, note,
+      idealProfileId: idealProfileId || null,
+      companyId,
+      companyName: companyData.name,
+      candidateCount: 0,
+      completedCount: 0,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    closeModal('modal-project');
+    showToast(`${name} layihəsi yaradıldı ✓`,'success');
+    openProjectDetail(ref.id);
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+async function openProjectDetail(projectId) {
+  currentProjectId = projectId;
+  const doc = await db.collection('projects').doc(projectId).get();
+  currentProjectData = doc.data();
+  document.getElementById('detail-project-name').textContent = currentProjectData.name;
+  const testLabel = {adaptg:'🔵 Adapt-G', '16fq':'🟡 15FQ+', ccsi:'🟠 CCSI', all:'🔷 Hamısı'}[currentProjectData.testType]||'';
+  document.getElementById('detail-project-meta').textContent = (currentProjectData.position||'') + ' · ' + testLabel;
+  // Firestore-dan unlock vəziyyətini oxu - daimi saxlanılır
+  if (currentProjectData.unlocked === true) {
+    currentProjectUnlocked = projectId;
+  } else {
+    currentProjectUnlocked = null;
+  }
+  showPage('project-detail');
+  loadProjectCandidates();
+}
+
+async function loadProjectCandidates() {
+  const tbody = document.getElementById('project-candidates-tbody');
+  tbody.innerHTML = '<tr><td colspan="9"><div class="loading"><div class="spinner"></div>Yüklənir...</div></td></tr>';
+  try {
+    const snap = await db.collection('candidates').where('projectId','==',currentProjectId).get();
+    currentProjectCandidates = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    // Nəticələri yüklə (adaptg)
+    const resultSnaps = await Promise.all(
+      currentProjectCandidates.map(c =>
+        db.collection('testResults').where('candidateId','==',c.id).where('testType','==','adaptg').get()
+      )
+    );
+    // 16FQ nəticələrini yüklə (BSD üçün)
+    const fqSnaps = await Promise.all(
+      currentProjectCandidates.map(c =>
+        db.collection('testResults').where('candidateId','==',c.id).where('testType','==','16fq').get()
+      )
+    );
+    const fqResultsMap = {};
+    currentProjectCandidates.forEach((c,i) => {
+      if(!fqSnaps[i].empty) fqResultsMap[c.id] = fqSnaps[i].docs[0].data();
+    });
+
+    // Hər namizidə xal əlavə et
+    currentProjectCandidates = currentProjectCandidates.map((c,i) => {
+      const res = resultSnaps[i];
+      if (!res.empty) {
+        const r = res.docs[0].data();
+        c.scores = r.sectionScores || {};
+        c.totalScore = r.totalScore || 0;
+        c.sten = scoreToSten(c.totalScore);
+        c.hasResult = true;
+      } else {
+        c.hasResult = false;
+        c.totalScore = -1;
+        c.sten = 0;
+      }
+      return c;
+    });
+
+    // Xala görə sırala
+    currentProjectCandidates.sort((a,b) => b.totalScore - a.totalScore);
+
+    // İdeal profil varsa BSD hesabla
+    if(currentProjectData.idealProfileId && currentProjectUnlocked===currentProjectId) {
+      try {
+        const idealDoc = await db.collection('idealProfiles').doc(currentProjectData.idealProfileId).get();
+        if(idealDoc.exists) {
+          const ideal = idealDoc.data().factors;
+          const factors = ['FA','B','FC','FE','FF','FG','FH','FI','FL','FM','FN','FO','FQ1','FQ2','FQ3','FQ4'];
+          const weights = {'high':3,'medium':2,'low':1};
+          currentProjectCandidates.forEach(c => {
+            if(!c.hasResult) return;
+            // 16FQ nəticəsini tap
+            const fqRes = fqResultsMap[c.id];
+            if(!fqRes) return;
+            const personality = fqRes.sectionScores?.personality || {};
+            let numerator=0, denominator=0;
+            factors.forEach(f => {
+              const idealVal = ideal[f];
+              if(!idealVal) return;
+              const pd = personality[f];
+              let sten = 5;
+              if(pd && pd.total>0) sten = Math.max(1,Math.min(10,Math.round((pd.agree/pd.total)*10)));
+              const w = weights[idealVal.weight]||2;
+              if(sten>=idealVal.min && sten<=idealVal.max) {
+                numerator += w;
+              } else {
+                const dist = Math.min(Math.abs(sten-idealVal.min), Math.abs(sten-idealVal.max));
+                numerator += w * Math.max(0, 1-dist/5);
+              }
+              denominator += w;
+            });
+            c.bsdScore = denominator>0 ? Math.round((numerator/denominator)*100)/100 : null;
+          });
+        }
+      } catch(e) { console.error('BSD xəta:',e); }
+    }
+
+    const total = currentProjectCandidates.length;
+    const done = currentProjectCandidates.filter(c=>c.hasResult).length;
+    document.getElementById('detail-total').textContent = total;
+    document.getElementById('detail-done').textContent = done;
+    document.getElementById('detail-pending').textContent = total - done;
+
+    if (!currentProjectCandidates.length) {
+      tbody.innerHTML = '<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">👥</div>Hələ namizid yoxdur</div></td></tr>';
+      return;
+    }
+
+    // Nəticə açılıbmı yoxla
+
+    // Nəticə açılıbmı yoxla
+    const isUnlocked = currentProjectUnlocked === currentProjectId || currentProjectData?.unlocked === true;
+
+    // Düymələri göstər/gizlə
+    const completedCount = currentProjectCandidates.filter(c=>c.hasResult).length;
+    const unlockBtn = document.getElementById('btn-unlock-results');
+    const excelBtn = document.getElementById('btn-group-excel');
+    if(completedCount > 0) {
+      if(isUnlocked) {
+        // Açılıb: unlock gizlət, excel göstər (pulsuz)
+        if(unlockBtn) { unlockBtn.style.display = 'none'; }
+        if(excelBtn) { excelBtn.style.display = 'inline-flex'; excelBtn.textContent = '📊 Excel Yüklə (Pulsuz)'; }
+      } else {
+        // Açılmayıb: unlock göstər, excel göstər (kredit istər)
+        if(unlockBtn) { unlockBtn.style.display = 'inline-flex'; }
+        if(excelBtn) { excelBtn.style.display = 'inline-flex'; excelBtn.textContent = '📊 Excel (Kredit ilə)'; }
+      }
+    } else {
+      if(unlockBtn) unlockBtn.style.display = 'none';
+      if(excelBtn) excelBtn.style.display = 'none';
+    }
+
+    let html = '';
+    currentProjectCandidates.forEach((c, idx) => {
+      const rank = idx + 1;
+      const testLink = `${window.location.origin}/test?c=${c.id}`;
+
+      if (!c.hasResult) {
+        html += `<tr>
+          <td><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted);">${rank}</span></td>
+          <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
+          <td colspan="6" style="color:var(--muted);font-size:12px;font-style:italic;">Test hələ keçilməyib</td>
+          <td><span style="font-size:12px;color:var(--muted);">⏳ Gözləyir</span></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
+        </tr>`;
+        return;
+      }
+
+      if (!isUnlocked) {
+        html += `<tr style="background:#fffbeb;">
+          <td><span style="font-family:'Syne',sans-serif;font-weight:700;font-size:15px;color:var(--muted);">${rank}</span></td>
+          <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td style="color:var(--muted);font-size:13px;">🔒 —</td>
+          <td><span class="badge" style="background:#fffbeb;color:var(--warning);border:1px solid #fde68a;">✓ Bitdi</span></td>
+          <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
+        </tr>`;
+        return;
+      }
+
+      // Açıq — xalları göstər
+      const verbal = c.scores?.verbal?.score || 0;
+      const numerical = c.scores?.numerical?.score || 0;
+      const abstract = c.scores?.abstract?.score || 0;
+      const totalPct = c.totalScore;
+      const sten = c.sten || 1;
+      const stenColor = sten >= 5 ? 'var(--success)' : 'var(--danger)';
+      const qiymət = sten >= 5 ?
+        '<span class="badge" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;">🟢 Güclü</span>' :
+        '<span class="badge" style="background:#fef2f2;color:var(--danger);border:1px solid #fecaca;">🔴 Zəif</span>';
+      const stenBar = `<div style="display:flex;align-items:center;gap:4px;">
+        <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:${stenColor};">${sten}</span>
+        <div style="display:flex;gap:2px;">${[1,2,3,4,5,6,7,8,9,10].map(i=>`<div style="width:8px;height:8px;border-radius:2px;background:${i<=sten?(sten>=5?'#059669':'#dc2626'):'#e2e6f0'};"></div>`).join('')}</div>
+      </div>`;
+      const rankColor = rank===1?'#d97706':rank===2?'#6b7280':rank===3?'#92400e':'var(--muted)';
+      // BSD skoru
+      const bsdScore = c.bsdScore;
+      let bsdHtml = '<span style="font-size:12px;color:var(--muted);">—</span>';
+      if(bsdScore !== undefined && bsdScore !== null) {
+        const bsdPct = Math.round(bsdScore*100);
+        const bsdColor = bsdPct>=75?'var(--success)':bsdPct>=50?'var(--warning)':'var(--danger)';
+        const bsdLabel = bsdPct>=75?'Yüksək':bsdPct>=50?'Orta':'Aşağı';
+        bsdHtml = `<div style="display:flex;align-items:center;gap:6px;">
+          <div style="width:60px;height:6px;background:#e2e8f0;border-radius:3px;overflow:hidden;">
+            <div style="width:${bsdPct}%;height:100%;background:${bsdColor};border-radius:3px;"></div>
+          </div>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:${bsdColor};">${bsdPct}%</span>
+          <span style="font-size:11px;color:${bsdColor};">${bsdLabel}</span>
+        </div>`;
+      } else if(currentProjectData.idealProfileId && c.hasResult) {
+        bsdHtml = '<span style="font-size:11px;color:var(--muted);">Hesablanır...</span>';
+      }
+
+      html += `<tr style="background:${rank<=3?'#fafafa':''};">
+        <td><span style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;color:${rankColor};">${rank}</span></td>
+        <td><div style="font-weight:600;">${c.name}</div><div style="font-size:12px;color:var(--muted);">${c.email}</div></td>
+        <td style="font-weight:700;color:#06b6d4;">${verbal}%</td>
+        <td style="font-weight:700;color:#059669;">${numerical}%</td>
+        <td style="font-weight:700;color:#f59e0b;">${abstract}%</td>
+        <td style="font-weight:800;font-size:16px;color:var(--accent);">${totalPct}%</td>
+        <td>${stenBar}</td>
+        <td>${bsdHtml}</td>
+        <td>${qiymət}</td>
+        <td style="display:flex;gap:4px;"><button class="btn-sm btn-link" onclick="copyToClipboard('${testLink}')">🔗 Link</button><button class="btn-sm btn-danger" onclick="deleteProjCandidate('${c.id}')">🗑️</button></td>
+      </tr>`;
+    });
+    tbody.innerHTML = html;
+  } catch(e) { console.error(e); tbody.innerHTML = '<tr><td colspan="9" style="color:red;text-align:center;padding:20px;">Xəta baş verdi</td></tr>'; }
+}
+
+function openAddToProject() {
+  document.getElementById('proj-cand-name').value = '';
+  document.getElementById('proj-cand-email').value = '';
+  selectedExistingCandId = null;
+  // Tab-ı "yeni namizid"-ə sıfırla
+  document.getElementById('panel-new-cand').style.display = 'block';
+  document.getElementById('panel-exist-cand').style.display = 'none';
+  openModal('modal-add-to-project');
+}
+
+async function addCandidateToProject() {
+  const name = document.getElementById('proj-cand-name').value.trim();
+  const email = document.getElementById('proj-cand-email').value.trim();
+  if (!name || !email) { showToast('Ad və e-poçt mütləqdir','error'); return; }
+  const tests = currentProjectData.testType === 'all' ? ['adaptg','16fq','ccsi'] : [currentProjectData.testType];
+  try {
+    const ref = await db.collection('candidates').add({
+      name, email,
+      position: currentProjectData.position || '',
+      companyId,
+      companyName: companyData.name,
+      projectId: currentProjectId,
+      projectName: currentProjectData.name,
+      assignedTests: tests,
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await db.collection('projects').doc(currentProjectId).update({
+      candidateCount: firebase.firestore.FieldValue.increment(1)
+    });
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    closeModal('modal-add-to-project');
+    showToast(`${name} əlavə edildi ✓`,'success');
+    navigator.clipboard.writeText(link).catch(()=>{});
+    showToast('Link kopyalandı! 📋','success');
+    loadProjectCandidates();
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+
+// ========== LAYIHƏ - YENİ FUNKSIYALAR ==========
+let currentProjectUnlocked = null;
+let allCompanyCandidates = [];
+let selectedExistingCandId = null;
+
+function switchAddTab(tab) {
+  const btnNew = document.getElementById('tab-new-cand');
+  const btnExist = document.getElementById('tab-exist-cand');
+  const panelNew = document.getElementById('panel-new-cand');
+  const panelExist = document.getElementById('panel-exist-cand');
+  const active = 'background:white;color:var(--accent);box-shadow:0 1px 4px rgba(0,0,0,0.08);';
+  const inactive = 'background:transparent;color:var(--muted);box-shadow:none;';
+  if(tab === 'new') {
+    btnNew.style.cssText = btnNew.style.cssText.replace(/background[^;]+;/g,'') + active;
+    btnExist.style.cssText = btnExist.style.cssText.replace(/background[^;]+;/g,'') + inactive;
+    panelNew.style.display = 'block';
+    panelExist.style.display = 'none';
+  } else {
+    btnExist.style.cssText = btnExist.style.cssText.replace(/background[^;]+;/g,'') + active;
+    btnNew.style.cssText = btnNew.style.cssText.replace(/background[^;]+;/g,'') + inactive;
+    panelNew.style.display = 'none';
+    panelExist.style.display = 'block';
+    loadExistingCandidates();
+  }
+}
+
+async function loadExistingCandidates() {
+  const listEl = document.getElementById('exist-cand-list');
+  listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Yüklənir...</div>';
+  try {
+    const snap = await db.collection('candidates').where('companyId','==',companyId).get();
+    const inProject = new Set(currentProjectCandidates.map(c=>c.id));
+    // Yalnız testi keçənlər + bu layihədə olmayanlar
+    allCompanyCandidates = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(c => !inProject.has(c.id) && (c.completedTests||[]).length > 0)
+      .sort((a,b) => (a.name||'').localeCompare(b.name||''));
+    renderExistingList(allCompanyCandidates);
+  } catch(e) {
+    listEl.innerHTML = '<div style="color:red;padding:20px;font-size:13px;">Xəta baş verdi</div>';
+  }
+}
+
+function renderExistingList(candidates) {
+  const listEl = document.getElementById('exist-cand-list');
+  if(!candidates.length) {
+    listEl.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);font-size:13px;">Testi keçmiş başqa namizid yoxdur</div>';
+    return;
+  }
+  const testLabels = {adaptg:'Adapt-G', '16fq':'15FQ+', ccsi:'CCSI'};
+  listEl.innerHTML = candidates.map(c => {
+    const tests = (c.completedTests||[]).map(t =>
+      `<span style="background:#eff6ff;color:var(--accent);border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;font-size:11px;font-weight:700;">${testLabels[t]||t}</span>`
+    ).join(' ');
+    return `<div onclick="selectExisting('${c.id}',this)" style="padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all 0.15s;" id="exist-item-${c.id}">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <div>
+          <div style="font-weight:600;font-size:14px;">${c.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">${c.email}${c.position?' · '+c.position:''}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;">${tests}</div>
+      </div>
+    </div>`;
   }).join('');
 }
 
-// ============================================================
-// SAXLA / YÜKLƏ
-// ============================================================
-function openSaveModal() {
-  const name = document.getElementById('profile-name').value.trim();
-  document.getElementById('save-name').value = name || 'İdeal Profil';
-  document.getElementById('save-company').value = companyData?.name || '—';
-  document.getElementById('modal-save').classList.add('active');
+function filterExistingCandidates() {
+  const q = document.getElementById('exist-search').value.toLowerCase();
+  const filtered = allCompanyCandidates.filter(c =>
+    (c.name||'').toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q)
+  );
+  renderExistingList(filtered);
 }
 
-function closeModal(id='modal-save') {
-  document.getElementById(id).classList.remove('active');
+function selectExisting(id, el) {
+  document.querySelectorAll('[id^="exist-item-"]').forEach(e => {
+    e.style.borderColor = 'var(--border)';
+    e.style.background = '';
+  });
+  el.style.borderColor = 'var(--accent)';
+  el.style.background = '#eef2ff';
+  selectedExistingCandId = id;
+  document.getElementById('btn-add-exist').disabled = false;
+  document.getElementById('btn-add-exist').style.opacity = '1';
 }
 
-async function saveProfile() {
-  const name = document.getElementById('save-name').value.trim();
-  const pos = document.getElementById('profile-pos').value.trim();
-  if(!name) { showToast('Profil adı daxil edin','error'); return; }
-  if(!companyId) { showToast('Giriş tələb olunur','error'); return; }
-
+async function addExistingToProject() {
+  if(!selectedExistingCandId) return;
+  const tests = currentProjectData.testType === 'all' ? ['adaptg','16fq','ccsi'] : [currentProjectData.testType];
   try {
-    await db.collection('idealProfiles').add({
-      name, position: pos,
-      companyId, companyName: companyData?.name || '',
-      factors: idealProfile,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    // Namizidi layihəyə bağla
+    await db.collection('candidates').doc(selectedExistingCandId).update({
+      projectId: currentProjectId,
+      projectName: currentProjectData.name,
+      assignedTests: tests,
+      completedTests: []
     });
-    closeModal();
-    showToast(`"${name}" profili saxlandı ✓`, 'success');
+    await db.collection('projects').doc(currentProjectId).update({
+      candidateCount: firebase.firestore.FieldValue.increment(1)
+    });
+    const cand = allCompanyCandidates.find(c=>c.id===selectedExistingCandId);
+    const link = `${window.location.origin}/test?c=${selectedExistingCandId}`;
+    closeModal('modal-add-to-project');
+    showToast(`${cand?.name||'Namizid'} layihəyə əlavə edildi ✓`,'success');
+    navigator.clipboard.writeText(link).catch(()=>{});
+    selectedExistingCandId = null;
+    loadProjectCandidates();
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+// UNLOCK - kredit ödəyib nəticələri aç
+function unlockProjectResults() {
+  const completed = currentProjectCandidates.filter(c=>c.hasResult);
+  if(!completed.length) { showToast('Hələ test nəticəsi yoxdur','error'); return; }
+  const cost = completed.length;
+  document.getElementById('gc-count').textContent = completed.length + ' nəfər';
+  document.getElementById('gc-total').textContent = cost + ' kredit';
+  const hasCredit = (companyData.credits||0) >= cost;
+  document.getElementById('gc-no-credit').style.display = hasCredit ? 'none' : 'block';
+  document.getElementById('gc-confirm-btn').style.display = hasCredit ? 'block' : 'none';
+  openModal('modal-group-credit');
+}
+
+async function deleteCandidate(id) {
+  if (!confirm('Bu namizidi silmək istəyirsiniz? Bu əməliyyat geri alına bilməz.')) return;
+  try {
+    const doc = await db.collection('candidates').doc(id).get();
+    const name = doc.exists ? doc.data().name : 'Namizid';
+    await db.collection('candidates').doc(id).delete();
+    const results = await db.collection('testResults').where('candidateId','==',id).get();
+    await Promise.all(results.docs.map(d => d.ref.delete()));
+    showToast(`${name} silindi ✓`, 'success');
+    loadCandidates();
   } catch(e) { showToast('Xəta: '+e.message, 'error'); }
 }
 
-async function loadProfiles() {
-  if(!companyId) return;
-  document.getElementById('modal-profiles').classList.add('active');
-  const list = document.getElementById('profiles-list');
-  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Yüklənir...</div>';
-
+async function deleteProjCandidate(id) {
+  if (!confirm('Bu namizidi layihədən çıxarmaq istəyirsiniz?')) return;
   try {
-    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
-    if(snap.empty) {
-      list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted);">Hələ saxlanmış profil yoxdur</div>';
-      return;
-    }
-    list.innerHTML = snap.docs.map(d => {
-      const data = d.data();
-      return `<div class="profile-item">
-        <div>
-          <div class="profile-item-name">${data.name}</div>
-          <div class="profile-item-meta">${data.position||'—'}</div>
-        </div>
-        <div class="profile-btns">
-          <button class="btn-sm btn-use" onclick="loadProfile('${d.id}')">📂 Yüklə</button>
-          <button class="btn-sm btn-del" onclick="deleteProfile('${d.id}','${data.name}')">🗑️</button>
-        </div>
-      </div>`;
-    }).join('');
+    const doc = await db.collection('candidates').doc(id).get();
+    const name = doc.exists ? doc.data().name : 'Namizid';
+    await db.collection('candidates').doc(id).update({
+      projectId: firebase.firestore.FieldValue.delete(),
+      projectName: firebase.firestore.FieldValue.delete()
+    });
+    await db.collection('projects').doc(currentProjectId).update({
+      candidateCount: firebase.firestore.FieldValue.increment(-1)
+    });
+    showToast(`${name} layihədən çıxarıldı ✓`, 'success');
+    loadProjectCandidates();
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+
+// ============================================================
+// BSD - Barrett Shaped Distance koeffisienti
+// Namizid profili ilə ideal profil arasındakı oxşarlıq
+// 0 = heç bir oxşarlıq, 1 = mükəmməl uyğunluq
+// ============================================================
+async function calcBSD(candidateId, profileId) {
+  try {
+    // İdeal profil
+    const idealDoc = await db.collection('idealProfiles').doc(profileId).get();
+    if(!idealDoc.exists) return null;
+    const ideal = idealDoc.data().factors;
+
+    // Namizid 15FQ nəticəsi
+    const snap = await db.collection('testResults')
+      .where('candidateId','==',candidateId)
+      .where('testType','==','16fq').get();
+    if(snap.empty) return null;
+
+    const result = snap.docs[0].data();
+    const personality = result.sectionScores?.personality || {};
+
+    const factors = ['FA','B','FC','FE','FF','FG','FH','FI','FL','FM','FN','FO','FQ1','FQ2','FQ3','FQ4'];
+    const weights = {'high':3,'medium':2,'low':1};
+
+    let numerator = 0, denominator = 0;
+
+    factors.forEach(f => {
+      const idealVal = ideal[f];
+      if(!idealVal) return;
+
+      const pd = personality[f];
+      let candidateSten = 5; // default orta
+      if(pd && pd.total > 0) {
+        const raw = Math.round((pd.agree/pd.total)*10);
+        candidateSten = Math.max(1,Math.min(10,raw));
+      }
+
+      const w = weights[idealVal.weight] || 2;
+      const idealMid = (idealVal.min + idealVal.max) / 2;
+
+      // BSD hesablaması
+      if(candidateSten >= idealVal.min && candidateSten <= idealVal.max) {
+        // Aralıq içindədir — tam uyğun
+        numerator += w;
+      } else {
+        // Kənardan nə qədər uzaq
+        const dist = Math.min(Math.abs(candidateSten - idealVal.min), Math.abs(candidateSten - idealVal.max));
+        const match = Math.max(0, 1 - dist/5);
+        numerator += w * match;
+      }
+      denominator += w;
+    });
+
+    return denominator > 0 ? Math.round((numerator/denominator)*100)/100 : 0;
   } catch(e) {
-    list.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>';
+    console.error('BSD xəta:', e);
+    return null;
   }
 }
 
-async function loadProfile(id) {
-  try {
-    const doc = await db.collection('idealProfiles').doc(id).get();
-    const data = doc.data();
-    idealProfile = data.factors;
-    document.getElementById('profile-name').value = data.name;
-    document.getElementById('profile-pos').value = data.position || '';
-
-    // Slider-ları yenilə
-    FACTORS.forEach(f => {
-      const val = idealProfile[f.key];
-      if(!val) return;
-      document.getElementById(`min-${f.key}`).value = val.min;
-      document.getElementById(`max-${f.key}`).value = val.max;
-      document.getElementById(`val-${f.key}`).textContent = `${val.min}–${val.max}`;
-      const wSel = document.getElementById(`weight-${f.key}`);
-      wSel.value = val.weight||'medium';
-      wSel.className = `weight-select w-${val.weight==='high'?'high':val.weight==='low'?'low':'med'}`;
-      updateFill(f.key);
-      renderStenCells(f.key);
-      updateDesc(f.key);
-    });
-    renderPreview();
-    closeModal('modal-profiles');
-    showToast(`"${data.name}" yükləndi ✓`, 'success');
-  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+function openIdealProfile() {
+  window.open('ideal-profile.html', '_blank');
 }
 
-async function deleteProfile(id, name) {
-  if(!confirm(`"${name}" profilini silmək istəyirsiniz?`)) return;
-  try {
-    await db.collection('idealProfiles').doc(id).delete();
-    showToast(`${name} silindi`, 'success');
-    loadProfiles();
-  } catch(e) { showToast('Xəta', 'error'); }
+function openIdealProfileBuilder() {
+  // Yeni tabda ideal profil səhifəsini aç
+  window.open('ideal-profile.html', '_blank');
 }
 
-// ============================================================
-// AUTH
-// ============================================================
-auth.onAuthStateChanged(async user => {
-  if(!user) { window.location.href='company-admin.html'; return; }
-  try {
-    const adminDoc = await db.collection('admins').doc(user.uid).get();
-    if(!adminDoc.exists) { window.location.href='company-admin.html'; return; }
-    const adminData = adminDoc.data();
-    companyId = adminData.companyId;
-    const compDoc = await db.collection('companies').doc(companyId).get();
-    companyData = compDoc.data();
-    // Saxlanmış profilləri yüklə
-    await loadSavedProfiles();
-  } catch(e) { console.error(e); }
-});
-
-// Saxlanmış profilləri topbar-a əlavə et
-async function loadSavedProfiles() {
+// Admin panel-ə qayıtdıqda ideal profil seçicini yenilə
+async function refreshIdealProfiles() {
+  const sel = document.getElementById('proj-ideal-profile');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">— Seçilməyib —</option>';
   try {
     const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
-    const count = snap.size;
-    // Profillər düyməsini yenilə
-    const btn = document.querySelector('.topbar-right .btn-profiles');
-    if(btn) btn.textContent = `📂 Profillər (${count})`;
+    snap.forEach(d => {
+      const data = d.data();
+      sel.innerHTML += `<option value="${d.id}">${data.name}${data.position?' — '+data.position:''}</option>`;
+    });
   } catch(e) {}
 }
 
+
 // ============================================================
-// TOPBAR - profillər düyməsi əlavə et
+// İDEAL PROFİL SİSTEMİ
 // ============================================================
-document.querySelector('.topbar-right').insertAdjacentHTML('afterbegin',
-  '<button class="btn-top btn-back" onclick="loadProfiles()" style="background:rgba(255,255,255,0.2);color:white;">📂 Profillər</button>'
-);
+const IP_FACTORS = [
+  {key:'FA',lbl:'fA',name:'İstiqanlılıq',l:'Soyuqqanlı',r:'İstiqanlı',
+   tips:['','Son dərəcə soyuqqanlı','Çox məsafəli','Formal davranır','Bir qədər çəkimli','Balanslaşdırılmış','İnsanlarla yaxşı ünsiyyət','Mehriban, dəstəkləyici','Çox istiqanlı','Son dərəcə empatik']},
+  {key:'B',lbl:'β',name:'İntellektans',l:'Aşağı intellektans',r:'Yüksək intellektans',
+   tips:['','Çox sadə tapşırıq','Məhdud analitik','Konkret düşüncə','Orta analitik','Adekvat intellekt','Analitik inkişaf etmiş','Zirək, tez həll edir','Güclü analitik','Son dərəcə intellektual']},
+  {key:'FC',lbl:'fC',name:'Emosional Sabitlik',l:'Hisslərə tabe',r:'Emosional sabit',
+   tips:['','Stress altında çöküş','Tez-tez narahat','Emosional dalgalanma','Bəzən stressdən etkilənir','Normal tarazlıq','Ümumiyyətlə sakit','Stressə effektiv cavab','Emosional güclü','Heç nəy sarsılmır']},
+  {key:'FE',lbl:'fE',name:'Dominantlıq',l:'Uyğunlaşan',r:'Dominant',
+   tips:['','Həmişə boyun əyir','Çox uyğunlaşan','Münaqişədən qaçır','Bəzən öz fikrini bildirir','Balanslaşdırılmış','Lazım olanda mövqeyini tutur','Qərar verici','Güclü dominant','Son dərəcə rəqabətcil']},
+  {key:'FF',lbl:'fF',name:'Canlılıq',l:'Ciddi',r:'Enerjili',
+   tips:['','Son dərəcə ciddi','Çox tutumlu','Ciddi, işə fokuslanmış','Bir qədər ciddi','Balanslaşdırılmış','Açıq, mehriban','Enerjili, canlandırır','Çox şən','Son dərəcə enerjili']},
+  {key:'FG',lbl:'fG',name:'Qaydaya riayət',l:'Sərbəst',r:'Vicdanlı',
+   tips:['','Qaydaları nəzərə almır','Çox az məsuliyyət','Çevik, az bağlı','Bəzən riayət edir','Orta məsuliyyət','Adətən vicdanlı','Məsuliyyəti yüksək','Güclü etik','Son dərəcə intizamlı']},
+  {key:'FH',lbl:'fH',name:'Sosial Cəsarət',l:'Çəkingən',r:'Sosial cəsur',
+   tips:['','Son dərəcə utancaq','Çox çəkingən','Kütlə qarşısında narahat','Bir qədər çəkimli','Situasiyaya görə','Ümumiyyətlə rahat','Sosial, tanışlıqları xoşlayır','Çox sosial cəsur','Hamısı ilə asanlıqla danışır']},
+  {key:'FI',lbl:'fI',name:'Həssaslıq',l:'Praktik',r:'Həssas',
+   tips:['','Hisslər qərarına təsir etmir','Son dərəcə praktik','Məntiqə əsaslanan','Adətən faktlara baxır','Balanslaşdırılmış','Bəzən hisslərini nəzərə alır','Həssas, insanlara yaxın','Güclü empatiya','Son dərəcə həssas']},
+  {key:'FL',lbl:'fL',name:'Güvən',l:'Güvənən',r:'Şübhəci',
+   tips:['','Hamıya körüklə güvənir','Çox sadəlövh','Asanlıqla güvənir','Ümumiyyətlə güvənir','Balanslaşdırılmış','Bir qədər ehtiyatlı','Şübhəci, dəqiq yoxlayır','Çox şübhəci','Heç kimə tam güvənmir']},
+  {key:'FM',lbl:'fM',name:'Abstrakt düşüncə',l:'Konkret',r:'Abstrakt',
+   tips:['','Yalnız əlinskini görür','Son dərəcə konkret','Praktik, realist','Adətən konkret','Balanslaşdırılmış','Bəzən abstrakt','Yaradıcı, böyük mənzərə','Güclü abstrakt','Son dərəcə visioner']},
+  {key:'FN',lbl:'fN',name:'Diplomatiya',l:'Birbaşa',r:'Diplomatik',
+   tips:['','Heç filter yoxdur','Çox birbaşa','Açıq, filtersiz','Adətən birbaşa','Balanslaşdırılmış','Bir qədər diplomatik','Diplomatik','Çox zirək','Son dərəcə diplomatik']},
+  {key:'FO',lbl:'fO',name:'Özgüvən',l:'Güvənli',r:'Narahat',
+   tips:['','Heç nədən şübhə etmir','Güclü özgüvən','Özünə güvənir','Adətən əmindir','Orta özgüvən','Bəzən şübhə edir','Özünə tənqidi','Çox az özgüvən','Daim özünü şübhə edir']},
+  {key:'FQ1',lbl:'fQ₁',name:'Yeniliyə açıqlıq',l:'Mühafizəkar',r:'Radikal',
+   tips:['','Dəyişikliyə kəskin müqavimət','Son dərəcə mühafizəkar','Ənənəvi','Köhnə üsulları üstün tutur','Balanslaşdırılmış','Yeniliklərə açıqdır','Dəyişikliyi sevir','Radikal, innovativ','Son dərəcə eksperimental']},
+  {key:'FQ2',lbl:'fQ₂',name:'Müstəqillik',l:'Qrupa bağlı',r:'Müstəqil',
+   tips:['','Tək qalmaqdan qorxur','Qrupa çox bağlı','Komandanı üstün tutur','Adətən qrupda','Balanslaşdırılmış','Həm tək həm qrupda','Müstəqili üstün tutur','Çox müstəqil','Son dərəcə özbaşına']},
+  {key:'FQ3',lbl:'fQ₃',name:'Özünü idarə',l:'Nizamsız',r:'Özünü idarə edən',
+   tips:['','Tamamilə impulsiv','Çox nizamsız','Plansız davranır','Bəzən idarə edə bilir','Orta idarəetmə','Adətən planlı','Planlı, məqsədyönlü','Güclü idarəetmə','Son dərəcə mükəmməlçi']},
+  {key:'FQ4',lbl:'fQ₄',name:'Gərginlik',l:'Sakit',r:'Gərgin',
+   tips:['','Heç nə üçün narahat olmur','Çox sakit','Ümumiyyətlə rahat','Az gərginlik','Orta gərginlik','Bəzən narahat','Tez-tez gərgin','Çox tələsik','Son dərəcə gərgin']}
+];
+
+let currentIdealProfile = {}; // key → {min, max, weight}
+let editingIdealId = null;
+
+// İdeal profil başlat
+function initIdealProfile() {
+  IP_FACTORS.forEach(f => {
+    currentIdealProfile[f.key] = {min:4, max:7, weight:'medium'};
+  });
+}
+initIdealProfile();
+
+// İdeal Profillər siyahısını yüklə
+async function loadIdealProfiles() {
+  const el = document.getElementById('ideal-profiles-list');
+  el.innerHTML = '<div class="loading"><div class="spinner"></div>Yüklənir...</div>';
+  try {
+    const snap = await db.collection('idealProfiles').where('companyId','==',companyId).get();
+    if(snap.empty) {
+      el.innerHTML = `<div class="card" style="padding:48px;text-align:center;">
+        <div style="font-size:48px;margin-bottom:12px;">🎯</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;">Hələ ideal profil yoxdur</div>
+        <div style="color:var(--muted);font-size:13px;margin-bottom:20px;">İdeal profil yaradın ki, namizidlərin şəxsiyyəti ilə müqayisə edə biləsiniz</div>
+        <button class="btn-primary" style="width:auto;padding:10px 24px;" onclick="openCreateIdealProfile()">+ İlk profili yarat</button>
+      </div>`;
+      return;
+    }
+    el.innerHTML = snap.docs.map(d => {
+      const data = d.data();
+      // Skala önizlə
+      const scalePreview = IP_FACTORS.map(f => {
+        const v = data.factors?.[f.key];
+        if(!v) return '';
+        const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
+          `<div style="width:16px;height:16px;border-radius:3px;background:${i>=v.min&&i<=v.max?'var(--accent)':'#e2e6f0'};display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:${i>=v.min&&i<=v.max?'white':'#94a3b8'};">${i}</div>`
+        ).join('');
+        return `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;border-bottom:1px solid #f1f5f9;">
+          <span style="background:var(--accent);color:white;border-radius:5px;padding:2px 7px;font-size:10px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:32px;text-align:center;">${f.lbl}</span>
+          <span style="font-size:12px;font-weight:600;min-width:140px;">${f.name}</span>
+          <div style="display:flex;gap:2px;">${cells}</div>
+        </div>`;
+      }).join('');
+
+      return `<div class="card" style="margin-bottom:14px;padding:0;overflow:hidden;">
+        <div style="padding:18px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;">
+          <div>
+            <div style="font-size:16px;font-weight:700;">🎯 ${data.name}</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px;">${data.position||'—'}</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+            <button class="btn-sm" style="background:#f0fdf4;color:var(--success);border:1px solid #bbf7d0;" onclick="createIdealTestLink('${d.id}','${data.name.replace(/'/g,"\'")}')">🎯 Test Linki Yarat</button>
+            <button class="btn-sm btn-report" onclick="editIdealProfile('${d.id}')">✏️ Düzəlt</button>
+            <button class="btn-sm btn-danger" onclick="deleteIdealProfile('${d.id}','${data.name.replace(/'/g,"\'")}')">🗑️</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;max-height:280px;overflow-y:auto;">
+          ${scalePreview}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:red;padding:20px;">Xəta: '+e.message+'</div>'; }
+}
+
+// İdeal profil üçün test linki yarat — siyahıdan basanda
+async function createIdealTestLink(idealProfileId, profileName) {
+  await createDirectTestLink(idealProfileId, profileName);
+}
+
+// Yeni ideal profil yarat
+function openCreateIdealProfile() {
+  editingIdealId = null;
+  initIdealProfile();
+  document.getElementById('ip-name').value = '';
+  document.getElementById('ip-pos').value = '';
+  document.getElementById('ideal-builder-title').textContent = 'Yeni İdeal Profil';
+  renderIPFactors();
+  showPage('ideal-builder');
+}
+
+// Mövcud ideal profili düzəlt
+async function editIdealProfile(id) {
+  try {
+    const doc = await db.collection('idealProfiles').doc(id).get();
+    const data = doc.data();
+    editingIdealId = id;
+    currentIdealProfile = data.factors || {};
+    // Çatışmayanları tamamla
+    IP_FACTORS.forEach(f => {
+      if(!currentIdealProfile[f.key]) currentIdealProfile[f.key] = {min:4,max:7,weight:'medium'};
+    });
+    document.getElementById('ip-name').value = data.name || '';
+    document.getElementById('ip-pos').value = data.position || '';
+    document.getElementById('ideal-builder-title').textContent = data.name + ' — Düzəliş';
+    renderIPFactors();
+    showPage('ideal-builder');
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+// Faktor UI-ni render et — köhnə ideal-profile.html UI kimi
+function renderIPFactors() {
+  const grid = document.getElementById('ip-factors-grid');
+  grid.innerHTML = IP_FACTORS.map(f => {
+    const v = currentIdealProfile[f.key] || {min:4,max:7,weight:'medium'};
+    const wCls = v.weight==='high'?'high':v.weight==='low'?'low':'med';
+    const cells = [1,2,3,4,5,6,7,8,9,10].map(i =>
+      `<div class="ip-cell${i>=v.min&&i<=v.max?' on':''}" id="ipc-${f.key}-${i}">${i}</div>`
+    ).join('');
+    const leftPct = ((v.min-1)/9)*100;
+    const widthPct = ((v.max-v.min)/9)*100;
+    return `<div class="ip-factor-row" id="iprow-${f.key}">
+      <div class="ip-factor-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span class="ip-badge">${f.lbl}</span>
+          <span style="font-size:14px;font-weight:700;color:var(--text);">${f.name}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <select class="ip-weight-sel ${wCls}" id="ipwgt-${f.key}"
+            onchange="updateIPWeight('${f.key}',this.value)">
+            <option value="high" ${v.weight==='high'?'selected':''}>⭐ Çox vacib</option>
+            <option value="medium" ${!v.weight||v.weight==='medium'?'selected':''}>• Vacib</option>
+            <option value="low" ${v.weight==='low'?'selected':''}>◦ Az vacib</option>
+          </select>
+          <span style="font-size:12px;font-weight:700;color:var(--accent);font-family:'JetBrains Mono',monospace;min-width:48px;text-align:right;" id="ipval-${f.key}">${v.min}–${v.max}</span>
+        </div>
+      </div>
+      <div class="ip-poles"><span>← ${f.l}</span><span>${f.r} →</span></div>
+      <div class="ip-range-wrap">
+        <div class="ip-track">
+          <div class="ip-fill" id="ipfill-${f.key}" style="left:${leftPct}%;width:${widthPct}%;"></div>
+        </div>
+        <input type="range" class="ip-range-input" min="1" max="10" value="${v.min}"
+          oninput="updateIPRange('${f.key}','min',this.value)">
+        <input type="range" class="ip-range-input upper" min="1" max="10" value="${v.max}"
+          oninput="updateIPRange('${f.key}','max',this.value)">
+      </div>
+      <div class="ip-sten-cells" id="ipcells-${f.key}">${cells}</div>
+      <div class="ip-desc-text" id="iptip-${f.key}">${f.tips[v.min]||''} — ${f.tips[v.max]||''}</div>
+    </div>`;
+  }).join('');
+}
+
+function updateIPRange(key, type, val) {
+  val = parseInt(val);
+  const f = IP_FACTORS.find(x=>x.key===key);
+  if(!f) return;
+  const v = currentIdealProfile[key];
+  if(type==='min') { v.min = Math.min(val, v.max); }
+  else { v.max = Math.max(val, v.min); }
+
+  // Fill yenilə
+  const fill = document.getElementById(`ipfill-${key}`);
+  if(fill) { fill.style.left=`${((v.min-1)/9)*100}%`; fill.style.width=`${((v.max-v.min)/9)*100}%`; }
+
+  // Val yenilə
+  const valEl = document.getElementById(`ipval-${key}`);
+  if(valEl) valEl.textContent = `${v.min}–${v.max}`;
+
+  // Cells yenilə
+  for(let i=1;i<=10;i++){
+    const cell = document.getElementById(`ipc-${key}-${i}`);
+    if(cell){ cell.className=`ip-cell${i>=v.min&&i<=v.max?' on':''}`; }
+  }
+
+  // Tip yenilə
+  const tip = document.getElementById(`iptip-${key}`);
+  if(tip) tip.textContent = `${f.tips[v.min]||''} — ${f.tips[v.max]||''}`;
+}
+
+function updateIPWeight(key, val) {
+  currentIdealProfile[key].weight = val;
+  const sel = document.getElementById(`ipwgt-${key}`);
+  if(sel) sel.className = `ip-weight-sel ${val==='high'?'high':val==='low'?'low':'med'}`;
+}
+
+// Saxla
+async function saveIdealProfile() {
+  const name = document.getElementById('ip-name').value.trim();
+  const pos = document.getElementById('ip-pos').value.trim();
+  if(!name) { showToast('Profil adı daxil edin','error'); return; }
+  try {
+    const data = {
+      name, position:pos, companyId, companyName:companyData.name,
+      factors: currentIdealProfile,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    let profileId = editingIdealId;
+    if(profileId) {
+      await db.collection('idealProfiles').doc(profileId).update(data);
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = await db.collection('idealProfiles').add(data);
+      profileId = ref.id;
+      editingIdealId = profileId;
+    }
+    return profileId;
+  } catch(e) { showToast('Xəta: '+e.message,'error'); return null; }
+}
+
+// Profili saxla + birbaşa ümumi test linki yarat
+async function saveAndCreateLink() {
+  const name = document.getElementById('ip-name').value.trim();
+  if(!name) { showToast('Profil adı daxil edin','error'); return; }
+
+  // Əvvəlcə profili saxla
+  const profileId = await saveIdealProfile();
+  if(!profileId) return;
+
+  // Birbaşa ümumi link yarat — ad/email lazım deyil
+  await createDirectTestLink(profileId, name);
+}
+
+async function createDirectTestLink(profileId, profileName) {
+  try {
+    // Ümumi "placeholder" namizid yarat — link paylaşılacaq
+    const ref = await db.collection('candidates').add({
+      name: '—',
+      email: '—',
+      companyId,
+      companyName: companyData.name,
+      idealProfileId: profileId,
+      idealProfileName: profileName,
+      assignedTests: ['16fq'],
+      completedTests: [],
+      isIdealTest: true,
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    navigator.clipboard.writeText(link).catch(()=>{});
+    showDirectLinkResult(link, profileName);
+  } catch(e) { showToast('Xəta: '+e.message, 'error'); }
+}
+
+function showDirectLinkResult(link, profileName) {
+  // Builder page-də nəticəni göstər
+  let resultDiv = document.getElementById('ip-link-result');
+  if(!resultDiv) {
+    resultDiv = document.createElement('div');
+    resultDiv.id = 'ip-link-result';
+    // Saxla düyməsinin yanına əlavə et
+    const btn = document.querySelector('[onclick="saveAndCreateLink()"]');
+    if(btn && btn.parentNode) {
+      btn.parentNode.insertAdjacentElement('afterend', resultDiv);
+    }
+  }
+  resultDiv.innerHTML = `
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-top:16px;">
+      <div style="font-size:14px;font-weight:700;color:var(--success);margin-bottom:8px;">✅ Test linki hazırdır və kopyalandı!</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">📋 "${profileName}" ideal profili üçün 15FQ+ test linki</div>
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:10px;">${link}</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Bu linki namizidlərə göndərin. Test bitdikdə nəticə ideal profilinizlə müqayisə ediləcək.</div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn-sm btn-report" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Yenidən kopyala</button>
+        <button class="btn-sm" style="background:#eff6ff;color:var(--accent);" onclick="showPage('ideal')">← Profillərə qayıt</button>
+      </div>
+    </div>`;
+}
+
+// Link yaratma modal-ı
+function openLinkCreateModal(profileId, profileName) {
+  let modal = document.getElementById('modal-link-create');
+  if(!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-link-create';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `<div class="modal" style="max-width:460px;">
+      <div class="modal-close" onclick="closeModal('modal-link-create')">✕</div>
+      <div class="modal-title">🔗 Test Linki Yarat</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Namizid bu linki açanda <b>15FQ+ şəxsiyyət testi</b> keçəcək. Test bitdikdə nəticə seçdiyiniz ideal profillə müqayisə ediləcək.</p>
+      <div class="form-row">
+        <div class="field-label">Namizid adı Soyadı</div>
+        <input type="text" class="field-input" id="lc-name" placeholder="Əli Həsənov">
+      </div>
+      <div class="form-row">
+        <div class="field-label">E-poçt</div>
+        <input type="email" class="field-input" id="lc-email" placeholder="eli@email.com">
+      </div>
+      <div class="form-row">
+        <div class="field-label">Vəzifə (optional)</div>
+        <input type="text" class="field-input" id="lc-pos" placeholder="Satış mütəxəssisi">
+      </div>
+      <div id="lc-result" style="display:none;"></div>
+      <button class="btn-primary" id="lc-btn" onclick="generateTestLink()">🎯 Test Linki Yarat</button>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+  // Profile ID saxla
+  modal.dataset.profileId = profileId;
+  modal.dataset.profileName = profileName;
+  // Reset
+  document.getElementById('lc-name').value = '';
+  document.getElementById('lc-email').value = '';
+  document.getElementById('lc-pos').value = '';
+  document.getElementById('lc-result').style.display = 'none';
+  document.getElementById('lc-btn').style.display = 'block';
+  modal.classList.add('active');
+}
+
+async function generateTestLink() {
+  const modal = document.getElementById('modal-link-create');
+  const candName = document.getElementById('lc-name').value.trim();
+  const candEmail = document.getElementById('lc-email').value.trim();
+  const candPos = document.getElementById('lc-pos').value.trim();
+  const profileId = modal.dataset.profileId;
+  const profileName = modal.dataset.profileName;
+
+  if(!candName) { showToast('Ad daxil edin','error'); return; }
+  if(!candEmail) { showToast('E-poçt daxil edin','error'); return; }
+
+  document.getElementById('lc-btn').textContent = 'Yaranır...';
+  document.getElementById('lc-btn').disabled = true;
+
+  try {
+    const ref = await db.collection('candidates').add({
+      name: candName,
+      email: candEmail,
+      position: candPos,
+      companyId,
+      companyName: companyData.name,
+      idealProfileId: profileId,
+      assignedTests: ['16fq'],
+      completedTests: [],
+      active: true,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    const link = `${window.location.origin}/test?c=${ref.id}`;
+    navigator.clipboard.writeText(link).catch(()=>{});
+
+    document.getElementById('lc-btn').style.display = 'none';
+    document.getElementById('lc-result').style.display = 'block';
+    document.getElementById('lc-result').innerHTML = `
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:14px;margin-bottom:12px;">
+        <div style="font-size:13px;font-weight:700;color:var(--success);margin-bottom:6px;">✅ Link hazırdır və kopyalandı!</div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">${candName} · ${profileName}</div>
+        <div style="background:white;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:11px;word-break:break-all;margin-bottom:10px;">${link}</div>
+        <button class="btn-sm btn-report" onclick="navigator.clipboard.writeText('${link}');showToast('Link kopyalandı ✓')">📋 Yenidən kopyala</button>
+      </div>
+      <button class="btn-primary" onclick="resetLinkModal()" style="background:#64748b;">+ Yeni link yarat</button>
+    `;
+  } catch(e) {
+    showToast('Xəta: '+e.message,'error');
+    document.getElementById('lc-btn').textContent = '🔗 Link Yarat';
+    document.getElementById('lc-btn').disabled = false;
+  }
+}
+
+function resetLinkModal() {
+  document.getElementById('lc-name').value = '';
+  document.getElementById('lc-email').value = '';
+  document.getElementById('lc-pos').value = '';
+  document.getElementById('lc-result').style.display = 'none';
+  document.getElementById('lc-btn').textContent = '🔗 Link Yarat';
+  document.getElementById('lc-btn').disabled = false;
+  document.getElementById('lc-btn').style.display = 'block';
+}
+
+async function deleteIdealProfile(id, name) {
+  if(!confirm(`"${name}" profilini silmək istəyirsiniz?`)) return;
+  try {
+    await db.collection('idealProfiles').doc(id).delete();
+    showToast(`${name} silindi`,'success');
+    loadIdealProfiles();
+  } catch(e) { showToast('Xəta','error'); }
+}
+
+function scoreToSten(score) {
+  if (score>=96) return 10; if (score>=89) return 9; if (score>=80) return 8;
+  if (score>=70) return 7; if (score>=60) return 6; if (score>=50) return 5;
+  if (score>=40) return 4; if (score>=30) return 3; if (score>=20) return 2;
+  return 1;
+}
+
+async function deleteProject(id, name) {
+  if (!confirm(`"${name}" layihəsini silmək istəyirsiniz?`)) return;
+  try {
+    await db.collection('projects').doc(id).delete();
+    showToast(`${name} silindi`,'success');
+    loadProjects();
+  } catch(e) { showToast('Xəta','error'); }
+}
+
+// GROUP EXCEL
+function exportGroupExcel() {
+  const completed = currentProjectCandidates.filter(c=>c.hasResult);
+  if (!completed.length) { showToast('Hələ test nəticəsi yoxdur','error'); return; }
+  // Artıq açılıbsa - pulsuz yüklə
+  if (currentProjectUnlocked === currentProjectId) {
+    generateGroupExcel(completed);
+    showToast('Excel yüklənir...','success');
+    return;
+  }
+  // Açılmayıbsa - kredit ist
+  const count = completed.length;
+  document.getElementById('gc-count').textContent = count + ' nəfər';
+  document.getElementById('gc-total').textContent = count + ' kredit';
+  const hasCredit = (companyData.credits||0) >= count;
+  document.getElementById('gc-no-credit').style.display = hasCredit ? 'none' : 'block';
+  document.getElementById('gc-confirm-btn').style.display = hasCredit ? 'block' : 'none';
+  openModal('modal-group-credit');
+}
+
+async function confirmGroupExcel() {
+  const completed = currentProjectCandidates.filter(c=>c.hasResult);
+  const cost = completed.length;
+  try {
+    // Kredit çıx
+    await db.collection('companies').doc(companyId).update({
+      credits: firebase.firestore.FieldValue.increment(-cost)
+    });
+    // Log
+    await db.collection('creditLogs').add({
+      companyId, companyName: companyData.name,
+      type:'use', amount:cost,
+      note:`Layihə nəticə açılışı: ${currentProjectData.name}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // Firestore-da layihəni unlock et - daimi saxla
+    await db.collection('projects').doc(currentProjectId).update({
+      unlocked: true,
+      unlockedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentProjectUnlocked = currentProjectId;
+    closeModal('modal-group-credit');
+    loadProjectCandidates();
+    showToast(`${cost} kredit ödənildi, nəticələr açıldı ✓`, 'success');
+    // Excel avtomatik yüklənmir - istəsə özü basır
+  } catch(e) { showToast('Xəta: '+e.message,'error'); }
+}
+
+function generateGroupExcel(candidates) {
+  const date = new Date().toLocaleDateString('az-AZ');
+  const wsData = [
+    ['PsychoAssess — Qrup Skala Hesabatı','','','','','','','','',''],
+    [currentProjectData.name + ' | ' + (currentProjectData.position||'') + ' | ' + date,'','','','','','','','',''],
+    [''],
+    ['Sıra','Ad Soyad','Verbal (%)','Numerical (%)','Abstract (%)','Ümumi (%)','Sten (1-10)','Səviyyə','Qiymət','Tövsiyə']
+  ];
+
+  candidates.forEach((c, idx) => {
+    const rank = idx + 1;
+    const v = c.scores?.verbal?.score || 0;
+    const n = c.scores?.numerical?.score || 0;
+    const a = c.scores?.abstract?.score || 0;
+    const total = c.totalScore || 0;
+    const sten = c.sten || 1;
+    const seviyye = total>=80?'Yüksək':total>=60?'Orta':'Aşağı';
+    const qiymet = sten>=5?'🟢 Güclü':'🔴 Zəif';
+    const tovsiyye = sten>=7?'İşə qəbul tövsiyə olunur':sten>=5?'Müsahibə tövsiyə olunur':'Uyğun deyil';
+    wsData.push([rank, c.name, v, n, a, total, sten, seviyye, qiymet, tovsiyye]);
+  });
+
+  wsData.push(['']);
+  wsData.push(['STATİSTİKA','','','','','','','','','']);
+  const totals = candidates.map(c=>c.totalScore||0);
+  const avg = Math.round(totals.reduce((s,v)=>s+v,0)/totals.length);
+  const strong = candidates.filter(c=>c.sten>=5).length;
+  const weak = candidates.filter(c=>c.sten<5).length;
+  wsData.push(['Ortalama xal','','','','',avg,'','','','']);
+  wsData.push(['Güclü namizidlər (Sten ≥5)','','','','','',strong,'','','']);
+  wsData.push(['Zəif namizidlər (Sten <5)','','','','','',weak,'','','']);
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(wsData);
+  ws['!cols'] = [{wch:6},{wch:22},{wch:12},{wch:14},{wch:14},{wch:12},{wch:12},{wch:12},{wch:14},{wch:24}];
+  ws['!merges'] = [{s:{r:0,c:0},e:{r:0,c:9}},{s:{r:1,c:0},e:{r:1,c:9}}];
+  XLSX.utils.book_append_sheet(wb, ws, 'Qrup Skala');
+  XLSX.writeFile(wb, `${currentProjectData.name}_Skala_${date}.xlsx`);
+}
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(()=>showToast('Link kopyalandı ✓','success'));
+}
 
 function showToast(msg, type='success') {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.style.background = type==='error'?'#dc2626':'#1e293b';
+  t.textContent = type==='success' ? '✓ '+msg : '✕ '+msg;
+  t.className = 'toast '+type;
   t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'), 3000);
+  setTimeout(() => t.classList.remove('show'), 3500);
 }
 
-// ============================================================
-// INIT
-// ============================================================
-renderFactors();
-renderPreview();
+// Global funksiyalar - onclick üçün
+window.doLogin = doLogin;
+window.doLogout = doLogout;
+window.showPage = showPage;
+window.openAddCandidate = openAddCandidate;
+window.toggleTest = toggleTest;
+window.createCandidate = createCandidate;
+window.showLink = showLink;
+window.copyLink = copyLink;
+window.openReport = openReport;
+window.updateReportCost = updateReportCost;
+window.downloadReport = downloadReport;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.filterResults = filterResults;
+window.openAddProject = openAddProject;
+window.createProject = createProject;
+window.openProjectDetail = openProjectDetail;
+window.openAddToProject = openAddToProject;
+window.switchAddTab = switchAddTab;
+window.filterExistingCandidates = filterExistingCandidates;
+window.selectExisting = selectExisting;
+window.addExistingToProject = addExistingToProject;
+window.addCandidateToProject = addCandidateToProject;
+window.unlockProjectResults = unlockProjectResults;
+window.exportGroupExcel = exportGroupExcel;
+window.confirmGroupExcel = confirmGroupExcel;
+window.copyToClipboard = copyToClipboard;
+window.deleteProject = deleteProject;
+window.deleteCandidate = deleteCandidate;
+window.deleteProjCandidate = deleteProjCandidate;
+window.openIdealProfile = openIdealProfile;
+window.openIdealProfileBuilder = openIdealProfileBuilder;
+window.openCreateIdealProfile = openCreateIdealProfile;
+window.editIdealProfile = editIdealProfile;
+window.deleteIdealProfile = deleteIdealProfile;
+window.saveIdealProfile = saveIdealProfile;
+window.updateIPRange = updateIPRange;
+window.updateIPWeight = updateIPWeight;
+window.createIdealTestLink = createIdealTestLink;
+window.saveAndCreateLink = saveAndCreateLink;
+window.generateTestLink = generateTestLink;
+window.resetLinkModal = resetLinkModal;
+window.showLinkModal = showLinkModal;
+window.calcBSD = calcBSD;
+
 </script>
 </body>
 </html>
