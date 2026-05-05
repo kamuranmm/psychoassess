@@ -1074,6 +1074,7 @@ async function loadCompanies() {
           <td>
             <div class="action-btns">
               <button class="btn-sm btn-credit" onclick="openCredit('${id}','${data.name}',${data.credits||0})">💳 Kredit</button>
+              <button class="btn-sm" style="background:#f0f9ff;color:#0369a1;border:1px solid #bae6fd;" onclick="showCompanyPassword('${id}','${data.name}')">🔑 Şifrə</button>
               <button class="btn-sm btn-toggle" onclick="toggleCompany('${id}',${data.active})">${data.active ? '⏸ Dayandır' : '▶ Aktiv et'}</button>
               <button class="btn-sm btn-danger" onclick="deleteCompany('${id}','${data.name}')">🗑</button>
             </div>
@@ -1171,6 +1172,7 @@ async function createCompany() {
     // Save company data
     const companyRef = await db.collection('companies').add({
       name, email, uid,
+      adminPassword: pass,
       credits,
       active: true,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1205,6 +1207,29 @@ async function createCompany() {
 }
 
 // ===== CREDIT =====
+async function showCompanyPassword(id, name) {
+  try {
+    const doc = await db.collection('companies').doc(id).get();
+    const pass = doc.data().adminPassword;
+    if (pass) {
+      if (confirm(`🔑 ${name}\n\nE-poçt: ${doc.data().email}\nŞifrə: ${pass}\n\nŞifrəni kopyalamaq üçün OK basın`)) {
+        navigator.clipboard.writeText(pass).then(()=>showToast('Şifrə kopyalandı ✓','success')).catch(()=>{});
+      }
+    } else {
+      // Köhnə hesablar - şifrəni yenilə
+      const newPass = prompt(`"${name}" şirkəti köhnə qeydiyyatdır, şifrə saxlanmayıb.\nYeni şifrə daxil edin (ən az 6 simvol):`);
+      if (newPass && newPass.length >= 6) {
+        await db.collection('companies').doc(id).update({ adminPassword: newPass });
+        showToast('Şifrə saxlandı. Firebase Auth-da da sıfırlamağı unutmayın.', 'success');
+      } else if (newPass) {
+        showToast('Şifrə ən az 6 simvol olmalıdır', 'error');
+      }
+    }
+  } catch(e) {
+    showToast('Xəta baş verdi', 'error');
+  }
+}
+
 function openCredit(id, name, current) {
   currentCompanyId = { id, name };
   document.getElementById('modal-current-credit').textContent = current;
